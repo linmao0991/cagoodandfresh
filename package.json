@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "cli": "^1.0.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "mysql2": "^2.1.0",
