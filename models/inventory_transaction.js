@@ -1,11 +1,11 @@
 module.exports = function ( sequelize, DataTypes){
-    var inventory_transactions = sequelize.define("inventory_transactions", {
+    var inventory_transaction = sequelize.define("inventory_transaction", {
         ar_invoice_number: {
             type: DataTypes.INTEGER
         },
-        ar_invoice_line_item_id: {
-            type: DataTypes.INTEGER
-        },
+        // ar_invoice_line_item_id: {
+        //     type: DataTypes.INTEGER
+        // },
         inventory_id: {
             type: DataTypes.INTEGER
         },
@@ -27,5 +27,5 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING
         }
     });
-    return inventory_transactions;
+    return inventory_transaction;
 };

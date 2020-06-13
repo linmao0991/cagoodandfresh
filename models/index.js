@@ -30,7 +30,23 @@ Object.keys(db).forEach(modelName => {
     db[modelName].associate(db);
   }
 });
+//Associations
 
+//customers has many accounts_payable_invoices association
+db.customers.hasMany(accounts_payable_invoices, {sourceKey: 'customer_account_number', foreignKey: 'customerAccountNumber'});
+
+//accounts_payable_invoices has many accounts_receivable_notes
+db.accounts_payable_invoices.hasMany(accounts_receivable_notes, {sourceKey: 'invoice_number', foreignKey: 'ar_invoice_number'})
+
+//accounts_payable_invoices has many ar_invoice_line_item
+db.accounts_payable_invoices.hasMany(accounts_payable_invoices, { sourceKey: 'invoice_number', foreignKey: "ar_invoice_number"});
+
+//ar_invoice_line_item has one inventory_transaction
+db.ar_invoice_line_item.hasOne(inventory_transaction, { foreignKey: 'ar_invoice_line_item_id'});
+
+
+
+//End Associations
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
