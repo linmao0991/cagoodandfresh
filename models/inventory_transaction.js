@@ -26,6 +26,8 @@ module.exports = function ( sequelize, DataTypes){
         transaction_type: {
             type: DataTypes.STRING
         }
+    },{
+        freezeTableName: true
     });
     return inventory_transaction;
 };

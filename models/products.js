@@ -42,6 +42,8 @@ module.exports = function ( sequelize, DataTypes){
         image: {
             type: DataTypes.INTEGER
         }
+    },{
+        freezeTableName: true
     });
     return product;
 };

@@ -36,6 +36,8 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: false,
             defaultValue: 0,
         }
+    },{
+        freezeTableName: true
     });
     return accounts_receivable_invoices;
 };

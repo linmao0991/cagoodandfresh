@@ -45,6 +45,8 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.DECIMAL(10,2),
             defaultValue: 0
         }
+    },{
+        freezeTableName: true
     });
     return ar_invoice_line_item;
 };

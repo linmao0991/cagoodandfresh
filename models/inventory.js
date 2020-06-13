@@ -34,6 +34,8 @@ module.exports = function ( sequelize, DataTypes){
         supplier_id: {
             type: DataTypes.INTEGER
         }
+    },{
+        freezeTableName: true
     });
     return inventory;
 };

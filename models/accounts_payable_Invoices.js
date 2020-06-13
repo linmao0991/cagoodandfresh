@@ -37,6 +37,8 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true,
             defaultValue: "UNPAID"
         }
+    },{
+        freezeTableName: true
     });
     return accounts_payable_invoices;
 };

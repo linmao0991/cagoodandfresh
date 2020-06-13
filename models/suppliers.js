@@ -62,6 +62,8 @@ module.exports = function ( sequelize, DataTypes){
     },{
     //Stops sequelize auto-pluralization and keeps table name as model name.
     freezeTableName: true
+    },{
+        freezeTableName: true
     });
     return suppliers_database;
 };
