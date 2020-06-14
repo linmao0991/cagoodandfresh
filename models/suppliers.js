@@ -2,7 +2,7 @@
 //-Check sequelize for parameters to check for unquie fields.
 //
 module.exports = function ( sequelize, DataTypes){
-    var suppliers_database = sequelize.define("suppliers_database", {
+    var suppliers = sequelize.define("suppliers", {
         name_english: {
             type: DataTypes.STRING,
             allowNUll: true,
@@ -65,5 +65,5 @@ module.exports = function ( sequelize, DataTypes){
     },{
         freezeTableName: true
     });
-    return suppliers_database;
+    return suppliers;
 };

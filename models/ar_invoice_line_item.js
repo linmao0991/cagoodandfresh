@@ -1,9 +1,9 @@
 module.exports = function ( sequelize, DataTypes){
     var ar_invoice_line_item = sequelize.define("ar_invoice_line_item", {
-        invoice_number: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-        },
+        // invoice_number: {
+        //     type: DataTypes.INTEGER,
+        //     allowNull: false,
+        // },
         customer_account_number: {
             type: DataTypes.INTEGER,
             allowNull: true

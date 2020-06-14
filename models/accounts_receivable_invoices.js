@@ -7,7 +7,7 @@ module.exports = function ( sequelize, DataTypes){
         },
         customer_account_number: {
             type: DataTypes.INTEGER,
-            allowNull: true
+            allowNull: true,
         },
         order_date: {
             type: DataTypes.DATEONLY,

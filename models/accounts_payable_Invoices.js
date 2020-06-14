@@ -2,12 +2,13 @@ module.exports = function ( sequelize, DataTypes){
     var accounts_payable_invoices = sequelize.define("accounts_payable_invoices", {
         invoice_number: {
             type: DataTypes.STRING,
-            allowNull: true
+            allowNull: false,
+            unique: true
         },
-        supplier_id: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
+        // supplier_id: {
+        //     type: DataTypes.STRING,
+        //     allowNull: true
+        // },
         purchase_order_number: {
             type: DataTypes.STRING,
             allowNull: true

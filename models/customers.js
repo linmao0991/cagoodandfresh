@@ -2,13 +2,13 @@
 //-Check sequelize for parameters to check for unquie fields.
 //
 module.exports = function ( sequelize, DataTypes){
-    var customers_database = sequelize.define("customers_database", {
+    var customers = sequelize.define("customers", {
         customer_account_number: {
             //customer account number is the same as business phone number
             type: DataTypes.INTEGER,
-            required: true,
+            //required: true,
             allowNUll: false,
-            unquie: true
+            unique: true
         },
         customer_representative: {
             type: DataTypes.STRING,
@@ -110,5 +110,5 @@ module.exports = function ( sequelize, DataTypes){
     //Stops sequelize auto-pluralization and keeps table name as model name.
     freezeTableName: true
     });
-    return customers_database;
+    return customers;
 };

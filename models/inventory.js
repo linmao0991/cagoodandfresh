@@ -16,9 +16,9 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING,
             allowNull: true
         },
-        ap_invoice_number: {
-            type: DataTypes.STRING
-        },
+        // ap_invoice_number: {
+        //     type: DataTypes.STRING
+        // },
         receive_date: {
             type: DataTypes.DATEONLY,
             allowNull: false
