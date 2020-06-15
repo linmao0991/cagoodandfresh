@@ -48,7 +48,10 @@ db.ar_invoice_line_item.hasOne(db.inventory_transaction, { foreignKey: 'ar_invoi
 db.suppliers.hasMany(db.accounts_payable_invoices, {foreignKey: 'supplier_id'});
 
 //accounts_payable_invoices has many inventory
-db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number', foreignKey: 'ar_invoice_number'})
+db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number', foreignKey: 'ar_invoice_number'});
+
+//accounts_payable_invoices has many accounts_payable_notes
+db.accounts_payable_invoices.hasMany(db.accounts_payable_notes, {sourceKey: 'invoice_number', foreignKey: 'ap_invoice_number'});
 
 //End Associations
 db.sequelize = sequelize;
