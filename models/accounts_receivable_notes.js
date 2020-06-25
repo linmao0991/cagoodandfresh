@@ -6,7 +6,7 @@ module.exports = function ( sequelize, DataTypes){
         //     unique: true
         // },
         customer_account_numeber: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             allowNull: true
         },
         //In place for future use.

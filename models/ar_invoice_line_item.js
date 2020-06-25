@@ -5,7 +5,7 @@ module.exports = function ( sequelize, DataTypes){
         //     allowNull: false,
         // },
         customer_account_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             allowNull: true
         },
         order_date: {
@@ -31,10 +31,10 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true
         },
         upc: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
         quantity: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.DECIMAL(10,2),
             allowNull: false
         },
         sale_price: {

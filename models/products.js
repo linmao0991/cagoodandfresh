@@ -2,15 +2,13 @@ const { daemon } = require("cli");
 
 module.exports = function ( sequelize, DataTypes){
     var product = sequelize.define("product", {
-        product_code: {
-            type: DataTypes.STRING,
-            unique: true
-        },
         location: {
             type: DataTypes.STRING,
+            allowNull: true,
         },
         upc: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         name_english: {
             type: DataTypes.STRING
@@ -21,26 +19,36 @@ module.exports = function ( sequelize, DataTypes){
         category: {
             type: DataTypes.STRING,
         },
-        measurement_system: {
+        holding: {
             type: DataTypes.STRING,
         },
+        measurement_system: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         weight: {
-            type: DataTypes.FLOAT,
+            type: DataTypes.DECIMAL(10,2),
+            allowNull: true,
         },
         description: {
-            type: DataTypes.STRING
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         supplier_primary_id: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         supplier_secondary_id: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         supplier_tertiary_id: {
-            type: DataTypes.INTEGER
+            type: DataTypes.INTEGER,
+            allowNull: true,
         },
         image: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING,
+            allowNull: true,
         }
     },{
         freezeTableName: true

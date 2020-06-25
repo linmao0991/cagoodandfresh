@@ -1,7 +1,7 @@
 module.exports = function ( sequelize, DataTypes){
     var inventory_transaction = sequelize.define("inventory_transaction", {
         ar_invoice_number: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
         // ar_invoice_line_item_id: {
         //     type: DataTypes.INTEGER
@@ -13,7 +13,7 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING,
         },
         quantity: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DECIMAL(10,2)
         },
         sale_price: {
             type: DataTypes.DECIMAL(10,2),

@@ -20,7 +20,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         contact_phone_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             allowNUll: false
         },
         billing_street: {
@@ -40,12 +40,12 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         business_phone_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             required: true,
             allowNUll: false
         },
         fax_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             required: true,
             allowNUll: false
         },

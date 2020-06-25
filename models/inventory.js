@@ -4,13 +4,13 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING,
         },
         upc: {
-            type: DataTypes.INTEGER
+            type: DataTypes.STRING
         },
         invoice_quantity: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DECIMAL(10,2)
         },
         current_quantity: {
-            type: DataTypes.INTEGER
+            type: DataTypes.DECIMAL(10,2)
         },
         purchase_order_number: {
             type: DataTypes.STRING,

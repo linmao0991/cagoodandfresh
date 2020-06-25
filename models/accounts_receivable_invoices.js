@@ -1,12 +1,12 @@
 module.exports = function ( sequelize, DataTypes){
     var accounts_receivable_invoices = sequelize.define("accounts_receivable_invoices", {
         invoice_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNull: false,
             unique: true
         },
         customer_account_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             allowNull: true,
         },
         order_date: {
@@ -31,7 +31,7 @@ module.exports = function ( sequelize, DataTypes){
             defaultValue: "UNPAID"
         },
         //In place for future use.
-        employee: {
+        employee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,

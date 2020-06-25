@@ -5,7 +5,7 @@ module.exports = function ( sequelize, DataTypes){
     var customers = sequelize.define("customers", {
         customer_account_number: {
             //customer account number is the same as business phone number
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             //required: true,
             allowNUll: false,
             unique: true
@@ -67,13 +67,18 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         business_phone_number: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING(11),
             required: true,
             allowNUll: false
         },
+        business_fax_number: {
+            type: DataTypes.STRING(11),
+            required: false,
+            allowNUll: true
+        },
         contact_phone_number: {
-            type: DataTypes.INTEGER,
-            allowNUll: false
+            type: DataTypes.STRING(11),
+            allowNUll: true
         },
         customer_email: {
             type: DataTypes.STRING,
