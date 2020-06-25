@@ -10,7 +10,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true
         },
         //In place for future use.
-        employee: {
+        employee_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 0,
