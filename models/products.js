@@ -1,7 +1,7 @@
 const { daemon } = require("cli");
 
 module.exports = function ( sequelize, DataTypes){
-    var product = sequelize.define("product", {
+    var products = sequelize.define("products", {
         location: {
             type: DataTypes.STRING,
             allowNull: true,
@@ -53,5 +53,5 @@ module.exports = function ( sequelize, DataTypes){
     },{
         freezeTableName: true
     });
-    return product;
+    return products;
 };

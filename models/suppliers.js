@@ -36,7 +36,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         billing_zipcode: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNUll: true
         },
         business_phone_number: {

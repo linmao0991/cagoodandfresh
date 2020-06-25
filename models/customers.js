@@ -47,7 +47,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         delivery_zipcode: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNUll: true
         },
         billing_street: {
@@ -63,7 +63,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         billing_zipcode: {
-            type: DataTypes.INTEGER,
+            type: DataTypes.STRING,
             allowNUll: true
         },
         business_phone_number: {
