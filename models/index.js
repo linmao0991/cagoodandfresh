@@ -41,6 +41,9 @@ db.accounts_receivable_invoices.hasMany(db.accounts_receivable_notes, {sourceKey
 //accounts_receivable_invoices has many ar_invoice_line_item
 db.accounts_receivable_invoices.hasMany(db.ar_invoice_line_item, { sourceKey: 'invoice_number', foreignKey: "ar_invoice_number"});
 
+//accounts_receivable_invoices has many collections
+db.accounts_receivable_invoices.hasMany(db.collections, { sourceKey: 'invoice_number', foreignKey: "ar_invoice_number"});
+
 //ar_invoice_line_item has one inventory_transaction
 db.ar_invoice_line_item.hasOne(db.inventory_transaction, { foreignKey: 'ar_invoice_line_item_id'});
 
@@ -52,6 +55,9 @@ db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number',
 
 //accounts_payable_invoices has many accounts_payable_notes
 db.accounts_payable_invoices.hasMany(db.accounts_payable_notes, {sourceKey: 'invoice_number', foreignKey: 'ap_invoice_number'});
+
+//employees has many employee_time
+db.employee.hasMany(db.employee_time, {foreignKey: 'employee_id', });
 
 //End Associations
 db.sequelize = sequelize;
