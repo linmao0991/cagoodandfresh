@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "cli": "^1.0.1",
     "concurrently": "^5.2.0",
     "dotenv": "^8.2.0",

@@ -5,8 +5,14 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+var config = require(__dirname + "/../config/config.json")[env];
 const db = {};
+
+if (process.env.NODE_ENV === "production") {
+  config = require(__dirname + "/../config/config.js")[env];
+}else{
+  const config = require(__dirname + '/../config/config.json')[env];
+}
 
 let sequelize;
 if (config.use_env_variable) {
@@ -57,7 +63,7 @@ db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number',
 db.accounts_payable_invoices.hasMany(db.accounts_payable_notes, {sourceKey: 'invoice_number', foreignKey: 'ap_invoice_number'});
 
 //employees has many employee_time
-db.employee.hasMany(db.employee_time, {foreignKey: 'employee_id', });
+db.employees.hasMany(db.employee_time, {foreignKey: 'employee_id', });
 
 //End Associations
 db.sequelize = sequelize;
