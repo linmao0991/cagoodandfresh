@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import Login from "../Pages/Login";
 import LoginContext from "../Context/LoginContext"
 import Directory from "../Pages/Directory";
+import Api from "../Utils/Api";
 
 class App extends Component {
   state = {
@@ -10,9 +11,8 @@ class App extends Component {
 
   static contextType = LoginContext
 
-  loginHandler = () => {
-    this.setState({isLoggedin: true});
-    console.log("logged in");
+  loginHandler = (email, password) => {
+      this.setState({isLoggedin: true});
   };
 
   render () {
