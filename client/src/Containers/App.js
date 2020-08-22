@@ -13,7 +13,6 @@ class App extends Component {
   };
 
   //Login context
-  static contextType = LoginContext
 
   componentDidMount() {
     //Check for log in
@@ -24,20 +23,17 @@ class App extends Component {
   loginHandler = () => {
       this.setState({isLoggedin: true});
       console.log(this.state.isLoggedin);
-      console.log(this.contextType);
   };
 
   //Function to set state of log in after logging in
   isLoggedIn = () =>{
-    this.context = LoginContext
-    console.log(this.context)
   }
 
   //Function to check server for log in
   userAuthorized = () =>{
     Api.userInfo({
     }).then(() => {
-      this.isLoggedIn()
+      this.setState({isLoggedin: true});
     }).catch(err => {
       console.log(err)
       console.log("[Not Logged in]")
@@ -50,7 +46,6 @@ class App extends Component {
   }
 
   render () {
-    console.log(this.context)
     return (
       <div>
         <LoginContext.Provider

@@ -37,7 +37,6 @@ class Directory extends Component{
     }
 
     render(){
-        console.log(this.context)
         return(
             this.directoryDisplay()
         )
