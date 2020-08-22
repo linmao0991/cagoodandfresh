@@ -1,20 +1,45 @@
 import React, { Component } from "react";
 import LoginContext from "../Context/LoginContext";
+import DirectoryContext from "../Context/DirectoryContext";
+import MainDirectory from "./DirectoryPages/MainDirectory";
+import AccountsPay from "./DirectoryPages/AccountsPay";
+import AccountsRec from "./DirectoryPages/AccountsRec";
+import AdminTools from "./DirectoryPages/AdminTools";
+import Customers from "./DirectoryPages/Customers";
+import Inventory from "./DirectoryPages/Inventory";
+import OrderForm from "./DirectoryPages/OrderForm";
 
 class Directory extends Component{
-    static contextType = LoginContext;
+    state = {
+
+    }
+    static contextType = DirectoryContext;
+
+    directoryDisplay = () =>{
+        switch (this.context.currentDir) {
+            case "main":
+                return (<MainDirectory />);
+            case "accountspay":
+                return (<AccountsPay />);
+            case "accountsrec":
+                return (<AccountsRec />);
+            case "admintools":
+                return (<AdminTools />);
+            case "customers":
+                return (<Customers />);
+            case "inventory":
+                return (<Inventory />);
+            case "orderform":
+                return (<OrderForm />);
+            default:
+                return (<MainDirectory />);
+        }
+    }
 
     render(){
-        console.log(this.context.isLoggedin)
+        console.log(this.context)
         return(
-            <div>
-                <h1>Directory</h1>
-                <h2>Order Form</h2>
-                <h2>Inventory</h2>
-                <h2>Customers</h2>
-                <h2>Accounts Recieveable</h2>
-                <h2>Accounts Payable</h2>
-            </div>
+            this.directoryDisplay()
         )
     }
 }

@@ -26,33 +26,33 @@ function Login(){
     };
 
     //Working function, move this to an admin page
-    // const userCreate = event => {
-    //     event.preventDefault();
-    //     Api.createrUser({
-    //         email: email,
-    //         password: password
-    //     }).then(res => {
-    //         console.log("success")
-    //         console.log(res.data)
-    //     }).catch(err => {
-    //         console.log("Something went wrong");
-    //         console.log(err)
-    //     })
-    // }
+    const userCreate = event => {
+        event.preventDefault();
+        Api.createrUser({
+            email: email,
+            password: password
+        }).then(res => {
+            console.log("success")
+            console.log(res.data)
+        }).catch(err => {
+            console.log("Something went wrong");
+            console.log(err)
+        })
+    }
 
     //Working function, move this to an admin page
-    // const getUserData = event =>{
-    //     event.preventDefault()
-    //     Api.userInfo({
+    const getUserData = event =>{
+        event.preventDefault()
+        Api.userInfo({
 
-    //     }).then( res =>{
-    //         console.log(["[Get User Data - Success"])
-    //         console.log(res.data)
-    //     }).catch(err => {
-    //         console.log(["[Get User Data - Failed"])
-    //         console.log(err)
-    //     })
-    // }
+        }).then( res =>{
+            console.log(["[Get User Data - Success"])
+            console.log(res.data)
+        }).catch(err => {
+            console.log(["[Get User Data - Failed"])
+            console.log(err)
+        })
+    }
 
     return(
         <div>
@@ -76,6 +76,10 @@ function Login(){
                 />
                 <br />
                 <button onClick={event => logUserIn(event)}>Log In</button>
+                <br />
+                <button onClick={event => userCreate(event)}>Create User</button>
+                <br />
+                <button onClick={event => getUserData(event)}>Get User Data</button>
             </form>
         </div>
     );
