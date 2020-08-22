@@ -24,6 +24,7 @@ function Login(){
             //loginContext.login;
           }).catch( err => {
             console.log("Something went wrong")
+            console.log(err);
           })
     };
 
@@ -36,6 +37,7 @@ function Login(){
             console.log("success")
         }).catch(err => {
             console.log("Something went wrong");
+            console.log(err)
         })
     }
 
