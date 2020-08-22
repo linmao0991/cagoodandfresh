@@ -9,37 +9,50 @@ function Login(){
 
     const logUserIn = event => {
         event.preventDefault();
-        console.log("username: " + email);
-        console.log("password: " + password)
         //API Call to log in using userName & password
-        //--Code Here
         Api.logIn({
             email: email,
             password: password
-          }).then(res => {
-              console.log("Success")
+          }).then(() => {
+              console.log("[Successul log in]")
               emailNameInput("")
               passwordInput("")
-              console.log(res.user)
+              loginContext.login();
             //loginContext.login;
           }).catch( err => {
-            console.log("Something went wrong")
+            console.log("[Unsuccessul log in]")
             console.log(err);
           })
     };
 
-    const userCreate = event => {
-        event.preventDefault();
-        Api.createrUser({
-            email: email,
-            password: password
-        }).then(res => {
-            console.log("success")
-        }).catch(err => {
-            console.log("Something went wrong");
-            console.log(err)
-        })
-    }
+    //Working function, move this to an admin page
+    // const userCreate = event => {
+    //     event.preventDefault();
+    //     Api.createrUser({
+    //         email: email,
+    //         password: password
+    //     }).then(res => {
+    //         console.log("success")
+    //         console.log(res.data)
+    //     }).catch(err => {
+    //         console.log("Something went wrong");
+    //         console.log(err)
+    //     })
+    // }
+
+    //Working function, move this to an admin page
+    // const getUserData = event =>{
+    //     event.preventDefault()
+    //     Api.userInfo({
+
+    //     }).then( res =>{
+    //         console.log(["[Get User Data - Success"])
+    //         console.log(res.data)
+    //     }).catch(err => {
+    //         console.log(["[Get User Data - Failed"])
+    //         console.log(err)
+    //     })
+    // }
 
     return(
         <div>
@@ -62,8 +75,7 @@ function Login(){
                     className="form-control validate"
                 />
                 <br />
-                <button onClick={logUserIn}>Log In</button>
-                <button onClick={userCreate}>Create</button>
+                <button onClick={event => logUserIn(event)}>Log In</button>
             </form>
         </div>
     );

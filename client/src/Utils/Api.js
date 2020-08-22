@@ -16,6 +16,7 @@ export default {
 
     //Test User info
     userInfo: () => {
-        return axios.post("/api/user_data")
+        console.log("[ Get User Data]")
+        return axios.get("/api/user_data")
     }
 }

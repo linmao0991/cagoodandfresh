@@ -11,9 +11,24 @@ class App extends Component {
 
   static contextType = LoginContext
 
-  loginHandler = (email, password) => {
+  componentDidMount() {
+    this.userAuthorized();
+  }
+
+  loginHandler = () => {
       this.setState({isLoggedin: true});
   };
+
+  userAuthorized = () =>{
+    Api.userInfo({
+
+    }).then(() => {
+      this.loginHandler()
+    }).catch(err => {
+      console.log(err)
+      console.log("[Not Logged in]")
+    })
+  }
 
   render () {
     return (

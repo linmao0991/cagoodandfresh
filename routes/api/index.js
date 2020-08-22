@@ -6,25 +6,17 @@ var router = require("express").Router();
 const { Op } = require("sequelize");
 
 var bcrypt = require("bcryptjs");
+const e = require('express');
 const saltRounds = 10;
 
-checkPermission = (user, threshold) =>{
-    let permission;
-    db.employees.findOne({
-        where: {
-            id: user
-          }
-        }).then(function (dbUser) {
-          res.json({
-            id: dbUser.id,
-            username: dbUser.username,
-            email: dbUser.email,
-            first_name: dbUser.first_name,
-            last_name: dbUser.last_name,
-            home_id: dbUser.home_id,
-            points: dbUser.points
-          });
-        });
+
+//Function to check user permission level agianst required level for function.
+checkPermission = (user, permission_req) =>{
+  if(user.permission_level >= permission_req){
+    return true
+  }else{
+    return false
+  }
 }
 
 //Log in
@@ -32,7 +24,12 @@ router.post("/login", passport.authenticate("local"), function (req, res) {
     console.log("===================================")
     console.log("[User Log In]")
     console.log("===================================")
-    res.json(req.user);
+    res.json({
+      id: req.user.id,
+      first_name: req.user.first_name,
+      last_name: req.user.last_name,
+      permission_level: req.user.permission_level,
+    });
   });
 
 
@@ -41,23 +38,29 @@ router.post("/create_employee", function (req, res) {
     console.log("===================================")
     console.log("[Create Employee]")
     console.log("===================================")
-    db.employees.create({
+    const permission_req = 3;
+    if (checkPermission(req.user, permission_req)) {
+      db.employees.create({
         email: req.body.email,
         password: req.body.password,
-    })
-        .then(function (dbUser) {
-        req.login(dbUser, function (err) {
-            if (err) {
-            console.log(err);
-            }
         })
-        res.json(dbUser);
-        })
-        .catch(function (err) {
-        console.log(err.errors[0].message)
-        res.status(401).json({ error: err.errors[0].message });
-
+          .then(function (dbUser) {
+          req.login(dbUser, function (err) {
+              if (err) {
+              console.log(err);
+              }
+          })
+          res.json(dbUser);
+          })
+          .catch(function (err) {
+          console.log(err.errors[0].message)
+          res.status(401).json({ error: err.errors[0].message });
         });
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
 });
 
 //
@@ -68,7 +71,8 @@ router.get("/user_data", function (req, res) {
     console.log("===================================")
     if (!req.user) {
       // The user is not logged in, send back an empty object
-      res.json({ response: "User Not Logged In" });
+      //res.json({ response: "User Not Logged In" });
+      res.status(401).send("Not Logged In")
     } else {
       // Otherwise perform API call to find users updated information then send information back to client
       db.employees.findOne({
@@ -80,6 +84,7 @@ router.get("/user_data", function (req, res) {
             user: req.user, 
             id: dbUser.id,
             email: dbUser.email,
+            permission_level: dbUser.permission_level
         });
       });
     }
