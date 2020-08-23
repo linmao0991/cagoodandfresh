@@ -4,16 +4,16 @@ import Api from "../../Utils/Api"
 
 function OrderForm (){
     const directoryContext = useContext(DirectoryContext);
-    const [phone, phoneInput] = useState("");
-    const [name, nameInput] = useState("");
-    const [account, accountInput] = useState("");
+    const [phone, phoneInput] = useState(null);
+    const [name, nameInput] = useState(null);
+    const [account, accountInput] = useState(null);
 
     const getCustomerInfo = (event) => {
         event.preventDefault();
         Api.getCustomerInfo({
-            account_number:account,
-            phone_number: phone,
-            restaurant_name: name
+            customer_account_number:account,
+            business_phone_number: phone,
+            restaurant_name_english: name
         }).then ( info => {
             console.log(info)
         }).catch( err => {

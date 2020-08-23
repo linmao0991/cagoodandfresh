@@ -91,25 +91,42 @@ router.get("/user_data", (req, res) => {
 
   //Find customer 
   router.post("/find_customer", (req, res) => {
-    console.log("==[Find Customer - Line 94]==")
-    console.log(req.body)
-    console.log("=======================")
-    // db.customers.findAll({
-    //   where: {
-    //     [Op.or]: [
-    //       {customer_account_number: req.body.account_number},
-    //       {business_phone_number: req.body.phone_number},
-    //       {restaurant_name_english: req.body.restaurant_name}
-    //     ]
-    //   }
-    // }).then( (dbCustomer) => {
-    //   res.json({
-    //     customer_info: dbCustomer
-    //   })
-    // }).catch((err) => {
-    //   console.log(err.errors[0].message)
-    //   res.status(404).json({ error: err.errors[0].message });
-    // })
+    let permission_req = 1;
+    //Check for user permission level
+    if (checkPermission(req.user, permission_req)) {
+      let searchArray =[];
+      //Convert object to array with search parameters
+      for (const property in req.body){
+        //Checks search input for null or empty string
+        if(req.body[property] !== "" && req.body[property] !== null){
+          searchArray.push({
+            [property]: {
+              [Op.or]: {
+                //Find data that starts with search property
+                [Op.startsWith]: req.body[property],
+                //Find ata that contains srarch property
+                [Op.like]: "%"+req.body[property]}
+              }
+            })
+          }
+        }
+
+      //Call database with
+      db.customers.findAll({
+        where: {
+          [Op.or]: searchArray
+        }
+      }).then( (dbCustomer) => {
+        res.json(dbCustomer)
+      }).catch((err) => {
+        console.log(err.errors[0].message)
+        res.status(404).json({ error: err.errors[0].message });
+      })
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
   });
 
 module.exports = router;
