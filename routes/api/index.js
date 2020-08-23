@@ -20,7 +20,7 @@ checkPermission = (user, permission_req) =>{
 }
 
 //Log in
-router.post("/login", passport.authenticate("local"), function (req, res) {
+router.post("/login", passport.authenticate("local"), (req, res) => {
     console.log("===================================")
     console.log("[User Log In]")
     console.log("===================================")
@@ -34,7 +34,7 @@ router.post("/login", passport.authenticate("local"), function (req, res) {
 
 
 //Create employee
-router.post("/create_employee", function (req, res) {
+router.post("/create_employee", (req, res) => {
     console.log("===================================")
     console.log("[Create Employee]")
     console.log("===================================")
@@ -44,15 +44,15 @@ router.post("/create_employee", function (req, res) {
         email: req.body.email,
         password: req.body.password,
         })
-          .then(function (dbUser) {
-          req.login(dbUser, function (err) {
+          .then((dbUser) => {
+          req.login(dbUser, (err) => {
               if (err) {
               console.log(err);
               }
           })
           res.json(dbUser);
           })
-          .catch(function (err) {
+          .catch((err) => {
           console.log(err.errors[0].message)
           res.status(401).json({ error: err.errors[0].message });
         });
@@ -63,9 +63,8 @@ router.post("/create_employee", function (req, res) {
     }
 });
 
-//
 // Route for getting some data about our user to be used client side
-router.get("/user_data", function (req, res) {
+router.get("/user_data", (req, res) => {
     console.log("===================================")
     console.log("[Get User Data - 151]")
     console.log("===================================")
@@ -79,7 +78,7 @@ router.get("/user_data", function (req, res) {
         where: {
           id: req.user.id
         }
-      }).then(function (dbUser) {
+      }).then((dbUser) => {
         res.json({
             user: req.user, 
             id: dbUser.id,
@@ -88,6 +87,29 @@ router.get("/user_data", function (req, res) {
         });
       });
     }
+  });
+
+  //Find customer 
+  router.post("/find_customer", (req, res) => {
+    console.log("==[Find Customer - Line 94]==")
+    console.log(req.body)
+    console.log("=======================")
+    // db.customers.findAll({
+    //   where: {
+    //     [Op.or]: [
+    //       {customer_account_number: req.body.account_number},
+    //       {business_phone_number: req.body.phone_number},
+    //       {restaurant_name_english: req.body.restaurant_name}
+    //     ]
+    //   }
+    // }).then( (dbCustomer) => {
+    //   res.json({
+    //     customer_info: dbCustomer
+    //   })
+    // }).catch((err) => {
+    //   console.log(err.errors[0].message)
+    //   res.status(404).json({ error: err.errors[0].message });
+    // })
   });
 
 module.exports = router;

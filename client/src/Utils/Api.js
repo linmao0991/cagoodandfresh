@@ -17,5 +17,11 @@ export default {
     //Test User info
     userInfo: () => {
         return axios.get("/api/user_data")
+    },
+
+    //Get customer information
+    getCustomerInfo: customerData => {
+        console.log("[Get Customer Data]")
+        return axios.post("/api/find_customer", customerData);
     }
 }
