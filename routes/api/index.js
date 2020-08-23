@@ -98,7 +98,7 @@ router.get("/user_data", (req, res) => {
       //Convert object to array with search parameters
       for (const property in req.body){
         //Checks search input for null or empty string
-        if(req.body[property] !== "" && req.body[property] !== null){
+        if(req.body[property] !== "" && req.body[property] !== undefined){
           searchArray.push({
             [property]: {
               [Op.or]: {
@@ -114,7 +114,7 @@ router.get("/user_data", (req, res) => {
       //Call database with
       db.customers.findAll({
         where: {
-          [Op.or]: searchArray
+          [Op.and]: searchArray
         }
       }).then( (dbCustomer) => {
         res.json(dbCustomer)
