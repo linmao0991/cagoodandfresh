@@ -2,16 +2,22 @@ import React, {useState, useContext} from "react";
 import DirectoryContext from "../../Context/DirectoryContext";
 import Api from "../../Utils/Api";
 import {Modal, Button} from "react-bootstrap";
+import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay"
 
+//Covert this component to a class component
 function OrderForm (){
     const directoryContext = useContext(DirectoryContext);
     const [phone, phoneInput] = useState(undefined);
     const [name, nameInput] = useState(undefined);
     const [account, accountInput] = useState(undefined);
     const [show, setShow] = useState(false);
+    const [displayCustomers, setCustToggle] = useState(false);
+    const [customerData, setCustData] = useState(undefined);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const showCustomers = () => setCustToggle(!displayCustomers);
+    const storeCustData = (data) => setCustData(data);
 
     const getCustomerInfo = (event) => {
         event.preventDefault();
@@ -20,18 +26,40 @@ function OrderForm (){
             business_phone_number: phone,
             restaurant_name_english: name
         }).then ( info => {
-            console.log(info)
+            console.log(info.data)
+            storeCustData(info.data)
+            showCustomers(info.data)
         }).catch( err => {
             console.log(err)
         })
     }
 
+    const selectCustomer = () =>{
+
+    }
+
+    const renderCustomerData = () => {
+        console.log(customerData);
+        if(customerData.length > 0 ){
+            customerData.forEach(customer => {
+                return (
+                    <CustomerDisplay
+                    data = {customer}
+                    selectCustomer = {selectCustomer}
+                    />
+                )
+            })
+        }else{
+
+        }
+    }
+
     return(
         <div>
             <div>
-                <button onClick={() => directoryContext.switchDir(directoryContext.previousDir)}>Back</button>
+                <Button onClick={() => directoryContext.switchDir(directoryContext.previousDir)}>Back</Button>
                 <h1>Order Form</h1>
-                <button onClick={handleShow}>Find Customers</button>
+                <Button onClick={handleShow}>Find Customers</Button>
             </div>
 
             <Modal 
@@ -72,15 +100,13 @@ function OrderForm (){
                     />
                     <br />
                 </form>
-                    <button onClick={event => getCustomerInfo(event)}>Get Info</button>
+                    <Button onClick={event => getCustomerInfo(event)}>Get Info</Button>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
-                    </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
-                    </Button>
+                    {displayCustomers?
+                        renderCustomerData()
+                    : 
+                    null}
                 </Modal.Footer>
             </Modal>
         </div>

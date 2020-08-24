@@ -1,6 +1,7 @@
 import React, {useState, useContext} from "react";
 import LoginContext from "../Context/LoginContext";
-import Api from "../Utils/Api"
+import Api from "../Utils/Api";
+import {Button, Container, Row, Col} from "react-bootstrap";
 
 function Login(){
     const loginContext = useContext(LoginContext);
@@ -55,33 +56,40 @@ function Login(){
     }
 
     return(
-        <div>
-            <form>
-                <h1>Log In</h1>
-                <p>Email</p>
-                <input
-                    value = {email}
-                    type = "email"
-                    autoComplete= "email"
-                    onChange = {event => emailNameInput(event.target.value)}
-                    className="form-control validate"
-                />
-                <p>Password</p>
-                <input
-                    value = {password}
-                    type = "password"
-                    autoComplete= "current-password"
-                    onChange = {event => passwordInput(event.target.value)}
-                    className="form-control validate"
-                />
-                <br />
-                <button onClick={event => logUserIn(event)}>Log In</button>
-                <br />
-                <button onClick={event => userCreate(event)}>Create User</button>
-                <br />
-                <button onClick={event => getUserData(event)}>Get User Data</button>
-            </form>
-        </div>
+        <Container>
+            <Row>
+                <Col></Col>
+                <Col>
+                    <form>
+                    <h1>Log In</h1>
+                    <p>Email</p>
+                        <input
+                            value = {email}
+                            type = "email"
+                            autoComplete= "email"
+                            onChange = {event => emailNameInput(event.target.value)}
+                            className="form-control validate"
+                        />
+                        <br />
+                        <p>Password</p>
+                        <input
+                            value = {password}
+                            type = "password"
+                            autoComplete= "current-password"
+                            onChange = {event => passwordInput(event.target.value)}
+                            className="form-control validate"
+                        />
+                    </form>
+                    <br />
+                    <Button onClick={event => logUserIn(event)}>Log In</Button>
+                    {/* <br />
+                    <Button onClick={event => userCreate(event)}>Create User</Button>
+                    <br />
+                    <Button onClick={event => getUserData(event)}>Get User Data</Button> */}
+                </Col>
+                <Col></Col>
+            </Row>
+        </Container>
     );
 }
 

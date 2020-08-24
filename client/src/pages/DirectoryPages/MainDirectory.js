@@ -1,5 +1,6 @@
 import React, {useState, useContext} from "react";
 import DirectoryContext from "../../Context/DirectoryContext"
+import {Button} from "react-bootstrap";
 
 function MainDirectory(){
     const directoryContext = useContext(DirectoryContext);
@@ -11,19 +12,19 @@ function MainDirectory(){
                 <h1>Directory</h1>
                 <br />
                 {/* Permission Level 1*/}
-                <h2>Order Form</h2><button onClick={() => directoryContext.switchDir("orderform")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("orderform")}>Order Form</Button>
                 <br />
-                <h2>Inventory</h2><button onClick={() => directoryContext.switchDir("inventory")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("inventory")}>Inventory</Button>
                 <br />
-                <h2>Customers</h2><button onClick={() => directoryContext.switchDir("customers")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("customers")}>Customers</Button>
                 <br />
                 {/* Permission Level 2*/}
-                <h2>Accounts Recieveable</h2><button onClick={() => directoryContext.switchDir("accountsrec")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("accountsrec")}>Accounts Recieveable</Button>
                 <br />
-                <h2>Accounts Payable</h2><button onClick={() => directoryContext.switchDir("accountspay")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("accountspay")}>Accounts Payable</Button>
                 <br />
                 {/* Permission Level 3*/}
-                <h2>Administrator Tools</h2><button onClick={() => directoryContext.switchDir("admintools")}>Back</button>
+                <Button onClick={() => directoryContext.switchDir("admintools")}>Administrator Tools</Button>
         </div>
     );
 }
