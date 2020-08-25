@@ -1,18 +1,39 @@
-import React, {useState, useContext} from "react";
+import React, {useState, useContext, Component} from "react";
 import DirectoryContext from "../../Context/DirectoryContext"
+import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 
-
-function AccountsPay(){
-    const directoryContext = useContext(DirectoryContext);
+class AccountsPay extends Component{
+    static contextType = DirectoryContext;
     // const [email, emailNameInput] = useState("");
     // const [password, passwordInput] = useState("");
 
-    return(
-        <div>
-            <button onClick={() => directoryContext.switchDir(directoryContext.previousDir)}>Back</button>
-            <h1>Accounts Payable</h1>
-        </div>
-    )
-};
+    render(){
+        return(
+            <Container>
+                <Row>
+                    
+                </Row>
+                <Row>
+                    <Col>
+                    </Col>
+                    <Col>
+                        <h1>Accounts Payable</h1>
+                    </Col>
+                    <Col>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col>
+                        <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
+                    </Col>
+                    <Col>
+                        <Button>Button</Button>
+                    </Col>
+                    <Col></Col>
+                </Row>
+            </Container>
+        )
+    }
+}
 
 export default AccountsPay;

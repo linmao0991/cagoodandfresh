@@ -1,11 +1,16 @@
 import React from "react";
-import {Row, Col} from "react-bootstrap";
+import {Row, Col, Button} from "react-bootstrap";
 
 function CustomerDisplay(props){
     return(
         <div>
             <hr />
             <Row>
+                <Col xs={3}>
+                    <Button variant="info"
+                        onClick = {() => props.selectCustomer(props.data)}
+                    >Select</Button>
+                </Col>
                 <Col>
                     <p>{props.data.restaurant_name_english}</p>
                     <p>{props.data.restaurant_name_chinese}</p>

@@ -12,7 +12,8 @@ class OrderForm extends Component{
         account: undefined,
         show: false,
         displayCustomers: false,
-        customerData: undefined
+        customerData: undefined,
+        selectedCustomer: undefined
     }
 
     static contextType = DirectoryContext
@@ -63,18 +64,58 @@ class OrderForm extends Component{
         })
     }
 
-    selectCustomer = () =>{
-
+    selectCustomer = (data) =>{
+        this.handleClose();
+        this.setState({selectedCustomer: data});
+        console.log("[Selected Customer]")
+        console.log(this.state.selectedCustomer);
     }
 
     render() {
         return(
-            <div>
-                <div>
-                    <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
-                    <h1>Order Form</h1>
-                    <Button onClick={this.handleShow}>Find Customers</Button>
-                </div>
+            <Container>
+                <Row>
+                    <Col>
+                    </Col>
+                    <Col>
+                        <h1>Order Form</h1>
+                    </Col>
+                    <Col>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={8}>
+                        <Row>
+                            <Col>
+                                <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
+                            </Col>
+                            <Col>
+                                <Button onClick={this.handleShow}>Find Customers</Button>
+                            </Col>
+                            <Col></Col>
+                        </Row>
+                        {this.state.selectedCustomer?
+                            <Row>
+                                <Col></Col>
+                                <Col>
+                                    <p>{this.state.selectedCustomer.restaurant_name_english}</p>
+                                    <p>{this.state.selectedCustomer.restaurant_name_chinese}</p>
+                                    <p>{this.state.selectedCustomer.business_phone_number}</p>
+                                </Col>
+                                <Col>
+                                    <p>{this.state.selectedCustomer.billing_street}</p>
+                                    <p>{this.state.selectedCustomer.billing_city}, {this.state.selectedCustomer.billing_state} {this.state.selectedCustomer.billing_zipcode}</p>
+                                </Col>
+                                <Col></Col>
+                            </Row>
+                            : 
+                            null
+                        }
+                    </Col>
+                    <Col style={{backgroundColor: "lightgray"}}>
+
+                    </Col>
+                </Row>
 
                 <Modal 
                     show={this.state.show} 
@@ -86,38 +127,46 @@ class OrderForm extends Component{
                         <Modal.Title>Find Customers</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <form>
-                        <input
-                            value = {this.state.phone}
-                            type = "text"
-                            label = "phone number"
-                            placeholder ="Phone Number"
-                            //autoComplete= "text"
-                            onChange = {event => this.handlePhoneInput(event.target.value)}
-                            className="form-control validate"
-                        />
-                        <br />
-                        <input
-                            value = {this.state.account}
-                            type = "text"
-                            label = "account number"
-                            placeholder ="Account Number"
-                            //autoComplete= "text"
-                            onChange = {event => this.handleAccountInput(event.target.value)}
-                            className="form-control validate"
-                        />
-                        <br />
-                        <input
-                            value = {this.state.name}
-                            type = "text"
-                            label = "name"
-                            placeholder = "Name"
-                            //autoComplete= "text"
-                            onChange = {event => this.handleNameInput(event.target.value)}
-                            className="form-control validate"
-                        />
-                        <br />
-                    </form>
+                        <Container>
+                            <Row>
+                                <Col></Col>
+                                <Col xs={6}>
+                                    <form>
+                                        <input
+                                            value = {this.state.phone}
+                                            type = "text"
+                                            label = "phone number"
+                                            placeholder ="Phone Number"
+                                            //autoComplete= "text"
+                                            onChange = {event => this.handlePhoneInput(event.target.value)}
+                                            className="form-control validate"
+                                        />
+                                        <br />
+                                        <input
+                                            value = {this.state.account}
+                                            type = "text"
+                                            label = "account number"
+                                            placeholder ="Account Number"
+                                            //autoComplete= "text"
+                                            onChange = {event => this.handleAccountInput(event.target.value)}
+                                            className="form-control validate"
+                                        />
+                                        <br />
+                                        <input
+                                            value = {this.state.name}
+                                            type = "text"
+                                            label = "name"
+                                            placeholder = "Name"
+                                            //autoComplete= "text"
+                                            onChange = {event => this.handleNameInput(event.target.value)}
+                                            className="form-control validate"
+                                        />
+                                        <br />
+                                    </form>
+                                </Col>
+                                <Col></Col>
+                            </Row>
+                        </Container>
                         <Button onClick={event => this.getCustomerInfo(event)}>Get Info</Button>
                     </Modal.Body>
                     <Modal.Footer>
@@ -127,6 +176,7 @@ class OrderForm extends Component{
                                     <CustomerDisplay 
                                         data = {data}
                                         key = {data.id}
+                                        selectCustomer = {this.selectCustomer}
                                     />
                                 ))}
                             </Container>
@@ -134,7 +184,7 @@ class OrderForm extends Component{
                         null}
                     </Modal.Footer>
                 </Modal>
-            </div>
+            </Container>
         )
     }
 }
