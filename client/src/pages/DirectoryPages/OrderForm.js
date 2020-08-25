@@ -1,116 +1,142 @@
-import React, {useState, useContext} from "react";
+import React, {useState, useContext, Component} from "react";
 import DirectoryContext from "../../Context/DirectoryContext";
 import Api from "../../Utils/Api";
-import {Modal, Button} from "react-bootstrap";
+import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay"
 
 //Covert this component to a class component
-function OrderForm (){
-    const directoryContext = useContext(DirectoryContext);
-    const [phone, phoneInput] = useState(undefined);
-    const [name, nameInput] = useState(undefined);
-    const [account, accountInput] = useState(undefined);
-    const [show, setShow] = useState(false);
-    const [displayCustomers, setCustToggle] = useState(false);
-    const [customerData, setCustData] = useState(undefined);
+class OrderForm extends Component{
+    state = {
+        phone: undefined,
+        name: undefined,
+        account: undefined,
+        show: false,
+        displayCustomers: false,
+        customerData: undefined
+    }
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const showCustomers = () => setCustToggle(!displayCustomers);
-    const storeCustData = (data) => setCustData(data);
+    static contextType = DirectoryContext
 
-    const getCustomerInfo = (event) => {
+    handleAccountInput = input =>{
+        this.setState({account: input})
+    }
+
+    handlePhoneInput = input =>{
+        this.setState({phone: input})
+    }
+
+    handleNameInput = input =>{
+        this.setState({name: input})
+    }
+
+    handleClose = () => {
+        this.setState({show: false})
+        this.setState({displayCustomers: false})
+    };
+
+    handleShow = () => {
+        this.setState({show: true})
+    };
+
+    showCustomers = () => {
+        this.setState({displayCustomers: !this.state.displayCustomers})};
+
+    storeCustData = (data) => {
+        this.setState({customerData: data})
+    };
+
+    getCustomerInfo = (event) => {
         event.preventDefault();
         Api.getCustomerInfo({
-            customer_account_number:account,
-            business_phone_number: phone,
-            restaurant_name_english: name
+            customer_account_number: this.state.account,
+            business_phone_number: this.state.phone,
+            restaurant_name_english: this.state.name
         }).then ( info => {
-            console.log(info.data)
-            storeCustData(info.data)
-            showCustomers(info.data)
+            this.storeCustData(info.data)
+            this.setState({displayCustomers: true})
+            this.setState({account: undefined})
+            this.setState({phone: undefined})
+            this.setState({name: undefined})
+            //this.showCustomers(info.data)
         }).catch( err => {
             console.log(err)
         })
     }
 
-    const selectCustomer = () =>{
+    selectCustomer = () =>{
 
     }
 
-    const renderCustomerData = () => {
-        console.log(customerData);
-        if(customerData.length > 0 ){
-            customerData.forEach(customer => {
-                return (
-                    <CustomerDisplay
-                    data = {customer}
-                    selectCustomer = {selectCustomer}
-                    />
-                )
-            })
-        }else{
-
-        }
-    }
-
-    return(
-        <div>
+    render() {
+        return(
             <div>
-                <Button onClick={() => directoryContext.switchDir(directoryContext.previousDir)}>Back</Button>
-                <h1>Order Form</h1>
-                <Button onClick={handleShow}>Find Customers</Button>
-            </div>
+                <div>
+                    <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
+                    <h1>Order Form</h1>
+                    <Button onClick={this.handleShow}>Find Customers</Button>
+                </div>
 
-            <Modal 
-                show={show} 
-                onHide={handleClose}
-                backdrop="static"
-                keyboard={false}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Find Customers</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    <form>
-                    <input
-                        value = {account}
-                        type = "text"
-                        label = "account number"
-                        autoComplete= "text"
-                        onChange = {event => accountInput(event.target.value)}
-                        className="form-control validate"
-                    />
-                    <br />
-                    <input
-                        value = {phone}
-                        type = "text"
-                        label = "phone number"
-                        autoComplete= "text"
-                        onChange = {event => phoneInput(event.target.value)}
-                        className="form-control validate"
-                    />
-                    <br />
-                    <input
-                        value = {name}
-                        type = "text"
-                        label = "name"
-                        autoComplete= "text"
-                        onChange = {event => nameInput(event.target.value)}
-                        className="form-control validate"
-                    />
-                    <br />
-                </form>
-                    <Button onClick={event => getCustomerInfo(event)}>Get Info</Button>
-                </Modal.Body>
-                <Modal.Footer>
-                    {displayCustomers?
-                        renderCustomerData()
-                    : 
-                    null}
-                </Modal.Footer>
-            </Modal>
-        </div>
-    )
+                <Modal 
+                    show={this.state.show} 
+                    onHide={this.handleClose}
+                    backdrop="static"
+                    keyboard={false}
+                    size ="xl">
+                    <Modal.Header closeButton>
+                        <Modal.Title>Find Customers</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <form>
+                        <input
+                            value = {this.state.phone}
+                            type = "text"
+                            label = "phone number"
+                            placeholder ="Phone Number"
+                            //autoComplete= "text"
+                            onChange = {event => this.handlePhoneInput(event.target.value)}
+                            className="form-control validate"
+                        />
+                        <br />
+                        <input
+                            value = {this.state.account}
+                            type = "text"
+                            label = "account number"
+                            placeholder ="Account Number"
+                            //autoComplete= "text"
+                            onChange = {event => this.handleAccountInput(event.target.value)}
+                            className="form-control validate"
+                        />
+                        <br />
+                        <input
+                            value = {this.state.name}
+                            type = "text"
+                            label = "name"
+                            placeholder = "Name"
+                            //autoComplete= "text"
+                            onChange = {event => this.handleNameInput(event.target.value)}
+                            className="form-control validate"
+                        />
+                        <br />
+                    </form>
+                        <Button onClick={event => this.getCustomerInfo(event)}>Get Info</Button>
+                    </Modal.Body>
+                    <Modal.Footer>
+                        {this.state.displayCustomers?
+                            <Container>
+                                {this.state.customerData.map(data => (
+                                    <CustomerDisplay 
+                                        data = {data}
+                                        key = {data.id}
+                                    />
+                                ))}
+                            </Container>
+                        : 
+                        null}
+                    </Modal.Footer>
+                </Modal>
+            </div>
+        )
+    }
 }
 
 export default OrderForm;
