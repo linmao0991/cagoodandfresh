@@ -32,7 +32,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
     });
   });
 
-  //Log Out
+//Log Out
 router.get("/logout", function (req, res) {
   console.log("===================================")
   console.log("[Log Out - 142]")
@@ -104,23 +104,24 @@ router.get("/user_data", (req, res) => {
     //Check for user permission level
     if (checkPermission(req.user, permission_req)) {
       let searchArray =[];
-      //Convert object to array with search parameters
+      //Convert search parameters object to array
       for (const property in req.body){
-        //Checks search input for null or empty string
+        //Checks search input for null or empty string and skips if null or empty
         if(req.body[property] !== "" && req.body[property] !== undefined){
+          //Add current search parameter object to array
           searchArray.push({
             [property]: {
               [Op.or]: {
                 //Find data that starts with search property
                 [Op.startsWith]: req.body[property],
-                //Find ata that contains srarch property
+                //Find data that contains srarch property
                 [Op.like]: "%"+req.body[property]}
               }
             })
           }
         }
 
-      //Call database with
+      //Search database with searchArray
       db.customers.findAll({
         where: {
           [Op.and]: searchArray
