@@ -4,8 +4,13 @@ export default {
 
     //Log in
     logIn: userData => {
-        console.log("[logging in]")
+        console.log("[Logging In]")
         return axios.post("/api/login", userData)
+    },
+
+    logOut: () => {
+        console.log("[Logging Out]")
+        return axios.get("/api/logout")
     },
 
     //Authorization

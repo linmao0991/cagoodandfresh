@@ -1,10 +1,9 @@
-import React, {useState, useContext, Component} from "react";
+import React, {Component} from "react";
 import DirectoryContext from "../../Context/DirectoryContext";
 import Api from "../../Utils/Api";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay"
 
-//Covert this component to a class component
 class OrderForm extends Component{
     state = {
         phone: undefined,

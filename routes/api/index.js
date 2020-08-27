@@ -32,6 +32,15 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
     });
   });
 
+  //Log Out
+router.get("/logout", function (req, res) {
+  console.log("===================================")
+  console.log("[Log Out - 142]")
+  console.log("===================================")
+  req.logout();
+  res.json({ message: "Logging out" });
+});
+
 
 //Create employee
 router.post("/create_employee", (req, res) => {

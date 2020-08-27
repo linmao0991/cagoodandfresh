@@ -14,12 +14,11 @@ function Login(){
         Api.logIn({
             email: email,
             password: password
-          }).then(() => {
+          }).then(user => {
               console.log("[Successul log in]")
               emailNameInput("")
               passwordInput("")
-              loginContext.login();
-            //loginContext.login;
+              loginContext.login(user);
           }).catch( err => {
             console.log("[Unsuccessul log in]")
             console.log(err);

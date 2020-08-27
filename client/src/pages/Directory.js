@@ -11,7 +11,6 @@ import OrderForm from "./DirectoryPages/OrderForm";
 
 class Directory extends Component{
     state = {
-
     }
     static contextType = DirectoryContext;
 
