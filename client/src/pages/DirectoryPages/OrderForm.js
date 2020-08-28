@@ -4,6 +4,7 @@ import Api from "../../Utils/Api";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
+import OrderContext from "../../Context/OrderContext";
 
 class OrderForm extends Component{
     state = {
@@ -13,10 +14,11 @@ class OrderForm extends Component{
         show: false,
         displayCustomers: false,
         customerData: undefined,
-        selectedCustomer: undefined
+        selectedCustomer: undefined,
+        orderCart: undefined,
     }
 
-    static contextType = DirectoryContext
+    static contextType = OrderContext;
 
     handleAccountInput = input =>{
         this.setState({account: input})
@@ -58,7 +60,6 @@ class OrderForm extends Component{
             this.setState({account: undefined})
             this.setState({phone: undefined})
             this.setState({name: undefined})
-            //this.showCustomers(info.data)
         }).catch( err => {
             console.log(err)
         })
@@ -66,14 +67,15 @@ class OrderForm extends Component{
 
     selectCustomer = (data) =>{
         this.handleClose();
+        //Stores selected customer to state
         this.setState({selectedCustomer: data});
-        console.log("[Selected Customer]")
-        console.log(this.state.selectedCustomer);
+        //Stores selected customer to OrderContext
+        this.context.orderContextStore(data, this.state.orderCart)
     }
 
     render() {
         return(
-            <Container>
+            <Container fluid>
                 <Row>
                     <Col>
                     </Col>
@@ -83,7 +85,7 @@ class OrderForm extends Component{
                     <Col>
                     </Col>
                 </Row>
-                <Row>
+                <Row style={{backgroundColor: "lightgrey"}}>
                     <Col xs={8}>
                         <Row>
                             <Col>
@@ -91,11 +93,11 @@ class OrderForm extends Component{
                             </Col>
                             <Col>
                                 <p><b>Customer:</b></p>
-                                {this.state.selectedCustomer? 
+                                {this.context.selectedCustomerData? 
                                     <>
-                                        <p>{this.state.selectedCustomer.restaurant_name_english}</p>
-                                        <p>{this.state.selectedCustomer.restaurant_name_chinese}</p>
-                                        <p>{this.state.selectedCustomer.business_phone_number}</p>
+                                        <p>{this.context.selectedCustomerData.restaurant_name_english}</p>
+                                        <p>{this.context.selectedCustomerData.restaurant_name_chinese}</p>
+                                        <p>{this.context.selectedCustomerData.business_phone_number}</p>
                                     </>
                                 :
                                     <p>None</p>
@@ -103,10 +105,10 @@ class OrderForm extends Component{
                             </Col>
                             <Col>
                                 <p><b>Address</b></p>
-                                {this.state.selectedCustomer?
+                                {this.context.selectedCustomerData?
                                     <>
-                                    <p>{this.state.selectedCustomer.billing_street}</p>
-                                    <p>{this.state.selectedCustomer.billing_city}, {this.state.selectedCustomer.billing_state} {this.state.selectedCustomer.billing_zipcode}</p>
+                                    <p>{this.context.selectedCustomerData.billing_street}</p>
+                                    <p>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}</p>
                                     </>
                                 :
                                     <p>None</p>

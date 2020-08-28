@@ -78,11 +78,11 @@ class App extends Component {
               <Container>
                 <Row>
                   <Col>
-                   {this.state.currentDir === "main"? 
+                   {/* {this.state.currentDir === "main"? 
                     null
                     :
                     <Button onClick={() => this.switchDirHandler(this.state.previousDir)}>Back</Button>
-                    }
+                    } */}
                   </Col>
                   <Col>
                   </Col>

@@ -24,7 +24,7 @@ class AccountsPay extends Component{
                 </Row>
                 <Row>
                     <Col>
-                        <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
+                        {/* <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button> */}
                     </Col>
                     <Col>
                         <Button>Button</Button>
