@@ -4,7 +4,13 @@ import {Table, Container, Row, Col} from "react-bootstrap";
 function orderCart () {
 
     return(
-        <Table striped bordered>
+        <Table 
+        bordered 
+        style={{
+            color: "white",
+            fontSize: "12px"
+        }}
+        >
             <thead>
                 <tr>
                     <th>Count</th>

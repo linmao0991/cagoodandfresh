@@ -1,10 +1,14 @@
 import React, {Component} from "react";
-import DirectoryContext from "../../Context/DirectoryContext";
 import Api from "../../Utils/Api";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
+
+const myBorder = {
+    //    borderStyle: "solid",
+    //    borderColor: "white"
+}
 
 class OrderForm extends Component{
     state = {
@@ -85,34 +89,15 @@ class OrderForm extends Component{
                     <Col>
                     </Col>
                 </Row>
-                <Row style={{backgroundColor: "lightgrey"}}>
-                    <Col xs={8}>
+                <Row>
+                    <Col xs={8} style={myBorder}>
                         <Row>
                             <Col>
                                 <Button onClick={this.handleShow}>Find Customers</Button>
                             </Col>
                             <Col>
-                                <p><b>Customer:</b></p>
-                                {this.context.selectedCustomerData? 
-                                    <>
-                                        <p>{this.context.selectedCustomerData.restaurant_name_english}</p>
-                                        <p>{this.context.selectedCustomerData.restaurant_name_chinese}</p>
-                                        <p>{this.context.selectedCustomerData.business_phone_number}</p>
-                                    </>
-                                :
-                                    <p>None</p>
-                                }
                             </Col>
                             <Col>
-                                <p><b>Address</b></p>
-                                {this.context.selectedCustomerData?
-                                    <>
-                                    <p>{this.context.selectedCustomerData.billing_street}</p>
-                                    <p>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}</p>
-                                    </>
-                                :
-                                    <p>None</p>
-                                }
                             </Col>
                         </Row>
                         {/* Item Selection */}
@@ -123,9 +108,23 @@ class OrderForm extends Component{
 
                     {/* Order Cart Section */}
                     <Col>
-                        <OrderCart>
-
-                        </OrderCart>
+                        <Row>
+                            <p><b>Customer</b>
+                            {this.context.selectedCustomerData? 
+                            <>
+                                <br/>{this.context.selectedCustomerData.restaurant_name_english} {this.context.selectedCustomerData.restaurant_name_chinese}
+                                <br/>{this.context.selectedCustomerData.business_phone_number}
+                                <br/>{this.context.selectedCustomerData.billing_street}
+                                <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
+                            </>
+                            :
+                                <p>None</p>
+                            }
+                            </p>
+                        </Row>
+                        <Row>
+                            <OrderCart/>
+                        </Row>
                     </Col>
                 </Row>
 
@@ -134,11 +133,12 @@ class OrderForm extends Component{
                     onHide={this.handleClose}
                     backdrop="static"
                     keyboard={false}
-                    size ="xl">
+                    size ="xl"
+                    >
                     <Modal.Header closeButton>
                         <Modal.Title>Find Customers</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>
+                    <Modal.Body >
                         <Container>
                             <Row>
                                 <Col></Col>

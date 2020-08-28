@@ -72,26 +72,26 @@ class Directory extends Component{
                                 <>
                                     {login.permissionLevel >= 1?
                                         <>
-                                        <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>
+                                        <Button active block onClick={() => this.context.switchDir("orderform")}>Order Form</Button>
                                         <br />
-                                        <Button onClick={() => this.context.switchDir("inventory")}>Inventory</Button>
+                                        <Button active block onClick={() => this.context.switchDir("inventory")}>Inventory</Button>
                                         <br />
-                                        <Button onClick={() => this.context.switchDir("customers")}>Customers</Button>
+                                        <Button active block onClick={() => this.context.switchDir("customers")}>Customers</Button>
                                         <br />
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Button onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Button>
+                                        <Button active block onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Button>
                                         <br />
-                                        <Button onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Button>
+                                        <Button active block onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Button>
                                         <br />
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
-                                        <Button onClick={() => this.context.switchDir("admintools")}>Administrator Tools</Button>
+                                        <Button active block onClick={() => this.context.switchDir("admintools")}>Admin Tools</Button>
                                     :
                                     null}
                                 </>
