@@ -2,7 +2,8 @@ import React, {Component} from "react";
 import DirectoryContext from "../../Context/DirectoryContext";
 import Api from "../../Utils/Api";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
-import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay"
+import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
+import OrderCart from "../../Components/OrderCart/OrderCart";
 
 class OrderForm extends Component{
     state = {
@@ -86,33 +87,43 @@ class OrderForm extends Component{
                     <Col xs={8}>
                         <Row>
                             <Col>
-                                <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button>
-                            </Col>
-                            <Col>
                                 <Button onClick={this.handleShow}>Find Customers</Button>
                             </Col>
-                            <Col></Col>
-                        </Row>
-                        {this.state.selectedCustomer?
-                            <Row>
-                                <Col></Col>
-                                <Col>
-                                    <p>{this.state.selectedCustomer.restaurant_name_english}</p>
-                                    <p>{this.state.selectedCustomer.restaurant_name_chinese}</p>
-                                    <p>{this.state.selectedCustomer.business_phone_number}</p>
-                                </Col>
-                                <Col>
+                            <Col>
+                                <p><b>Customer:</b></p>
+                                {this.state.selectedCustomer? 
+                                    <>
+                                        <p>{this.state.selectedCustomer.restaurant_name_english}</p>
+                                        <p>{this.state.selectedCustomer.restaurant_name_chinese}</p>
+                                        <p>{this.state.selectedCustomer.business_phone_number}</p>
+                                    </>
+                                :
+                                    <p>None</p>
+                                }
+                            </Col>
+                            <Col>
+                                <p><b>Address</b></p>
+                                {this.state.selectedCustomer?
+                                    <>
                                     <p>{this.state.selectedCustomer.billing_street}</p>
                                     <p>{this.state.selectedCustomer.billing_city}, {this.state.selectedCustomer.billing_state} {this.state.selectedCustomer.billing_zipcode}</p>
-                                </Col>
-                                <Col></Col>
-                            </Row>
-                            : 
-                            null
-                        }
-                    </Col>
-                    <Col style={{backgroundColor: "lightgray"}}>
+                                    </>
+                                :
+                                    <p>None</p>
+                                }
+                            </Col>
+                        </Row>
+                        {/* Item Selection */}
+                        <Row>
 
+                        </Row>
+                    </Col>
+
+                    {/* Order Cart Section */}
+                    <Col>
+                        <OrderCart>
+
+                        </OrderCart>
                     </Col>
                 </Row>
 
