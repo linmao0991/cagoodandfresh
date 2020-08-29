@@ -47,7 +47,7 @@ router.post("/create_employee", (req, res) => {
     console.log("===================================")
     console.log("[Create Employee]")
     console.log("===================================")
-    const permission_req = 3;
+    let permission_req = 3;
     if (checkPermission(req.user, permission_req)) {
       db.employees.create({
         email: req.body.email,
@@ -128,6 +128,25 @@ router.get("/user_data", (req, res) => {
         }
       }).then( (dbCustomer) => {
         res.json(dbCustomer)
+      }).catch((err) => {
+        console.log(err.errors[0].message)
+        res.status(404).json({ error: err.errors[0].message });
+      })
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
+  });
+
+  //Get Product Categories
+  router.get("/get_product_categories", (req, res) =>{
+    let permission_req = 1;
+    if (checkPermission(req.user, permission_req)){
+      db.products.findAll({
+        group: ["holding"]
+      }).then(data => {
+        res.json(data)
       }).catch((err) => {
         console.log(err.errors[0].message)
         res.status(404).json({ error: err.errors[0].message });

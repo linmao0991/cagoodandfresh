@@ -28,5 +28,10 @@ export default {
     getCustomerInfo: customerData => {
         console.log("[Get Customer Data]")
         return axios.post("/api/find_customer", customerData);
+    },
+
+    //Get Product Categories
+    getProductCate: () => {
+        return axios.get("/api/get_product_categories")
     }
 }

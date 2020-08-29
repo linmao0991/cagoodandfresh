@@ -14,7 +14,8 @@ import OrderContext from "../Context/OrderContext";
 class Directory extends Component{
     state = {
         orderCustomerData: undefined,
-        orderData: undefined
+        orderData: undefined,
+        productCate: undefined
     }
     static contextType = DirectoryContext;
 
@@ -50,6 +51,7 @@ class Directory extends Component{
                         value={{
                             selectedCustomerData: this.state.orderCustomerData,
                             orderCartData: this.state.orderData,
+                            productCate: this.state.productCate,
                             orderContextStore: this.orderContextStoreHandler
                         }}
                     >

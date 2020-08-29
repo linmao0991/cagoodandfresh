@@ -4,6 +4,7 @@ import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
+import ProductSelection from "../../Components/ProductSelection/ProductSelection";
 
 const myBorder = {
     //    borderStyle: "solid",
@@ -111,7 +112,7 @@ class OrderForm extends Component{
                         </Row>
                         {/* Item Selection */}
                         <Row>
-
+                            <ProductSelection/>
                         </Row>
                     </Col>
 
@@ -129,7 +130,7 @@ class OrderForm extends Component{
                                     <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
                                 </>
                                 :
-                                    <p>None</p>
+                                <><br/>None</>
                             }
                             </p>
                             </Col>
