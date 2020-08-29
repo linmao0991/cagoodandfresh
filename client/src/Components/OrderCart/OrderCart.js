@@ -28,9 +28,13 @@ function orderCart () {
             </thead>
             <tbody>
                 <tr>
+                    {/* Count */}
                     <td>1</td>
+                    {/* Item */}
                     <td>Broccoli</td>
-                    <td>17.85</td>
+                    {/* Unit Price */}
+                    <td>17.95</td>
+                    {/* Total Price */}
                     <td>17.95</td>
                 </tr>
                 <tr>

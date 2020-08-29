@@ -73,9 +73,18 @@ class OrderForm extends Component{
         this.handleClose();
         //Stores selected customer to state
         this.setState({selectedCustomer: data});
-        //Stores selected customer to OrderContext
+        //Stores selected customer to OrderContext, Provider in Directory.js
         this.context.orderContextStore(data, this.state.orderCart)
     }
+
+    formatPhoneNumber = (phoneNumberString) => {
+        var cleaned = ('' + phoneNumberString).replace(/\D/g, '')
+        var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/)
+        if (match) {
+          return '(' + match[1] + ') ' + match[2] + '-' + match[3]
+        }
+        return null
+      }
 
     render() {
         return(
@@ -90,10 +99,10 @@ class OrderForm extends Component{
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={7} style={myBorder}>
+                    <Col xs={8} style={myBorder}>
                         <Row>
                             <Col>
-                                <Button onClick={this.handleShow}>Find Customers</Button>
+                                <Button variant="info" onClick={this.handleShow}>Find Customers</Button>
                             </Col>
                             <Col>
                             </Col>
@@ -109,18 +118,25 @@ class OrderForm extends Component{
                     {/* Order Cart Section */}
                     <Col>
                         <Row>
+                            <Col>
                             <p><b>Customer</b>
                             {this.context.selectedCustomerData? 
-                            <>
-                                <br/>{this.context.selectedCustomerData.restaurant_name_english} {this.context.selectedCustomerData.restaurant_name_chinese}
-                                <br/>{this.context.selectedCustomerData.business_phone_number}
-                                <br/>{this.context.selectedCustomerData.billing_street}
-                                <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
-                            </>
-                            :
-                                <p>None</p>
+                                <>
+                                    <br/>{this.context.selectedCustomerData.restaurant_name_english} 
+                                    {this.context.selectedCustomerData.restaurant_name_chinese? <><br/>{this.context.selectedCustomerData.restaurant_name_chinese}</>: null}
+                                    <br/>{this.formatPhoneNumber(this.context.selectedCustomerData.business_phone_number)}
+                                    <br/>{this.context.selectedCustomerData.billing_street}
+                                    <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
+                                </>
+                                :
+                                    <p>None</p>
                             }
                             </p>
+                            </Col>
+                            <Col>
+                                <p><b>Cart Total</b>: $33.90</p>
+                                <p><b>Total Items</b>: 2</p>
+                            </Col>
                         </Row>
                         <Row>
                             <OrderCart/>
