@@ -87,7 +87,7 @@ class App extends Component {
                   <Col>
                   </Col>
                   <Col>
-                    <Button onClick = {() => this.logoutHandler()}>Log Out</Button>
+                    <Button style={{float: "right"}} onClick = {() => this.logoutHandler()}>Log Out</Button>
                   </Col>
                 </Row>
               </Container>

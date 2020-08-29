@@ -90,7 +90,7 @@ class OrderForm extends Component{
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={8} style={myBorder}>
+                    <Col xs={7} style={myBorder}>
                         <Row>
                             <Col>
                                 <Button onClick={this.handleShow}>Find Customers</Button>

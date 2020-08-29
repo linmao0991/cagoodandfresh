@@ -6,11 +6,18 @@ function orderCart () {
     return(
         <Table 
         bordered 
+        size = "sm"
         style={{
             color: "white",
-            fontSize: "12px"
+            fontSize: "14px"
         }}
         >
+            <colgroup>
+                <col style={{width: "10%"}}/>
+                <col style={{width: "60%"}}/>
+                <col style={{width: "15%"}}/>
+                <col style={{width: "15%"}}/>
+            </colgroup>
             <thead>
                 <tr>
                     <th>Count</th>
