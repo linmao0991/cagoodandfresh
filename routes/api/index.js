@@ -144,7 +144,7 @@ router.get("/user_data", (req, res) => {
     let permission_req = 1;
     if (checkPermission(req.user, permission_req)){
       db.products.findAll({
-        group: ["holding"]
+        group: ["category"]
       }).then(data => {
         res.json(data)
       }).catch((err) => {
