@@ -14,21 +14,31 @@ import OrderContext from "../Context/OrderContext";
 class Directory extends Component{
     state = {
         orderCustomerData: undefined,
-        orderData: undefined,
-        productCate: undefined
+        productCate: undefined,
+        categoryData: undefined,
+        cartData: undefined
     }
     static contextType = DirectoryContext;
 
-    orderContextStoreHandler = (customerData, orderData) =>{
+    //Store selected customer data to the OrderContext
+    orderContextCustStore = (customerData) =>{
         console.log("=============================")
         console.log("Store Order Context")
         console.log(customerData)
-        console.log(orderData)
         console.log("=============================")
         this.setState({
             orderCustomerData: customerData,
-            orderData: orderData
         })
+    }
+
+    //Store Category data to the OrderContext
+    orderContextCateStore = (categoryData) => {
+        this.setState({categoryData: categoryData})
+    }
+
+    //Store CART DATA to the OrderContext
+    orderContextCartStore = (cartData) => {
+        this.setState({cartData: cartData})
     }
 
     directoryDisplay = () =>{
@@ -50,9 +60,11 @@ class Directory extends Component{
                     <OrderContext.Provider
                         value={{
                             selectedCustomerData: this.state.orderCustomerData,
-                            orderCartData: this.state.orderData,
+                            cartData: this.state.cartData,
                             productCate: this.state.productCate,
-                            orderContextStore: this.orderContextStoreHandler
+                            orderContextCustStore: this.orderContextCustStore,
+                            orderContextCateStore: this.orderContextCateStore,
+                            orderContextCartStore: this.orderContextCartStore
                         }}
                     >
                         <OrderForm />

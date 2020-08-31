@@ -75,7 +75,7 @@ class OrderForm extends Component{
         //Stores selected customer to state
         this.setState({selectedCustomer: data});
         //Stores selected customer to OrderContext, Provider in Directory.js
-        this.context.orderContextStore(data, this.state.orderCart)
+        this.context.orderContextCustStore(data)
     }
 
     formatPhoneNumber = (phoneNumberString) => {

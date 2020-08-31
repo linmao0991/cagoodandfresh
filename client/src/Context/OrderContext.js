@@ -2,9 +2,11 @@ import React from "react";
 
 const orderContext = React.createContext({
     selectedCustomerData: undefined,
-    orderCartData: undefined,
+    cartData: undefined,
     productCate: undefined,
-    orderContextStore: () => {}
+    orderContextCustStore: () => {},
+    orderContextCateStore: () => {},
+    orderContextCartStore: () => {}
 })
 
 export default orderContext
