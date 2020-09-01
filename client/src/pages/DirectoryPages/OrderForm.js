@@ -49,10 +49,6 @@ class OrderForm extends Component{
     showCustomers = () => {
         this.setState({displayCustomers: !this.state.displayCustomers})};
 
-    storeCustData = (data) => {
-        this.setState({customerData: data})
-    };
-
     getCustomerInfo = (event) => {
         event.preventDefault();
         Api.getCustomerInfo({
@@ -60,7 +56,7 @@ class OrderForm extends Component{
             business_phone_number: this.state.phone,
             restaurant_name_english: this.state.name
         }).then ( info => {
-            this.storeCustData(info.data)
+            this.setState({customerData: info.data})
             this.setState({displayCustomers: true})
             this.setState({account: undefined})
             this.setState({phone: undefined})
