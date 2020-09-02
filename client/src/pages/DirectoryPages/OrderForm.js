@@ -118,7 +118,7 @@ class OrderForm extends Component{
         console.log("[OrderForm.js]")
         return(
             <>
-            <Container>
+            <Container fluid>
                 <Row>
                     <Col>
                     </Col>
