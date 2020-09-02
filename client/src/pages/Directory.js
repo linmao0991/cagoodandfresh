@@ -10,22 +10,26 @@ import Customers from "./DirectoryPages/Customers";
 import Inventory from "./DirectoryPages/Inventory";
 import OrderForm from "./DirectoryPages/OrderForm";
 import OrderContext from "../Context/OrderContext";
+import Api from "../Utils/Api"
 
 class Directory extends Component{
     state = {
         orderCustomerData: undefined,
         productCate: undefined,
         categoryData: undefined,
-        cartData: undefined
+        cartData: undefined,
+        categorySelection: undefined,
+        searchType: undefined,
+        productData: undefined,
     }
     static contextType = DirectoryContext;
 
+    componentDidMount(){
+        this.getProductCate();
+    }
+
     //Store selected customer data to the OrderContext
     orderContextCustStore = (customerData) =>{
-        console.log("=============================")
-        console.log("Store Order Context")
-        console.log(customerData)
-        console.log("=============================")
         this.setState({
             orderCustomerData: customerData,
         })
@@ -41,6 +45,33 @@ class Directory extends Component{
         this.setState({cartData: cartData})
     }
 
+    getProductCate = () => {
+        Api.getProductCate().then(res => {
+            this.setState({productCate: res.data});
+            console.log(this.state.productCate)
+        }).catch(err => {
+            console.log("Something went wrong in getProductCate api call")
+        })
+    }
+
+    //Stores the selected category to be stored into OrderContext.
+    //--Called from ProductSelection.js
+    orderContextCateSelStore  = (category, productData,searchType) => {
+        console.log("[Directory - orderContextCateSelStore]")
+        console.log(category)
+        console.log(productData)
+        console.log(searchType)
+        this.setState({
+            categorySelection: category,
+            productData: productData,
+            searchType: searchType
+        })
+    }
+
+    orderContextSearchStore = type => {
+        this.setState({searchType: type})
+    }
+
     directoryDisplay = () =>{
         switch (this.context.currentDir) {
             case "main":
@@ -54,7 +85,25 @@ class Directory extends Component{
             case "customers":
                 return (<Customers />);
             case "inventory":
-                return (<Inventory />);
+                return (
+                    <OrderContext.Provider
+                        value={{
+                            selectedCustomerData: this.state.orderCustomerData,
+                            cartData: this.state.cartData,
+                            productCate: this.state.productCate,
+                            categorySelection: this.state.categorySelection,
+                            searchType: this.state.searchType,
+                            productData: this.state.productData,
+                            storeCustomer: this.orderContextCustStore,
+                            storeCategory: this.orderContextCateStore,
+                            storeCart: this.orderContextCartStore,
+                            storeCategorySelection: this.orderContextCateSelStore,
+                            storeSearchType: this.orderContextSearchStore,
+                        }}
+                    >
+                        <Inventory />
+                    </OrderContext.Provider>
+                );
             case "orderform":
                 return (
                     <OrderContext.Provider
@@ -62,9 +111,14 @@ class Directory extends Component{
                             selectedCustomerData: this.state.orderCustomerData,
                             cartData: this.state.cartData,
                             productCate: this.state.productCate,
-                            orderContextCustStore: this.orderContextCustStore,
-                            orderContextCateStore: this.orderContextCateStore,
-                            orderContextCartStore: this.orderContextCartStore
+                            categorySelection: this.state.categorySelection,
+                            searchType: this.state.searchType,
+                            productData: this.state.productData,
+                            storeCustomer: this.orderContextCustStore,
+                            storeCategory: this.orderContextCateStore,
+                            storeCart: this.orderContextCartStore,
+                            storeCategorySelection: this.orderContextCateSelStore,
+                            storeSearchType: this.orderContextSearchStore,
                         }}
                     >
                         <OrderForm />

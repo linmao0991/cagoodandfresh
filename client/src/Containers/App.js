@@ -57,8 +57,6 @@ class App extends Component {
   }
 
   render () {
-    console.log("[APP Render]")
-    console.log(this.state)
     return (
         <LoginContext.Provider
           value = {{

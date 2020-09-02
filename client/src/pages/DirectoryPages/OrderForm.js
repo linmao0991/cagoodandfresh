@@ -4,7 +4,8 @@ import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
-import ProductSelection from "../../Components/ProductSelection/ProductSelection";
+import CategorySelection from "../../Components/CategorySelection/CategorySelection";
+import ProductListing from "../../Components/ProductListing/ProductListing";
 
 const myBorder = {
     //    borderStyle: "solid",
@@ -71,7 +72,7 @@ class OrderForm extends Component{
         //Stores selected customer to state
         this.setState({selectedCustomer: data});
         //Stores selected customer to OrderContext, Provider in Directory.js
-        this.context.orderContextCustStore(data)
+        this.context.storeCustomer(data)
     }
 
     formatPhoneNumber = (phoneNumberString) => {
@@ -83,9 +84,41 @@ class OrderForm extends Component{
         return null
       }
 
+    productSearchType = () => {
+        switch (this.context.searchType) {
+            case "search":
+                return(<div>Search</div>);
+            case "selection":
+                return(
+                    this.context.productCate.map((category, index) =>{
+                        return(
+                        <CategorySelection
+                            category = {category}
+                            key = {index}
+                        />)
+                    }));
+            case "selection-product":
+                return(
+                    this.context.productData.map((product, index) => {
+                        return(
+                            <ProductListing 
+                                product = {product}
+                                key = {product.id}
+                            />
+                        )
+                    })
+                );
+            default:
+                //if(this.context.categorySelection)
+                return(<div>Select a search tye.</div>)
+        }
+    }
+
     render() {
+        console.log("[OrderForm.js]")
         return(
-            <Container fluid>
+            <>
+            <Container>
                 <Row>
                     <Col>
                     </Col>
@@ -93,13 +126,14 @@ class OrderForm extends Component{
                         <h1>Order Form</h1>
                     </Col>
                     <Col>
+                        <Button variant="info" onClick={this.handleShow}>Find Customers</Button>
                     </Col>
                 </Row>
                 <Row>
                     <Col xs={8} style={myBorder}>
                         <Row>
                             <Col>
-                                <Button variant="info" onClick={this.handleShow}>Find Customers</Button>
+                                <Button variant="info" onClick={() => this.context.storeSearchType("search")}>Search</Button> <Button variant="info" onClick={() => this.context.storeSearchType("selection")}>Selection</Button>
                             </Col>
                             <Col>
                             </Col>
@@ -108,7 +142,9 @@ class OrderForm extends Component{
                         </Row>
                         {/* Item Selection */}
                         <Row>
-                            <ProductSelection/>
+                            <Container fluid>
+                                {this.productSearchType()}
+                            </Container>
                         </Row>
                     </Col>
 
@@ -140,6 +176,7 @@ class OrderForm extends Component{
                         </Row>
                     </Col>
                 </Row>
+            </Container>
 
                 <Modal 
                     show={this.state.show} 
@@ -209,7 +246,7 @@ class OrderForm extends Component{
                         null}
                     </Modal.Footer>
                 </Modal>
-            </Container>
+            </>
         )
     }
 }

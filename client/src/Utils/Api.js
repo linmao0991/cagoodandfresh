@@ -21,6 +21,7 @@ export default {
 
     //Test User info
     userInfo: () => {
+        console.log("[Get User Info]")
         return axios.get("/api/user_data")
     },
 
@@ -32,6 +33,13 @@ export default {
 
     //Get Product Categories
     getProductCate: () => {
+        console.log("[Get Categories]")
         return axios.get("/api/get_product_categories")
+    },
+
+    //Get all products by category
+    getProductsByCate: (category) =>{
+        console.log(["Get Products by Category"])
+        return axios.post("/api/get_products_by_category", category)
     }
 }

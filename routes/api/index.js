@@ -142,9 +142,38 @@ router.get("/user_data", (req, res) => {
   //Get Product Categories
   router.get("/get_product_categories", (req, res) =>{
     let permission_req = 1;
+    //Check Permission Level
     if (checkPermission(req.user, permission_req)){
+      //Find category
       db.products.findAll({
         group: ["category"]
+      }).then(data => {
+        let categories = [];
+        //Create array with only a list of categories
+        for (const index in data){
+          categories.push(data[index].dataValues.category)
+        }
+        res.json(categories)
+      }).catch((err) => {
+        console.log(err.errors[0].message)
+        res.status(404).json({ error: err.errors[0].message });
+      })
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
+  });
+
+  //Get all products by category
+  router.post("/get_products_by_category", (req, res) =>{
+    let permission_req = 1;
+    if (checkPermission(req.user, permission_req)){
+      //Find all products from category
+      db.products.findAll({
+        where: {
+          category: req.body.category
+        }
       }).then(data => {
         res.json(data)
       }).catch((err) => {

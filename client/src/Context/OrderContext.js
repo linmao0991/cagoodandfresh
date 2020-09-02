@@ -4,9 +4,14 @@ const orderContext = React.createContext({
     selectedCustomerData: undefined,
     cartData: undefined,
     productCate: undefined,
-    orderContextCustStore: () => {},
-    orderContextCateStore: () => {},
-    orderContextCartStore: () => {}
+    categorySelection: undefined,
+    searchType: undefined,
+    productData: undefined,
+    storeCustomer: () => {},
+    storeCategory: () => {},
+    storeCart: () => {},
+    storeCategorySelection: () => {},
+    storeSearchType: () => {},
 })
 
 export default orderContext
