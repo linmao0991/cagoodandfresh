@@ -17,7 +17,7 @@ class Directory extends Component{
         orderCustomerData: undefined,
         productCate: undefined,
         categoryData: undefined,
-        cartData: undefined,
+        cartData: [],
         categorySelection: undefined,
         searchType: undefined,
         productData: undefined,

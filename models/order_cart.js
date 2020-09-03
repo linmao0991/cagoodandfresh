@@ -16,6 +16,9 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.INTEGER,
             allowNull: true
         },
+        ar_invoice_number: {
+            type: DataTypes.STRING
+        },
         sales_price: {
             type: DataTypes.DECIMAL(10,2),
             defaultValue: 0

@@ -1,7 +1,9 @@
-import React from "react";
+import React, {useContext, useStat} from "react";
 import {Table, Container, Row, Col} from "react-bootstrap";
+import OrderContext from "../../Context/OrderContext";
 
-function orderCart () {
+function OrderCart () {
+    const orderContext = useContext(OrderContext);
 
     return(
         <Table 
@@ -49,4 +51,4 @@ function orderCart () {
     )
 }
 
-export default orderCart;
+export default OrderCart;
