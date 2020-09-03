@@ -12,6 +12,18 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING,
             allowNull: true
         },
+        inventory_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
+        sales_price: {
+            type: DataTypes.DECIMAL(10,2),
+            defaultValue: 0
+        },
+        cost: {
+            type: DataTypes.DECIMAL(10,2),
+            defaultValue: 0
+        },
         product_name_english: {
             type: DataTypes.STRING,
         },
