@@ -41,5 +41,12 @@ export default {
     getProductsByCate: (category) =>{
         console.log(["Get Products by Category"])
         return axios.post("/api/get_products_by_category", category)
+    },
+
+    //Get inventory by product code
+    //--NOTE: product code is product id
+    getInventoryByOroduct: (productCode) => {
+        console.log("[Get Inventory of Product]")
+        return axios.post("/api/get_inventory_by_product_code", productCode)
     }
 }

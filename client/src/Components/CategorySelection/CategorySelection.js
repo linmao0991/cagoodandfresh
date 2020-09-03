@@ -6,6 +6,7 @@ import {Container, Row, Col, Button, Modal} from "react-bootstrap"
 function CategorySelection (props){
     const orderContext = useContext(OrderContext);
 
+    //Gets all products from selected category and sends it to be stored to context
     const getProductData = () =>{
         Api.getProductsByCate({
             category: props.category

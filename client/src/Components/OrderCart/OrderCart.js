@@ -5,10 +5,11 @@ function orderCart () {
 
     return(
         <Table 
-        bordered 
+        bordered
+        hover
         size = "sm"
+        variant="dark"
         style={{
-            color: "white",
             fontSize: "14px"
         }}
         >

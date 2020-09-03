@@ -187,4 +187,28 @@ router.get("/user_data", (req, res) => {
     }
   });
 
+  router.post("/get_inventory_by_product_code",(req, res) => {
+    let permission_req = 1;
+    if(checkPermission(req.user, permission_req)){
+      db.inventory.findAll({
+        where: {
+          [Op.and]: [
+            {product_code: req.body.productCode},
+            {current_quantity: {[Op.gt]: 0}}
+          ]
+        }
+      }).then( data =>{
+        //console.log(data)
+        res.json(data);
+      }).catch( err => {
+        console.log(err.errors[0].message)
+        res.status(404).json({ error: err.errors[0].message });
+      })
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
+  });
+
 module.exports = router;
