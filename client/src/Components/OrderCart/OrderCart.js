@@ -30,22 +30,25 @@ function OrderCart () {
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    {/* Count */}
-                    <td>1</td>
-                    {/* Item */}
-                    <td>Broccoli</td>
-                    {/* Unit Price */}
-                    <td>17.95</td>
-                    {/* Total Price */}
-                    <td>17.95</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>Green Pepper</td>
-                    <td>15.85</td>
-                    <td>15.95</td>
-                </tr>
+                {orderContext.cartData.length > 0? 
+                    orderContext.cartData.map((cartItem, Index)=>{
+                        return(
+                            <tr key={Index}>
+                                <td>{cartItem.quantity}</td>
+                                <td>{cartItem.name_english} {cartItem.name_chinese}</td>
+                                <td>{cartItem.sales_price}</td>
+                                <td>{(cartItem.quantity * cartItem.sales_price).toFixed(2)}</td>
+                            </tr>
+                        )
+                    })
+                : 
+                    <tr>
+                        <td></td>
+                        <td>Empty Cart</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                }
             </tbody>
         </Table>
     )

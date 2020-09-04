@@ -165,9 +165,9 @@ class OrderForm extends Component{
                         </Row>
                         {/* Item Selection */}
                         <Row>
-                            <Container fluid>
+                            {/* <Container fluid> */}
                                 {this.productSearchType()}
-                            </Container>
+                            {/* </Container> */}
                         </Row>
                     </Col>
 

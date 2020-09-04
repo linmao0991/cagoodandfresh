@@ -2,16 +2,9 @@ import React, {useContext, useState} from "react";
 import {Container, Row, Col, Modal, Button} from "react-bootstrap";
 import Api from "../../Utils/Api";
 import OrderContext from "../../Context/OrderContext";
-import InventoryModal from "../InventoryModal/InventoryModal";
+import AddProductModal from "../AddProductModal/AddProductModal";
 
-//Add Modal to display product information
-//--Call to inventory table
-//--Toggled by select button
-//--display inventory counts
-//----different records of inventory in at different prices
 //--display detailed information
-
-//Add function to select item to cart
 
 function ProductListing (props){
     const [show, toggleShow] = useState(false)
@@ -43,7 +36,7 @@ function ProductListing (props){
             <td>{props.product.weight} {props.product.measurement_system}</td>
         </tr>
         {show? 
-            <InventoryModal
+            <AddProductModal
                 show = {show}
                 productInven = {productInven}
                 productData = {props.product}

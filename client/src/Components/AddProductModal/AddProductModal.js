@@ -2,7 +2,17 @@ import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
-function InventoryModal (props) {
+//==Issue==
+//----Inputting quantities in multiple input fields then clicking on a NON corresponding add button will update state baseed on the LAST input field.
+//---Fix Requirements
+//-----Find a way to associate button with corresponding inputs and then update state while accounting for quantities in multiple input fields
+//--Possible Fixes
+//-----Use an array for the count state, intialize the state array with the number of inventory in index order
+//-----Use the index position for each inventory as keys for the MAP elements to asscoiate inputs with state index.
+//-----EX: count = [inventory1, inventory2, inventory3] aka [index 1, index 2, index 3]. Then each elements will have keys 1,2,3 we can use to assocaite input values.
+//-----This will also allow user to add quantities from different loads AND we can possibly allow user to change the sale price if we set count state as objects with quantity and sale_price
+
+function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
     const [show, toggleShow] = useState(props.show);
     const [count, setCount] =useState("");
@@ -26,19 +36,20 @@ function InventoryModal (props) {
         console.log(orderContext.cartData);
         console.log("[New Cart]");
         console.log(cart);
-        //Store the updated cart to OrderContext
+        // Store the updated cart to OrderContext
         orderContext.storeCart(cart)
+        props.toggleShow(!show)
     }
 
     return(
         <>
-        {console.log(props.show)}
         <Modal
             size="lg"
             show={show}
             onHide={props.toggleShow}
             backdrop="static"
             keyboard={false}
+            key={props.productInven.id}
         >
             <Modal.Header closeButton>
                 <Modal.Title>
@@ -76,13 +87,14 @@ function InventoryModal (props) {
                                     <tr key={index}>
                                         <td><InputGroup
                                                 onChange={(event)=>setCount(event.target.value)}
+                                                key={index}
                                             >
                                             <FormControl
                                                 placeholder=""
                                                 aria-label="product count"
                                             />
                                                 <InputGroup.Append>
-                                                    <Button size="sm" variant="outline-success" onClick={()=>addProductToCart(inventory)}>Add</Button>
+                                                    <Button size="sm" variant="outline-success" onClick={(event)=>addProductToCart(inventory)}>Add</Button>
                                                 </InputGroup.Append>
                                             </InputGroup>
                                         </td>
@@ -107,4 +119,4 @@ function InventoryModal (props) {
 
 }
 
-export default InventoryModal;
+export default AddProductModal;

@@ -1,7 +1,7 @@
 import React, {useState, useContext, Component} from "react";
 import OrderContext from "../../Context/OrderContext";
 import Api from "../../Utils/Api";
-import {Container, Row, Col, Button, Modal} from "react-bootstrap"
+import {Container, Row, Col, Button, Modal, Card} from "react-bootstrap"
 
 function CategorySelection (props){
     const orderContext = useContext(OrderContext);
@@ -20,9 +20,9 @@ function CategorySelection (props){
 
     return(
         <Button
+            style={{width: "100 px"}, {height: "50 px"}}
             onClick = {() => 
                 getProductData()
-                //orderContext.storeCategorySelection(props.category, "selection-product")
             }
         >
             {props.category}
