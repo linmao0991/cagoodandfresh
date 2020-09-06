@@ -4,7 +4,7 @@ var db = require("../../models");
 var passport = require("../../config/passport");
 var router = require("express").Router();
 const { Op } = require("sequelize");
-const axios = require('axios').default;
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
@@ -26,82 +26,75 @@ checkPermission = (user, permission_req) =>{
 
 //Search yelp for potential new customers
 router.post("/new_customer_search_yelp", (req, res) => {
-  //request sends search requests as a array of searches i.e. ["&radius={radius}", "location={location}",...]
   let permission_req = 1;
   if(checkPermission(req.user, permission_req)){
-    // let queryUrl = ""
-    // console.log(req.body.searchParam)
-    // let searchParam = [
-    //   "https://api.yelp.com/v3/businesses/search?",
-    //   "term=restaurants",
-    //   "&categories=chinese",
-    //   ...req.body.searchParam,
-    //   "&sort_by=distance"
-    // ]
-    
-    // searchParam.forEach(param => {
-    //   console.log(param)
-    //   if(param){
-    //     queryUrl = queryUrl+param
-    //   }
-    // })
 
     //Yelps results is limited to 50
-    //--Trying to find a way to call Yelp until all total results are retrived.
-    //----While loop seesm very complicated and not efficient
-    //----Using promises may be the answer
-    //----see this stackoverflow for possible soltuion https://stackoverflow.com/questions/43064719/javascript-asynchronous-method-in-while-loop/43064993
-    console.log(req.body)
-    let promises = []
+    //--[Solved]Trying to find a way to call Yelp until all total results are retrived.
+    //----Using storing promises into an array and using promise.all to run array.
     let restaurants = []
-    let offset = 0
-    let totalResutus = null,
-
-    while (restaurants.length < totalResutus || totalResutus === null){
-      offset = offset+50
-      promises.push(new Promise((resolve, reject) => {
+    let multiYelp = []
+    
+    //Promise for yelp API call
+    const yelpsearch = (offset) => {
+      return new Promise((resolve, reject) => {
         client.search({
+          //search business type (restaurants, gas stations, ...etc)
           term: req.body.term,
+          //search center at this location
           location: req.body.location,
+          //filter by categories (chinese, japanese,...etc)
           categories: req.body.categories,
+          //Search radius from location ( in meters)
           radius: req.body.radius,
+          //Sort results by
           sort_by: "distance",
+          //limit results default is 20, max is 50
           limit: req.body.limit,
-          offset: req.body.offset
+          //offset results.
+          offset: offset
         }).then( response => {
-          if(!totalResutus){
-            totalResutus = response.jsonBody.total;
-          }
+          //Adds returned result to our restaurants array
           restaurants = [...restaurants, ...response.jsonBody.businesses]
-          resolve(response.jsonBody.businesses)
+          //resolves promise with lenght of business array length (results yelp gave us max 50) and total results
+          resolve({arrayLength: response.jsonBody.businesses.length, totalResults: response.jsonBody.total})
         }).catch(err => {
           console.log(err)
-          reject()
+          reject(err)
         })
-      }))
+      })
     }
 
-    Promise.all(promises).then(() => {
+  //Initial yelp search using offset of 0
+  yelpsearch(0).then( results => {
+    //results should send back (returned yelp results ( 50 max), total results)
+    // Run only if there are total results over 50 and if results is at max 50
+    if(results.arrayLength === 50 && results.totalResults > 50){
+      //Calculating total iterations for loop rounding up
+      let totalIteration = Math.ceil((results.totalResults-results.arrayLength)/50);
+      //for loop starting at 1 and ending at total iterations +1. 
+      for ( let i = 1; i < totalIteration+1; i++){
+        //pushing yelpsearch promise in multiYelp array and setting offet by 50*i
+        //----This will run our promises with correct offets to return total results from yelp
+        multiYelp.push(yelpsearch(50*i))
+      }
+      console.log(multiYelp)
+      //Promise all to run all the multiYelp array promises and then send the combined restuants array to client
+      Promise.all(multiYelp).then(()=>{
+
+        res.json(restaurants)
+      })
+    }else{
+      //If yelp returns less than 50 businesses and total results is less than 50. Then return restaurants. This means there were not more than the max 50 results
       res.json(restaurants)
+    }
+  }).catch( error => {
+    console.log(error)
+    res.json({
+      msg: "error"
     })
+  })
 
-
-    // axios({
-    //   url: queryUrl,
-    //   headers: {
-    //     "Authorization": "Bearer "+process.env.YELP_KEY,
-    //   },
-    //   method: "GET",
-    //   dataType: "json"
-    // }).then(data => {
-    //   console.log(data.data)
-    //   res.json({
-    //     data: data.data
-    //   });
-    // }).catch(err => {
-    //   //res.json(err)
-    //   console.log(err)
-    // })
   }else{
     res.json({
       messege: "Permission level too low"

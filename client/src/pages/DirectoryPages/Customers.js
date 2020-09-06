@@ -2,11 +2,14 @@ import React, {useState, useContext, Component} from "react";
 import DirectoryContext from "../../Context/DirectoryContext"
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import Api from "../../Utils/Api";
+import FindRestaurantResults from '../../Components/FindRestaurantResults/FindRestaurantResults';
 
 class Customers extends Component{
     static contextType = DirectoryContext;
-    // const [email, emailNameInput] = useState("");
-    // const [password, passwordInput] = useState("");
+    state = {
+        display: undefined,
+        findRestaurantResults: undefined,
+    }
 
     //Search yelp for restaurants at a specified location and radius
     searchYelp = () =>{
@@ -19,7 +22,24 @@ class Customers extends Component{
                 limit: "50",
         }).then(data => {
             console.log(data.data);
+            this.setState({findRestaurantResults: data.data})
+            this.setState({display: "FindRestaurants"})
         })
+    }
+
+    customerDisplaySwitch = () =>{
+        switch (this.state.display){
+            case "FindRestaurants":
+                return(
+                    <FindRestaurantResults 
+                        results={this.state.findRestaurantResults}
+                    />
+                );
+            default:
+                return(
+                    <Col>Select a Function</Col>
+                );
+        }
     }
 
     render(){
@@ -45,6 +65,9 @@ class Customers extends Component{
                         <Button>Button</Button> <Button onClick={() => this.searchYelp()}>Find Customers</Button>
                     </Col>
                     <Col></Col>
+                </Row>
+                <Row>
+                    {this.customerDisplaySwitch()}
                 </Row>
             </Container>
         )
