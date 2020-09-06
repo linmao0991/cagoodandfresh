@@ -10,11 +10,11 @@ import OrderContext from "../../Context/OrderContext";
 //-----Use an array for the count state, intialize the state array with the number of inventory in index order
 //-----Use the index position for each inventory as keys for the MAP elements to asscoiate inputs with state index.
 //-----EX: count = [inventory1, inventory2, inventory3] aka [index 1, index 2, index 3]. Then each elements will have keys 1,2,3 we can use to assocaite input values.
-//--------------Finished initializing count state as a array of objects in the format listed on the line above.
-//--------------Finished handleSetCount to set the coutn state based on the input field values.
-//----------//Next Task
-//--------------addProductToCart needs to loop though count state and add each array inventory to the cart.
-//-----This will also allow user to add quantities from different loads AND we can possibly allow user to change the sale price if we set count state as objects with quantity and sale_price
+//---Finished initializing count state as a array of objects in the format listed on the line above.
+//---Finished handleSetCount to set the coutn state based on the input field values.
+//----//Next Task
+//------addProductToCart needs to loop though count state and add each array inventory to the cart.
+//--This will also allow user to add quantities from different loads AND we can possibly allow user to change the sale price if we set count state as objects with quantity and sale_price
 
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
