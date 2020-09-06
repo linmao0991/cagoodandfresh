@@ -4,9 +4,14 @@ var db = require("../../models");
 var passport = require("../../config/passport");
 var router = require("express").Router();
 const { Op } = require("sequelize");
+const axios = require('axios').default;
+
+const yelp = require('yelp-fusion');
+const client = yelp.client(process.env.YELP_KEY);
 
 var bcrypt = require("bcryptjs");
 const e = require('express');
+const cli = require('cli');
 const saltRounds = 10;
 
 
@@ -18,6 +23,92 @@ checkPermission = (user, permission_req) =>{
     return false
   }
 }
+
+//Search yelp for potential new customers
+router.post("/new_customer_search_yelp", (req, res) => {
+  //request sends search requests as a array of searches i.e. ["&radius={radius}", "location={location}",...]
+  let permission_req = 1;
+  if(checkPermission(req.user, permission_req)){
+    // let queryUrl = ""
+    // console.log(req.body.searchParam)
+    // let searchParam = [
+    //   "https://api.yelp.com/v3/businesses/search?",
+    //   "term=restaurants",
+    //   "&categories=chinese",
+    //   ...req.body.searchParam,
+    //   "&sort_by=distance"
+    // ]
+    
+    // searchParam.forEach(param => {
+    //   console.log(param)
+    //   if(param){
+    //     queryUrl = queryUrl+param
+    //   }
+    // })
+
+    //Yelps results is limited to 50
+    //--Trying to find a way to call Yelp until all total results are retrived.
+    //----While loop seesm very complicated and not efficient
+    //----Using promises may be the answer
+    //----see this stackoverflow for possible soltuion https://stackoverflow.com/questions/43064719/javascript-asynchronous-method-in-while-loop/43064993
+    console.log(req.body)
+    let promises = []
+    let restaurants = []
+    let offset = 0
+    let totalResutus = null,
+
+    while (restaurants.length < totalResutus || totalResutus === null){
+      offset = offset+50
+      promises.push(new Promise((resolve, reject) => {
+        client.search({
+          term: req.body.term,
+          location: req.body.location,
+          categories: req.body.categories,
+          radius: req.body.radius,
+          sort_by: "distance",
+          limit: req.body.limit,
+          offset: req.body.offset
+        }).then( response => {
+          if(!totalResutus){
+            totalResutus = response.jsonBody.total;
+          }
+          restaurants = [...restaurants, ...response.jsonBody.businesses]
+          resolve(response.jsonBody.businesses)
+        }).catch(err => {
+          console.log(err)
+          reject()
+        })
+      }))
+    }
+
+    Promise.all(promises).then(() => {
+      res.json(restaurants)
+    })
+
+
+    // axios({
+    //   url: queryUrl,
+    //   headers: {
+    //     "Authorization": "Bearer "+process.env.YELP_KEY,
+    //   },
+    //   method: "GET",
+    //   dataType: "json"
+    // }).then(data => {
+    //   console.log(data.data)
+    //   res.json({
+    //     data: data.data
+    //   });
+    // }).catch(err => {
+    //   //res.json(err)
+    //   console.log(err)
+    // })
+  }else{
+    res.json({
+      messege: "Permission level too low"
+    })
+  }
+})
+
 
 //Log in
 router.post("/login", passport.authenticate("local"), (req, res) => {

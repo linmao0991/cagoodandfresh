@@ -48,5 +48,11 @@ export default {
     getInventoryByOroduct: (productCode) => {
         console.log("[Get Inventory of Product]")
         return axios.post("/api/get_inventory_by_product_code", productCode)
-    }
+    },
+
+    //Search help for restaurants nearby zipcode or city
+    searchYelp: (searchParam) => {
+        console.log("[Search Yelp]")
+        return axios.post("/api/new_customer_search_yelp", searchParam)
+    },
 }
