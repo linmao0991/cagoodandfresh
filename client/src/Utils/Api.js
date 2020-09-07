@@ -55,4 +55,9 @@ export default {
         console.log("[Search Yelp]")
         return axios.post("/api/new_customer_search_yelp", searchParam)
     },
+
+    exportRestaurantCSV: (restaurants) => {
+        console.log("[Create New Restaruant CSV]")
+        return axios.post("/api/create_restaurant_csv", restaurants);
+    }
 }

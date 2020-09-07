@@ -1,10 +1,12 @@
 // Requiring our models and passport as we've configured it
 require('dotenv').config();
+var path = require("path")
 var db = require("../../models");
 var passport = require("../../config/passport");
 var router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const fileSystem = require('fs')
 
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
@@ -24,14 +26,22 @@ checkPermission = (user, permission_req) =>{
   }
 }
 
+
+router.post("/convert_restaurant_results_to_csv", (req, res) =>{
+  let permission_req = 1;
+  if(checkPermission(req.user, permission_req)){
+    
+  }else{
+    res.json({
+      messege: "Permission level too low"
+    })
+  }
+})
+
 //Search yelp for potential new customers
 router.post("/new_customer_search_yelp", (req, res) => {
   let permission_req = 1;
   if(checkPermission(req.user, permission_req)){
-
-    //Yelps results is limited to 50
-    //--[Solved]Trying to find a way to call Yelp until all total results are retrived.
-    //----Using storing promises into an array and using promise.all to run array.
     let restaurants = []
     let multiYelp = []
     
@@ -59,42 +69,35 @@ router.post("/new_customer_search_yelp", (req, res) => {
           //resolves promise with lenght of business array length (results yelp gave us max 50) and total results
           resolve({arrayLength: response.jsonBody.businesses.length, totalResults: response.jsonBody.total})
         }).catch(err => {
-          console.log(err)
           reject(err)
         })
       })
     }
 
-  //Initial yelp search using offset of 0
-  yelpsearch(0).then( results => {
-    //results should send back (returned yelp results ( 50 max), total results)
-    // Run only if there are total results over 50 and if results is at max 50
-    if(results.arrayLength === 50 && results.totalResults > 50){
-      //Calculating total iterations for loop rounding up
-      let totalIteration = Math.ceil((results.totalResults-results.arrayLength)/50);
-      //for loop starting at 1 and ending at total iterations +1. 
-      for ( let i = 1; i < totalIteration+1; i++){
-        //pushing yelpsearch promise in multiYelp array and setting offet by 50*i
-        //----This will run our promises with correct offets to return total results from yelp
-        multiYelp.push(yelpsearch(50*i))
-      }
-      console.log(multiYelp)
-      //Promise all to run all the multiYelp array promises and then send the combined restuants array to client
-      Promise.all(multiYelp).then(()=>{
-
+    //Initial yelp search using offset of 0
+    yelpsearch(0).then( results => {
+      //results should send back (returned yelp results ( 50 max), total results)
+      // Run only if there are total results over 50 and if results is at max 50
+      if(results.arrayLength === 50 && results.totalResults > 50){
+        //Calculating total iterations for loop rounding up
+        let totalIteration = Math.ceil((results.totalResults-results.arrayLength)/50);
+        //for loop starting at 1 and ending at total iterations +1. 
+        for ( let i = 1; i < totalIteration+1; i++){
+          //pushing yelpsearch promise in multiYelp array and setting offet by 50*i
+          //----This will run our promises with correct offets to return total results from yelp
+          multiYelp.push(yelpsearch(50*i))
+        }
+        //Promise all to run all the multiYelp array promises and then send the combined restuants array to client
+        Promise.all(multiYelp).then(()=>{
+          res.json(restaurants)
+        })
+      }else{
+        //If yelp returns less than 50 businesses and total results is less than 50. Then return restaurants. This means there were not more than the max 50 results
         res.json(restaurants)
-      })
-    }else{
-      //If yelp returns less than 50 businesses and total results is less than 50. Then return restaurants. This means there were not more than the max 50 results
-      res.json(restaurants)
-    }
-  }).catch( error => {
-    console.log(error)
-    res.json({
-      msg: "error"
+      }
+    }).catch( error => {
+      res.json(error)
     })
-  })
-
   }else{
     res.json({
       messege: "Permission level too low"
@@ -102,6 +105,60 @@ router.post("/new_customer_search_yelp", (req, res) => {
   }
 })
 
+//Create CSV for exporting to client.
+//--Issue: Cannot send the created csv file to client
+//----Figure out a way to send the file itself to the client
+//----Client needs a way to start the download of the file.
+router.post("/create_restaurant_csv",(req, res)=>{
+  const csvWriter = createCsvWriter({
+    path: path.join(__dirname, '../../csv/restaurants.csv'),
+    header: [
+      {id: 'name', title: 'Name'},
+      {id: 'address', title: 'Address'},
+      {id: 'address2', title: 'Address2'},
+      {id: 'address3', title: 'Address3'},
+      {id: 'city', title: 'City'},
+      {id: 'state', title: 'State'},
+      {id: 'zipcode', title: 'Zip'},
+      {id: 'phone', title: 'Phone'},
+      {id: 'latitude', title: 'Latitude'},
+      {id: 'longitude', title: 'Longitude'},
+    ]
+  });
+
+  let data = req.body.restaurants.map((restaurant)=>{
+    let dataEntry = {
+      name: restaurant.name,
+      address: restaurant.location.address1,
+      address2: restaurant.location.address2,
+      address3: restaurant.location.address3,
+      city: restaurant.location.city,
+      state: restaurant.location.state,
+      zip: restaurant.location.zip_code,
+      phone: restaurant.phone,
+      latitude: restaurant.coordinates.latitude,
+      longitude: restaurant.coordinates.longitude
+    }
+    return dataEntry;
+  })
+  console.log(data)
+
+  csvWriter
+    .writeRecords(data)
+    .then(()=> console.log('The CSV file was written successfully'));
+
+  let filePath = path.join(__dirname, '../../csv/restaurants.csv');
+  let stat = fileSystem.statSync(filePath);
+  
+  // res.set({ 'Content-Disposition': 'attachment; filename=testing.csv', 'Content-Type': 'text/csv' })
+  // res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
+  // res.set('Content-Type':'text/csv');
+  // res.status(200).send(path.join(__dirname, '../../csv/restaurants.csv'));
+  res.writeHead(200, {
+    'Content-Type': 'text/csv',
+    'Content-Length': stat.size
+  })
+})
 
 //Log in
 router.post("/login", passport.authenticate("local"), (req, res) => {

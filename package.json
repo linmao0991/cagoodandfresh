@@ -13,6 +13,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "if-env": "^1.0.4",
+    "json2csv": "^5.0.1",
     "mysql2": "^2.1.0",
     "nodemon": "^2.0.4",
     "passport": "^0.4.1",

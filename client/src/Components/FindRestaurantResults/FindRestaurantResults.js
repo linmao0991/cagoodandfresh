@@ -5,7 +5,9 @@ import {Container, Button, Modal, Row, Col, Table} from 'react-bootstrap';
 function FindRestaurantResults (props){
 
     return(
-        <Container fluid>
+        <Container 
+            fluid
+        >
             <Table
                 striped 
                 bordered 
@@ -29,7 +31,7 @@ function FindRestaurantResults (props){
                     {props.results.map((restaurant, index)=> {
                         return(
                             <tr key={index}>
-                                <td>{index}</td>
+                                <td>{index+1}</td>
                                 <td>{restaurant.name}</td>
                                 <td>{restaurant.display_phone}</td>
                                 <td>{restaurant.location.address1}, {restaurant.location.address2? restaurant.location.address2+", ": null}{restaurant.location.address3? restaurant.location.address3+", ": null}</td>
