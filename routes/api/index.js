@@ -14,6 +14,7 @@ const client = yelp.client(process.env.YELP_KEY);
 var bcrypt = require("bcryptjs");
 const e = require('express');
 const cli = require('cli');
+const { resolve } = require('path');
 const saltRounds = 10;
 
 
@@ -44,7 +45,33 @@ router.post("/new_customer_search_yelp", (req, res) => {
   if(checkPermission(req.user, permission_req)){
     let restaurants = []
     let multiYelp = []
-    
+
+    //Filters yelp results 
+    const removeCurrentCustomers = (getCurrentCustomers, yelpResults) => {
+      let newCustomers = yelpResults.filter(restaurant => {
+        let duplicate = getCurrentCustomers.find(customer => {
+          console.log(customer.business_phone_number+"|"+restaurant.phone.slice(-10))
+           return(customer.business_phone_number === restaurant.phone.slice(-10)?true:false)
+        })
+        return (duplicate ? null : restaurant)
+      })
+      return newCustomers
+    }
+
+    const getCurrentCustomers = () => {
+      return new Promise((resolve, reject) => {
+         db.customers.findAll({
+           where:{
+             active_customer: true
+           }
+         }).then( results => {
+           resolve(results)
+         }).catch( error => {
+           reject(error)
+         })
+      })
+    }
+
     //Promise for yelp API call
     const yelpsearch = (offset) => {
       return new Promise((resolve, reject) => {
@@ -74,13 +101,16 @@ router.post("/new_customer_search_yelp", (req, res) => {
       })
     }
 
-    //Initial yelp search using offset of 0
-    yelpsearch(0).then( results => {
-      //results should send back (returned yelp results ( 50 max), total results)
+    Promise.all([yelpsearch(0, false, null), getCurrentCustomers()]).then( results => {
+      let yelpStats = results[0]
+      let currentCustomers = results[1]
+      console.log(yelpStats.totalResults)
+      //console.log(restaurants)
+            //results should send back (returned yelp results ( 50 max), total results)
       // Run only if there are total results over 50 and if results is at max 50
-      if(results.arrayLength === 50 && results.totalResults > 50){
+      if(yelpStats.arrayLength === 50 && yelpStats.totalResults > 50){
         //Calculating total iterations for loop rounding up
-        let totalIteration = Math.ceil((results.totalResults-results.arrayLength)/50);
+        let totalIteration = Math.ceil((yelpStats.totalResults-yelpStats.arrayLength)/50);
         //for loop starting at 1 and ending at total iterations +1. 
         for ( let i = 1; i < totalIteration+1; i++){
           //pushing yelpsearch promise in multiYelp array and setting offet by 50*i
@@ -89,14 +119,13 @@ router.post("/new_customer_search_yelp", (req, res) => {
         }
         //Promise all to run all the multiYelp array promises and then send the combined restuants array to client
         Promise.all(multiYelp).then(()=>{
-          res.json(restaurants)
+          let filteredRestaurants = removeCurrentCustomers(currentCustomers, restaurants)
+          res.json(filteredRestaurants)
         })
       }else{
         //If yelp returns less than 50 businesses and total results is less than 50. Then return restaurants. This means there were not more than the max 50 results
         res.json(restaurants)
       }
-    }).catch( error => {
-      res.json(error)
     })
   }else{
     res.json({
@@ -141,6 +170,7 @@ router.post("/create_restaurant_csv",(req, res)=>{
     }
     return dataEntry;
   })
+
   console.log(data)
 
   csvWriter

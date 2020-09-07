@@ -13,6 +13,12 @@ class Customers extends Component{
         location: "44114",
         btnDownloadCsv: true,
         searching: false,
+        exportName: "44114"
+    }
+
+    handleExportName = (event) => {
+        event.preventDefault()
+        this.setState({exportName: event.target.value})
     }
 
     handleLocationChange = (event) =>{
@@ -80,7 +86,23 @@ class Customers extends Component{
                             <Button variant="success" disabled={this.state.btnDownloadCsv}>Compare to Existing</Button>
                         </Col>
                         <Col>
-                            <Button variant="success" disabled={this.state.btnDownloadCsv} onClick={()=> this.exportCSV()}>Export CSV</Button>
+                            <InputGroup 
+                                className="mb-3"
+                                onChange={(event) => {this.handleExportName(event)}}
+                            >
+                                <InputGroup.Prepend>
+                                <Button 
+                                    variant="success" 
+                                    disabled={this.state.btnDownloadCsv} 
+                                    onClick={()=> this.exportCSV()}
+                                >
+                                    Export CSV
+                                </Button>
+                                </InputGroup.Prepend>
+                                <FormControl
+                                    aria-describedby="export-name" 
+                                />
+                            </InputGroup>
                         </Col>
                     </>
                 );

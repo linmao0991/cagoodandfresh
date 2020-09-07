@@ -10,6 +10,10 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: false,
             unique: true
         },
+        active_customer: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true
+        },
         customer_representative: {
             type: DataTypes.STRING,
             allowNUll: true
