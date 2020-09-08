@@ -1,11 +1,9 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {Container, Row, Col, Modal, Button} from "react-bootstrap";
 import Api from "../../Utils/Api";
-import OrderContext from "../../Context/OrderContext";
 import AddProductModal from "../AddProductModal/AddProductModal";
 
 //--display detailed information
-
 function ProductListing (props){
     const [show, toggleShow] = useState(false)
     const [productInven, storeInven] = useState(undefined)

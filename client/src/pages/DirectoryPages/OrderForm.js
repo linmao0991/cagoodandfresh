@@ -6,6 +6,7 @@ import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
 import CategorySelection from "../../Components/CategorySelection/CategorySelection";
 import ProductListing from "../../Components/ProductListing/ProductListing";
+import SearchProduct from '../../Components/SearchProduct/SearchProduct';
 
 const myBorder = {
     //    borderStyle: "solid",
@@ -25,6 +26,11 @@ class OrderForm extends Component{
     }
 
     static contextType = OrderContext;
+
+    handleEmptyCart = () =>{
+        let emptyCart = []
+        this.context.storeCart(emptyCart)
+    }
 
     handleAccountInput = input =>{
         this.setState({account: input})
@@ -87,16 +93,23 @@ class OrderForm extends Component{
     productSearchType = () => {
         switch (this.context.searchType) {
             case "search":
-                return(<div>Search</div>);
+                return(
+                    <Container fluid>
+                        <SearchProduct />
+                    </Container>
+                );
             case "selection":
                 return(
-                    this.context.productCate.map((category, index) =>{
-                        return(
-                        <CategorySelection
-                            category = {category}
-                            key = {index}
-                        />)
-                    }));
+                    <Container fluid>
+                        {this.context.productCate.map((category, index) =>{
+                            return(
+                            <CategorySelection
+                                category = {category}
+                                key = {index}
+                            />)
+                        })}
+                    </Container>
+                    );
             case "selection-product":
                 return(
                     <Container fluid>
@@ -142,6 +155,7 @@ class OrderForm extends Component{
         return(
             <>
             <Container fluid>
+                <br />
                 <Row>
                     <Col>
                     </Col>
@@ -149,7 +163,7 @@ class OrderForm extends Component{
                         <h1>Order Form</h1>
                     </Col>
                     <Col>
-                        <Button variant="info" onClick={this.handleShow}>Find Customers</Button>
+                        <Button variant="info" onClick={this.handleShow}>Find Customers</Button> <Button variant="info" onClick={() => this.handleEmptyCart()}>Empty Cart</Button>
                     </Col>
                 </Row>
                 <Row>
@@ -164,6 +178,7 @@ class OrderForm extends Component{
                             </Col>
                         </Row>
                         {/* Item Selection */}
+                        <br />
                         <Row>
                             {/* <Container fluid> */}
                                 {this.productSearchType()}
@@ -190,8 +205,6 @@ class OrderForm extends Component{
                             </p>
                             </Col>
                             <Col>
-                                <p><b>Cart Total</b>: $33.90</p>
-                                <p><b>Total Items</b>: 2</p>
                             </Col>
                         </Row>
                         <Row>
