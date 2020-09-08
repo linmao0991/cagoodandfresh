@@ -3,6 +3,7 @@ import DirectoryContext from "../../Context/DirectoryContext"
 import {Modal, Button, Container, Row, Col, InputGroup, FormControl} from "react-bootstrap";
 import Api from "../../Utils/Api";
 import FindRestaurantResults from '../../Components/FindRestaurantResults/FindRestaurantResults';
+import download from "downloadjs";
 
 class Customers extends Component{
     static contextType = DirectoryContext;
@@ -12,8 +13,12 @@ class Customers extends Component{
         findRestaurantResults: undefined,
         location: "44114",
         btnDownloadCsv: true,
+        btnFilterResults: true,
+        btnSearch: false,
         searching: false,
-        exportName: "44114"
+        exportName: "44114",
+        exportingPending: false,
+        filteringPending: false
     }
 
     handleExportName = (event) => {
@@ -25,9 +30,13 @@ class Customers extends Component{
         event.preventDefault()
         this.setState({location: event.target.value})
     }
+
     //Search yelp for restaurants at a specified location and radius
     searchYelp = () =>{
-        this.setState({searching: true})
+        this.setState({
+            searching: true,
+            btnSearch: true
+        })
         Api.searchYelp({
             //Trim search paramters before sending to server
                 term: "restaurants",
@@ -37,22 +46,73 @@ class Customers extends Component{
                 limit: "50",
         }).then(data => {
             console.log(data.data);
-            this.setState({findRestaurantResults: data.data})
-            this.setState({display: "SearchYelp"})
-            this.setState({searching: false})
+            this.setState({
+                findRestaurantResults: data.data,
+                display: "SearchYelp",
+                searching: false,
+                btnSearch: false
+            })
             if(data.data.length > 0){
-                this.setState({btnDownloadCsv: false})
+                this.setState({
+                    btnDownloadCsv: false,
+                    btnFilterResults: false
+                })
             }
         })
     }
 
+    filterSearchResults = () => {
+        this.setState({
+            btnSearch: true,
+            btnDownloadCsv: true,
+            btnFilterResults: true,
+            filteringPending: true
+        })
+        Api.filterSearchResults({
+            restaurants: this.state.findRestaurantResults
+        }).then( data => {
+            this.setState({
+                findRestaurantResults: data.data,
+                btnSearch: false,
+                btnDownloadCsv: false,
+                btnFilterResults: false,
+                filteringPending: false
+            })
+            
+        })
+    }
+
     exportCSV = () => {
+        this.setState({
+            btnSearch: true,
+            btnDownloadCsv: true,
+            btnFilterResults: true,
+            exportingPending: true
+        })
         Api.exportRestaurantCSV({
+            csvName: this.state.exportName,
             restaurants: this.state.findRestaurantResults
         }).then( results => {
-            console.log(results)
+            Api.downloadCSV(this.state.exportName).then(file =>{
+                this.setState({
+                    btnSearch: false,
+                    btnDownloadCsv: false,
+                    btnFilterResults: false,
+                    exportingPending: false
+                })
+                console.log(file)
+                //window.location.href = (file)
+                console.log(this.state.exportName+'.csv')
+                download(file.data, this.state.exportName+'.csv')
+            })
             //Figure a way to download the csv file sent from the server
         }).catch( err => {
+            this.setState({
+                btnSearch: false,
+                btnDownloadCsv: false,
+                btnFilterResults: false,
+                exportingPending: false
+            })
             console.log(err)
         })
     }
@@ -69,8 +129,8 @@ class Customers extends Component{
                             >
                                 <InputGroup.Prepend>
                                 <Button 
-                                    variant="success" 
-                                    disabled={this.state.searching}
+                                    variant={this.state.searching? "warning":"success"}  
+                                    disabled={this.state.btnSearch}
                                     onClick={()=>this.searchYelp()}
                                 >
                                     {this.state.searching? "Loading...": "Search"}
@@ -83,7 +143,13 @@ class Customers extends Component{
                             </InputGroup>
                         </Col>
                         <Col>
-                            <Button variant="success" disabled={this.state.btnDownloadCsv}>Compare to Existing</Button>
+                            <Button 
+                                variant={this.state.filteringPending? "warning":"success"} 
+                                disabled={this.state.btnFilterResults}
+                                onClick={()=> this.filterSearchResults()}
+                            >
+                                {this.state.filteringPending? "Filtering...": "Filter Results"}
+                            </Button>
                         </Col>
                         <Col>
                             <InputGroup 
@@ -92,11 +158,11 @@ class Customers extends Component{
                             >
                                 <InputGroup.Prepend>
                                 <Button 
-                                    variant="success" 
+                                    variant={this.state.exportingPending? "warning":"success"} 
                                     disabled={this.state.btnDownloadCsv} 
                                     onClick={()=> this.exportCSV()}
                                 >
-                                    Export CSV
+                                    {this.state.exportingPending? "Exporting...": "Export CSV"}
                                 </Button>
                                 </InputGroup.Prepend>
                                 <FormControl
@@ -148,10 +214,11 @@ class Customers extends Component{
                         {/* <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button> */}
                     </Col>
                     <Col>
-                        <Button>Button</Button> <Button onClick={() => this.setState({subMenuDisplay: "FindNewCsutomers"})}>Find Customers</Button>
+                        <Button variant="info" onClick={() => this.setState({subMenuDisplay: "FindNewCsutomers"})}>Restaurant Search</Button>
                     </Col>
                     <Col></Col>
                 </Row>
+                <br />
                 <Row>
                     {this.subMenuDisplaySwitch()}
                 </Row>

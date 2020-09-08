@@ -6,7 +6,6 @@ var passport = require("../../config/passport");
 var router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-const fileSystem = require('fs')
 
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
@@ -14,7 +13,6 @@ const client = yelp.client(process.env.YELP_KEY);
 var bcrypt = require("bcryptjs");
 const e = require('express');
 const cli = require('cli');
-const { resolve } = require('path');
 const saltRounds = 10;
 
 
@@ -27,50 +25,15 @@ checkPermission = (user, permission_req) =>{
   }
 }
 
-
-router.post("/convert_restaurant_results_to_csv", (req, res) =>{
-  let permission_req = 1;
-  if(checkPermission(req.user, permission_req)){
-    
-  }else{
-    res.json({
-      messege: "Permission level too low"
-    })
-  }
-})
-
 //Search yelp for potential new customers
 router.post("/new_customer_search_yelp", (req, res) => {
+  console.log("===================================")
+  console.log("[Search for Restaurants]")
+  console.log("===================================")
   let permission_req = 1;
   if(checkPermission(req.user, permission_req)){
+    //Declare our restaurants result array
     let restaurants = []
-    let multiYelp = []
-
-    //Filters yelp results 
-    const removeCurrentCustomers = (getCurrentCustomers, yelpResults) => {
-      let newCustomers = yelpResults.filter(restaurant => {
-        let duplicate = getCurrentCustomers.find(customer => {
-          console.log(customer.business_phone_number+"|"+restaurant.phone.slice(-10))
-           return(customer.business_phone_number === restaurant.phone.slice(-10)?true:false)
-        })
-        return (duplicate ? null : restaurant)
-      })
-      return newCustomers
-    }
-
-    const getCurrentCustomers = () => {
-      return new Promise((resolve, reject) => {
-         db.customers.findAll({
-           where:{
-             active_customer: true
-           }
-         }).then( results => {
-           resolve(results)
-         }).catch( error => {
-           reject(error)
-         })
-      })
-    }
 
     //Promise for yelp API call
     const yelpsearch = (offset) => {
@@ -91,8 +54,12 @@ router.post("/new_customer_search_yelp", (req, res) => {
           //offset results.
           offset: offset
         }).then( response => {
-          //Adds returned result to our restaurants array
-          restaurants = [...restaurants, ...response.jsonBody.businesses]
+          //Filters out restaurants with no phone numbers, usually means restaurant is permanently closed
+          let validPhoneOnly = response.jsonBody.businesses.filter(restaurants => {
+            return (restaurants.phone? restaurants: null);
+          })
+          //Add validPhoneOnly restaurants to our restaurant array.
+          restaurants = [...restaurants, ...validPhoneOnly]
           //resolves promise with lenght of business array length (results yelp gave us max 50) and total results
           resolve({arrayLength: response.jsonBody.businesses.length, totalResults: response.jsonBody.total})
         }).catch(err => {
@@ -101,26 +68,25 @@ router.post("/new_customer_search_yelp", (req, res) => {
       })
     }
 
-    Promise.all([yelpsearch(0, false, null), getCurrentCustomers()]).then( results => {
+    //Promise all to run when all promises are complete. Currently not useful, but if you were to add multi-location search this would work well.
+    Promise.all([yelpsearch(0)]).then( results => {
+      //Set values from returned promise at array index 0
       let yelpStats = results[0]
-      let currentCustomers = results[1]
-      console.log(yelpStats.totalResults)
-      //console.log(restaurants)
-            //results should send back (returned yelp results ( 50 max), total results)
-      // Run only if there are total results over 50 and if results is at max 50
+      //Declares multiYelp array for later promise all
+      let multiYelp = []
+      // Run only if there are total results over 50 and if returned results is at max 50
       if(yelpStats.arrayLength === 50 && yelpStats.totalResults > 50){
         //Calculating total iterations for loop rounding up
         let totalIteration = Math.ceil((yelpStats.totalResults-yelpStats.arrayLength)/50);
         //for loop starting at 1 and ending at total iterations +1. 
         for ( let i = 1; i < totalIteration+1; i++){
-          //pushing yelpsearch promise in multiYelp array and setting offet by 50*i
+          //pushing yelpsearch promise in multiYelp array and setting offset by 50*i
           //----This will run our promises with correct offets to return total results from yelp
           multiYelp.push(yelpsearch(50*i))
         }
         //Promise all to run all the multiYelp array promises and then send the combined restuants array to client
         Promise.all(multiYelp).then(()=>{
-          let filteredRestaurants = removeCurrentCustomers(currentCustomers, restaurants)
-          res.json(filteredRestaurants)
+          res.json(restaurants)
         })
       }else{
         //If yelp returns less than 50 businesses and total results is less than 50. Then return restaurants. This means there were not more than the max 50 results
@@ -134,13 +100,51 @@ router.post("/new_customer_search_yelp", (req, res) => {
   }
 })
 
+//Filter out current customers from the restaurant search
+router.post("/filter_restaurant_search", (req, res)=>{
+  console.log("===================================")
+  console.log("[Filter Restaurant Search Results]")
+  console.log("===================================")
+  //Function that recieves all active current customers and restaurant search results. Then compares and removes active customers from the restaurant search results
+  const removeCurrentCustomers = (getCurrentCustomers, yelpResults) => {
+    //Run array filter on restaurant search and set returned values into newCustomers array
+    let newCustomers = yelpResults.filter(restaurant => {
+      //Use array find to go though active customers and compare with current restaurant in the search results
+      let duplicate = getCurrentCustomers.find(customer => {
+        //Returns boolean value based on matching phone numbers
+        return(customer.business_phone_number === restaurant.phone.slice(-10)?true:false)
+      })
+      //If duplcaite is true then don't return restaurant because it is a current customer. If false then return thr restaurant data
+      return (duplicate ? null : restaurant)
+    })
+    return newCustomers
+  }
+
+  //Search customers table for all active customers
+  db.customers.findAll({
+    where:{
+      active_customer: true
+    }
+  }).then( results => {
+    //Send results of database search and restaurant search data to removeCurrentCustomers.
+    let filteredResults = removeCurrentCustomers(results, req.body.restaurants)
+    //Return filtered results
+    res.json(filteredResults)
+  }).catch( error => {
+    res.json(error)
+  })
+})
+
 //Create CSV for exporting to client.
-//--Issue: Cannot send the created csv file to client
-//----Figure out a way to send the file itself to the client
-//----Client needs a way to start the download of the file.
 router.post("/create_restaurant_csv",(req, res)=>{
+  console.log("===================================")
+  console.log("[Create CSV]")
+  console.log("===================================")
+  //sets filePath with path and name of the file
+  let filePath = path.join(__dirname, '../../csv/'+req.body.csvName+'.csv');
+  //Use csv Writer and write the header for the csv file
   const csvWriter = createCsvWriter({
-    path: path.join(__dirname, '../../csv/restaurants.csv'),
+    path: filePath,
     header: [
       {id: 'name', title: 'Name'},
       {id: 'address', title: 'Address'},
@@ -155,6 +159,7 @@ router.post("/create_restaurant_csv",(req, res)=>{
     ]
   });
 
+  //Sets map though our restaurant search results and formats it to match our csv header.
   let data = req.body.restaurants.map((restaurant)=>{
     let dataEntry = {
       name: restaurant.name,
@@ -171,23 +176,26 @@ router.post("/create_restaurant_csv",(req, res)=>{
     return dataEntry;
   })
 
-  console.log(data)
-
+  //use csvWriter to create the csv file using our data. Then sending true back to client
   csvWriter
     .writeRecords(data)
-    .then(()=> console.log('The CSV file was written successfully'));
+    .then(()=> {
+      console.log('The CSV file was written successfully')
+      res.json({
+        created: true
+      })
+    });
+})
 
-  let filePath = path.join(__dirname, '../../csv/restaurants.csv');
-  let stat = fileSystem.statSync(filePath);
-  
-  // res.set({ 'Content-Disposition': 'attachment; filename=testing.csv', 'Content-Type': 'text/csv' })
-  // res.setHeader('Content-disposition', 'attachment; filename=testing.csv');
-  // res.set('Content-Type':'text/csv');
-  // res.status(200).send(path.join(__dirname, '../../csv/restaurants.csv'));
-  res.writeHead(200, {
-    'Content-Type': 'text/csv',
-    'Content-Length': stat.size
-  })
+//Route to download created restaurant search result csv
+router.get("/download_csv/:id", (req,res)=>{
+  console.log("===================================")
+  console.log("[Download CSV]")
+  console.log("===================================")
+  //sets the file path to our csv file. This route is ran immediatly after creating the csv file. The name of the csv file is sent with this get.
+  let filePath = path.join(__dirname, '../../csv/'+req.params.id+'.csv');
+  //send csv file to client for download
+  res.download(filePath)
 })
 
 //Log in

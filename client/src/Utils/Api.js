@@ -59,5 +59,15 @@ export default {
     exportRestaurantCSV: (restaurants) => {
         console.log("[Create New Restaruant CSV]")
         return axios.post("/api/create_restaurant_csv", restaurants);
+    },
+
+    downloadCSV: (csvName) =>{
+        console.log("[Getting CSV "+csvName+"]")
+        return axios.get("/api/download_csv/"+csvName)
+    },
+
+    filterSearchResults: (data) => {
+        console.log("[Filter Search Results]")
+        return axios.post("/api/filter_restaurant_search", data)
     }
 }
