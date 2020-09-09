@@ -69,5 +69,10 @@ export default {
     filterSearchResults: (data) => {
         console.log("[Filter Search Results]")
         return axios.post("/api/filter_restaurant_search", data)
+    },
+
+    searchInventoryByInput: (input) => {
+        console.log("[Filter Search Results]")
+        return axios.post("/api/search_inventory_by_input", input)
     }
 }

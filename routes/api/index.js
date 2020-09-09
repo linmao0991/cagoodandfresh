@@ -366,11 +366,39 @@ router.get("/user_data", (req, res) => {
     }
   });
 
+  //Search inventory by search input
+  router.post("/search_inventory_by_input", (req, res) => {
+    let permission_req = 1;
+    if(checkPermission(req.user, permission_req)){
+      db.products.findAll({
+        where:{
+          [Op.or]: [
+            {id: req.body.searchInput},
+            {name_english: {[Op.substring]: req.body.searchInput}}, 
+            {name_chinese: {[Op.substring]: req.body.searchInput}}
+          ]
+        }
+      }).then( result => {
+        console.log(result[0])
+        res.json(result)
+      }).catch( error => {
+        console.log(error)
+        res.json(error)
+      })
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
+  })
+
+  //Get inventory by product code (product id)
   router.post("/get_inventory_by_product_code",(req, res) => {
     let permission_req = 1;
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
         where: {
+          //Where product code equal code snet and inventory current quantity > 0
           [Op.and]: [
             {product_code: req.body.productCode},
             {current_quantity: {[Op.gt]: 0}}

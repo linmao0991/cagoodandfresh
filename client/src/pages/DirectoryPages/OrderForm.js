@@ -113,35 +113,10 @@ class OrderForm extends Component{
             case "selection-product":
                 return(
                     <Container fluid>
-                    <Table
-                        striped 
-                        bordered 
-                        hover
-                        variant="dark"
-                        style={{
-                            fontSize: "14px"
-                        }}
-                    >
-                        <thead>
-                            <tr>
-                                <td style={{fontSize: "16px", fontWeight: "bold"}}>{this.context.categorySelection.toUpperCase()}</td>
-                                <td>Product Name English</td>
-                                <td>Product Name Chinese</td>
-                                <td>Holding</td>
-                                <td>Size</td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {this.context.productData.map((product, index) => {
-                                return(
-                                    <ProductListing 
-                                        product = {product}
-                                        key = {product.id}
-                                    />
-                                )
-                            })}
-                        </tbody>
-                    </Table>
+                        <ProductListing 
+                            allProductData = {this.context.productData}
+                            categorySelection = {this.context.categorySelection.toUpperCase()}
+                        />
                     </Container>
                 );
             default:

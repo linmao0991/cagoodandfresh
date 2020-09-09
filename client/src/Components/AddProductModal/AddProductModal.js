@@ -27,8 +27,8 @@ function AddProductModal (props) {
     }
     const [show, toggleShow] = useState(props.show);
     const [count, setCount] = useState(setInitialCount());
-    console.log("[Intial Count State]")
-    console.log(count);
+    const [totalCount, setTotalCount] = useState(undefined)
+    const [totalSale, setTotalSale] = useState(undefined)
 
     //Function to add selected product into the cart then stores updated cart to OrderContext
     const addProductToCart = (event) => {
@@ -36,7 +36,6 @@ function AddProductModal (props) {
         //Create new object with combined product data and inventory data
         let newCartItems = 
             count.map(item => {
-                console.log(item)
                 let cartItem ={
                     ...props.productData,
                     quantity: item.quantity,
@@ -47,24 +46,14 @@ function AddProductModal (props) {
                     supplier_name: item.inventory.supplier_name,
                     supplier_id: item.inventory.supplier_id
                 }
-                console.log(cartItem)
                 if(item.quantity>0){
                     return cartItem
                 }
             }).filter(cartItem =>{
                 return(cartItem? cartItem: null)
             })
-
-        // let cleanedCart = newCartItems.filter(cartItem =>{
-        //     return(cartItem? cartItem: null)
-        // })
-        console.log(newCartItems)
         //Add new cart item to the existing cart
         let cart = [...orderContext.cartData,...newCartItems]
-        console.log("[Old Cart]")
-        console.log(orderContext.cartData);
-        console.log("[New Cart]");
-        console.log(cart);
         // Store the updated cart to OrderContext
         orderContext.storeCart(cart)
         props.toggleShow(!show)
@@ -72,16 +61,8 @@ function AddProductModal (props) {
 
     const handleSetCount = (index, value, event) => {
         event.preventDefault()
-        console.log("[----handleSetCount-----]")
-        console.log("Key "+index)
-        console.log("Value "+value)
         let newState = [...count]
-        console.log("Old Count")
-        console.log(newState)
         newState[index].quantity = value
-        //newState.splice(index, 1, {quantity: value})
-        console.log("New Count");
-        console.log(newState)
         setCount(newState)
     }
 
@@ -91,11 +72,15 @@ function AddProductModal (props) {
         let currentItemCount = newState[index].quantity
         let inventoryCount = newState[index].inventory.current_quantity
         let changeValue = value
-        console.log("Current Count: "+currentItemCount)
-        console.log("Inventory Count: "+inventoryCount)
         if( (currentItemCount+changeValue >= 0) && (currentItemCount+changeValue <= inventoryCount)){
             newState[index].quantity = newState[index].quantity + value
             console.log(newState)
+            let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
+            let newTotalSales = newState.reduce((accumulator, currentValue) => {return accumulator + (currentValue.quantity * currentValue.inventory.sale_price)},0)
+            console.log(newTotalCount)
+            console.log(newTotalSales)
+            setTotalCount(newTotalCount)
+            setTotalSale(newTotalSales.toFixed(2))
             setCount(newState)
         }
     }
@@ -179,8 +164,8 @@ function AddProductModal (props) {
             <Modal.Footer>
                 <Container fluid>
                     <Row>
-                        <Col></Col>
-                        <Col></Col>
+                        <Col>Total Count: {totalCount}</Col>
+                        <Col>Total Sales: ${totalSale}</Col>
                         <Col>
                             <Button size="sm" variant="success" onClick={(event)=>addProductToCart(event)}>ADD TO CART</Button>
                         </Col>

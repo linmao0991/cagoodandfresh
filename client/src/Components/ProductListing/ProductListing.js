@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Container, Row, Col, Modal, Button} from "react-bootstrap";
+import {Table, Button} from "react-bootstrap";
 import Api from "../../Utils/Api";
 import AddProductModal from "../AddProductModal/AddProductModal";
 
@@ -7,10 +7,12 @@ import AddProductModal from "../AddProductModal/AddProductModal";
 function ProductListing (props){
     const [show, toggleShow] = useState(false)
     const [productInven, storeInven] = useState(undefined)
+    const [productData, storeProduct] = useState(undefined)
 
-    const getInventoryData = () =>{
+    const getInventoryData = (product) =>{
+        storeProduct(product)
         Api.getInventoryByOroduct({
-            productCode: props.product.id
+            productCode: product.id
         }).then( inventory => {
             console.log(inventory.data)
             storeInven(inventory.data);
@@ -24,20 +26,45 @@ function ProductListing (props){
 
     const handleModalToggle = () => toggleShow(!show);
 
-    return(
-        <>
-        <tr>
-            <td><Button size="sm" variant="outline-success" onClick={() => getInventoryData()}>Select</Button></td>
-            <td>{props.product.name_english}</td>
-            <td>{props.product.name_chinese}</td>
-            <td>{props.product.holding}</td>
-            <td>{props.product.weight} {props.product.measurement_system}</td>
-        </tr>
+    return( 
+        <>               
+        <Table
+            striped 
+            bordered 
+            hover
+            variant="dark"
+            style={{
+                fontSize: "14px"
+            }}
+        >
+            <thead>
+                <tr>
+                    <td style={{fontSize: "16px", fontWeight: "bold"}}>{props.categorySelection}</td>
+                    <td>Product Name English</td>
+                    <td>Product Name Chinese</td>
+                    <td>Holding</td>
+                    <td>Size</td>
+                </tr>
+            </thead>
+            <tbody>
+                {props.allProductData.map((product, index) => {
+                    return(
+                        <tr key={index}>
+                            <td><Button size="sm" variant="outline-success" onClick={() => getInventoryData(product)}>Select</Button></td>
+                            <td>{product.name_english}</td>
+                            <td>{product.name_chinese}</td>
+                            <td>{product.holding}</td>
+                            <td>{product.weight} {product.measurement_system}</td>
+                        </tr>
+                    )
+                })}
+            </tbody>
+        </Table>
         {show? 
             <AddProductModal
                 show = {show}
                 productInven = {productInven}
-                productData = {props.product}
+                productData = {productData}
                 toggleShow = {handleModalToggle}
             />
         : null}
