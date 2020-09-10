@@ -26,8 +26,8 @@ function OrderCart () {
                             return accumulator+currentValue.quantity}, 0)}
                         </th>
                         <th>Total: ${(orderContext.cartData.reduce((accumulator, currentValue) => {
-                            console.log(accumulator+" : "+(currentValue.quantity * currentValue.sales_price).toFixed(2))
-                            return accumulator+(currentValue.quantity * currentValue.sales_price)
+                            console.log(accumulator+" : "+(currentValue.quantity * currentValue.sale_price).toFixed(2))
+                            return accumulator+(currentValue.quantity * currentValue.sale_price)
                             }, 0)).toFixed(2)}
                         </th>
                     </tr>
@@ -63,8 +63,8 @@ function OrderCart () {
                                 <tr key={Index}>
                                     <td>{cartItem.quantity}</td>
                                     <td>{cartItem.name_english} {cartItem.name_chinese}</td>
-                                    <td>{cartItem.sales_price}</td>
-                                    <td>{(cartItem.quantity * cartItem.sales_price).toFixed(2)}</td>
+                                    <td>{cartItem.sale_price}</td>
+                                    <td>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
                                 </tr>
                             )
                         })

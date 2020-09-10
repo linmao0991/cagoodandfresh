@@ -19,12 +19,13 @@ import OrderContext from "../../Context/OrderContext";
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
     const setInitialCount = () =>{
-        let initialState = []
+        let initialCountState = []
         for (let [index, inventory] of props.productInven.entries()){
-            initialState.push({index: index, quantity: 0, inventory: inventory})
+            initialCountState.push({index: index, quantity: 0, newSalePrice: parseFloat(inventory.sale_price).toFixed(2), inventory: inventory})
         }
-        return initialState;
+        return initialCountState;
     }
+
     const [show, toggleShow] = useState(props.show);
     const [count, setCount] = useState(setInitialCount());
     const [totalCount, setTotalCount] = useState(undefined)
@@ -39,7 +40,7 @@ function AddProductModal (props) {
                 let cartItem ={
                     ...props.productData,
                     quantity: item.quantity,
-                    sales_price: item.inventory.sale_price,
+                    sale_price: item.newSalePrice,
                     cost: item.inventory.cost,
                     inventory_id: item.inventory.id,
                     ar_invoice_number: item.inventory.ar_invoice_number,
@@ -59,10 +60,19 @@ function AddProductModal (props) {
         props.toggleShow(!show)
     }
 
-    const handleSetCount = (index, value, event) => {
+    const handleSetCount = (index, event) => {
         event.preventDefault()
         let newState = [...count]
-        newState[index].quantity = value
+        newState[index].quantity = parseFloat(event.target.value)
+        calculateTotals(newState)
+        setCount(newState)
+    }
+
+    const handleSetNewSalePrice = (index, event) =>{
+        event.preventDefault()
+        let newState = [...count]
+        newState[index].newSalePrice = event.target.value
+        calculateTotals(newState)
         setCount(newState)
     }
 
@@ -70,19 +80,19 @@ function AddProductModal (props) {
         event.preventDefault()
         let newState =[...count]
         let currentItemCount = newState[index].quantity
-        let inventoryCount = newState[index].inventory.current_quantity
-        let changeValue = value
-        if( (currentItemCount+changeValue >= 0) && (currentItemCount+changeValue <= inventoryCount)){
+        let changeValue = parseFloat(value)
+        if(currentItemCount+changeValue >= 0){
             newState[index].quantity = newState[index].quantity + value
-            console.log(newState)
-            let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
-            let newTotalSales = newState.reduce((accumulator, currentValue) => {return accumulator + (currentValue.quantity * currentValue.inventory.sale_price)},0)
-            console.log(newTotalCount)
-            console.log(newTotalSales)
-            setTotalCount(newTotalCount)
-            setTotalSale(newTotalSales.toFixed(2))
+            calculateTotals(newState)
             setCount(newState)
         }
+    }
+
+    const calculateTotals = (newState) => {
+        let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
+        let newTotalSales = newState.reduce((accumulator, currentValue) => {return accumulator + (currentValue.quantity * currentValue.newSalePrice)},0)
+        setTotalCount(newTotalCount)
+        setTotalSale(newTotalSales.toFixed(2))
     }
 
     return(
@@ -132,25 +142,33 @@ function AddProductModal (props) {
                                         <td><InputGroup
                                                 key={index}
                                             >
-                                            <InputGroup.Prepend>
-                                                <Button size="sm" variant="outline-success" onClick={(event)=>handleCountIncDec(index, -1, event)}>-</Button>
-                                            </InputGroup.Prepend>
-                                            <FormControl
-                                                value={count[index].quantity}
-                                                onChange={(event)=>handleSetCount(index, event.target.value, event)}
-                                                placeholder=""
-                                                aria-label="product-count"
-                                            />
-                                            <InputGroup.Append>
-                                                <Button size="sm" variant="outline-success" onClick={(event)=>handleCountIncDec(index, 1, event)}>+</Button>
-                                            </InputGroup.Append>
-                                            {/* <InputGroup.Append>
-                                                <Button size="sm" variant="outline-success" onClick={(event)=>addProductToCart(event)}>+</Button>
-                                            </InputGroup.Append> */}
+                                                <InputGroup.Prepend>
+                                                    <Button size="sm" variant="outline-success" onClick={(event)=>handleCountIncDec(index, -1, event)}>-</Button>
+                                                </InputGroup.Prepend>
+                                                <FormControl
+                                                    value={count[index].quantity? count[index].quantity: 0}
+                                                    onChange={(event)=>handleSetCount(index, event)}
+                                                    placeholder=""
+                                                    aria-label="product-count"
+                                                    type="number"
+                                                />
+                                                <InputGroup.Append>
+                                                    <Button size="sm" variant="outline-success" onClick={(event)=>handleCountIncDec(index, 1, event)}>+</Button>
+                                                </InputGroup.Append>
                                             </InputGroup>
                                         </td>
                                         <td>{inventory.current_quantity}</td>
-                                        <td>${inventory.sale_price}</td>
+                                        <td>
+                                            <InputGroup>
+                                                <FormControl
+                                                    value={count[index].newSalePrice}
+                                                    onChange={(event)=> handleSetNewSalePrice(index, event)}
+                                                    aria-label="product-sale-price"
+                                                    type="number"
+                                                >
+                                                </FormControl>
+                                            </InputGroup>
+                                        </td>
                                         <td>${inventory.cost}</td>
                                         <td>{inventory.receive_date}</td>
                                         <td>{inventory.supplier_name}</td>
