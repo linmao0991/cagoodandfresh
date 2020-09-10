@@ -2,20 +2,6 @@ import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
-//==Issue==
-//----Inputting quantities in multiple input fields then clicking on a NON corresponding add button will update state baseed on the LAST input field.
-//---Fix Requirements
-//-----Find a way to associate button with corresponding inputs and then update state while accounting for quantities in multiple input fields
-//--Possible Fixes
-//-----Use an array for the count state, intialize the state array with the number of inventory in index order
-//-----Use the index position for each inventory as keys for the MAP elements to asscoiate inputs with state index.
-//-----EX: count = [inventory1, inventory2, inventory3] aka [index 1, index 2, index 3]. Then each elements will have keys 1,2,3 we can use to assocaite input values.
-//---Finished initializing count state as a array of objects in the format listed on the line above.
-//---Finished handleSetCount to set the coutn state based on the input field values.
-//----//Next Task
-//------addProductToCart needs to loop though count state and add each array inventory to the cart.
-//--This will also allow user to add quantities from different loads AND we can possibly allow user to change the sale price if we set count state as objects with quantity and sale_price
-
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
     const setInitialCount = () =>{
@@ -57,9 +43,12 @@ function AddProductModal (props) {
         let cart = [...orderContext.cartData,...newCartItems]
         // Store the updated cart to OrderContext
         orderContext.storeCart(cart)
+        // Calls the toggleShow function in the parent component ProductListing to hide the modal
         props.toggleShow(!show)
     }
 
+    //Sets the item count by manual input and calculates...
+    //...new total count and sales then sets the state
     const handleSetCount = (index, event) => {
         event.preventDefault()
         let newState = [...count]
@@ -68,14 +57,19 @@ function AddProductModal (props) {
         setCount(newState)
     }
 
-    const handleSetNewSalePrice = (index, event) =>{
-        event.preventDefault()
+    //Sets the sale price of current item and calculates...
+    //...new total count and sales then sets the states
+        event.preventDefault(
         let newState = [...count]
         newState[index].newSalePrice = event.target.value
         calculateTotals(newState)
         setCount(newState)
     }
 
+    //Increments and decrements the item count using the...
+    //...+,- buttons on either side of the input. Then
+    // checks to make sure amout is not less than 0
+    // before updating total count, sales, and sets the states
     const handleCountIncDec = (index, value, event)=>{
         event.preventDefault()
         let newState =[...count]
@@ -88,6 +82,7 @@ function AddProductModal (props) {
         }
     }
 
+    //Takes in current basket and calculates total count and sales, then set state
     const calculateTotals = (newState) => {
         let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
         let newTotalSales = newState.reduce((accumulator, currentValue) => {return accumulator + (currentValue.quantity * currentValue.newSalePrice)},0)
