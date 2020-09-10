@@ -59,7 +59,8 @@ function AddProductModal (props) {
 
     //Sets the sale price of current item and calculates...
     //...new total count and sales then sets the states
-        event.preventDefault(
+    const handleSetNewSalePrice = (index, event) => {
+        event.preventDefault()
         let newState = [...count]
         newState[index].newSalePrice = event.target.value
         calculateTotals(newState)
