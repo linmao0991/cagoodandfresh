@@ -73,23 +73,9 @@ class App extends Component {
                 switchDir: this.switchDirHandler
               }}
             >
-              <Container>
-                <Row>
-                  <Col>
-                   {/* {this.state.currentDir === "main"? 
-                    null
-                    :
-                    <Button onClick={() => this.switchDirHandler(this.state.previousDir)}>Back</Button>
-                    } */}
-                  </Col>
-                  <Col>
-                  </Col>
-                  <Col>
-                    <Button style={{float: "right"}} onClick = {() => this.logoutHandler()}>Log Out</Button>
-                  </Col>
-                </Row>
-              </Container>
-              <Directory/>
+              <Directory
+                logoutHandler = {this.logoutHandler}
+              />
             </DirectoryContext.Provider>
             : 
             <Login/>}

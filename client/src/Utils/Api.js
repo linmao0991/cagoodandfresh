@@ -45,7 +45,7 @@ export default {
 
     //Get inventory by product code
     //--NOTE: product code is product id
-    getInventoryByOroduct: (productCode) => {
+    getInventoryByProductID: (productCode) => {
         console.log("[Get Inventory of Product]")
         return axios.post("/api/get_inventory_by_product_code", productCode)
     },

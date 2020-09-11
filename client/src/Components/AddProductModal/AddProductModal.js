@@ -4,6 +4,8 @@ import OrderContext from "../../Context/OrderContext";
 
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
+
+    //Function to set the intial count of the inventory with default values and inventory data from conetext
     const setInitialCount = () =>{
         let initialCountState = []
         for (let [index, inventory] of props.productInven.entries()){
@@ -23,8 +25,10 @@ function AddProductModal (props) {
         //Create new object with combined product data and inventory data
         let newCartItems = 
             count.map(item => {
+                //Spreadt both inventory, product, and quantity data into new cartItem
                 let cartItem ={
                     ...props.productData,
+                    receive_date: item.inventory.receive_date,
                     quantity: item.quantity,
                     sale_price: item.newSalePrice,
                     cost: item.inventory.cost,
@@ -33,16 +37,35 @@ function AddProductModal (props) {
                     supplier_name: item.inventory.supplier_name,
                     supplier_id: item.inventory.supplier_id
                 }
+                //If the quantity is > 0 return this new cartItem
                 if(item.quantity>0){
                     return cartItem
                 }
+            //Filter through the new array returned by map and remove indexes that contain null.
             }).filter(cartItem =>{
                 return(cartItem? cartItem: null)
             })
-        //Add new cart item to the existing cart
-        let cart = [...orderContext.cartData,...newCartItems]
+
+        //Get cartData store to cartData
+        let cartData = [...orderContext.cartData]
+        //If cartData is empty, then spread newCartItmes inside and set context
+        if (cartData.length === 0){
+            cartData=[...newCartItems]
+        }else{
+            //If not empty then loop through each newCartItems and carData indexes and find matching inventory id.
+            for(let newCartItem of newCartItems){
+                let oldCartIndex = cartData.findIndex( oldCartItem => oldCartItem.inventory_id === newCartItem.inventory_id)
+                //If no match found, push newCartItem into cartData array
+                if ( oldCartIndex === -1){
+                    cartData.push(newCartItem)
+                //Otherwise returned index of findIndex() is used to add quantity of the newCartItem to cartData
+                }else{
+                    cartData[oldCartIndex].quantity += newCartItem.quantity
+                }
+            }
+        }
         // Store the updated cart to OrderContext
-        orderContext.storeCart(cart)
+        orderContext.storeCart(cartData)
         // Calls the toggleShow function in the parent component ProductListing to hide the modal
         props.toggleShow(!show)
     }

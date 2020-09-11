@@ -132,40 +132,45 @@ class Directory extends Component{
     render(){
         return(
             <Container fluid>
+                <br />
                 <Row>
-                    <Col xs={1}>
-                        <h2>Menu</h2>
+                    <Col md="auto">
                         <LoginContext.Consumer>
                             {login => (
                                 <>
+                                    <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>{" "}
+                                    <Button onClick={() => this.context.switchDir("inventory")}>Inventory</Button>{" "}
+                                    <Button onClick={() => this.context.switchDir("customers")}>Customers</Button>{" "}
                                     {login.permissionLevel >= 1?
                                         <>
-                                        <Button active block onClick={() => this.context.switchDir("orderform")}>Order Form</Button>
-                                        <br />
-                                        <Button active block onClick={() => this.context.switchDir("inventory")}>Inventory</Button>
-                                        <br />
-                                        <Button active block onClick={() => this.context.switchDir("customers")}>Customers</Button>
-                                        <br />
+                                        <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>{" "}
+                                        <Button onClick={() => this.context.switchDir("inventory")}>Inventory</Button>{" "}
+                                        <Button onClick={() => this.context.switchDir("customers")}>Customers</Button>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Button active block onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Button>
-                                        <br />
-                                        <Button active block onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Button>
-                                        <br />
+                                        <Button onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Button>{" "}
+                                        <Button onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Button>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
-                                        <Button active block onClick={() => this.context.switchDir("admintools")}>Admin Tools</Button>
+                                    <>
+                                        <Button onClick={() => this.context.switchDir("admintools")}>Admin Tools</Button>{" "}
+                                    </>
                                     :
                                     null}
                                 </>
                             )}
                         </LoginContext.Consumer>
                     </Col>
+                    <Col md="auto">
+                        <Button variant="danger" onClick={() => this.props.logoutHandler()}>Log Out</Button>
+                    </Col>
+                </Row>
+                <Row>
                     <Col>
                         {this.directoryDisplay()}
                     </Col>

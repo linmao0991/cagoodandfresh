@@ -11,7 +11,8 @@ function ProductListing (props){
 
     const getInventoryData = (product) =>{
         storeProduct(product)
-        Api.getInventoryByOroduct({
+        console.log(product.id);
+        Api.getInventoryByProductID({
             productCode: product.id
         }).then( inventory => {
             console.log(inventory.data)
@@ -37,6 +38,13 @@ function ProductListing (props){
                 fontSize: "14px"
             }}
         >
+            <colgroup>
+                <col style={{width: "10%"}}/>
+                <col style={{width: "35%"}}/>
+                <col style={{width: "35%"}}/>
+                <col style={{width: "10%"}}/>
+                <col style={{width: "10%"}}/>
+            </colgroup>
             <thead>
                 <tr>
                     <td style={{fontSize: "16px", fontWeight: "bold"}}>{props.categorySelection}</td>

@@ -142,7 +142,7 @@ class OrderForm extends Component{
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={8} style={myBorder}>
+                    <Col xs={7} style={myBorder}>
                         <Row>
                             <Col>
                                 <Button variant="info" onClick={() => this.context.storeSearchType("search")}>Search</Button> <Button variant="info" onClick={() => this.context.storeSearchType("selection")}>Selection</Button>

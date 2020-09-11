@@ -394,7 +394,8 @@ router.get("/user_data", (req, res) => {
 
   //Get inventory by product code (product id)
   router.post("/get_inventory_by_product_code",(req, res) => {
-    let permission_req = 1;
+    let permission_req = 1
+    console.log(req.body.productCode)
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
         where: {
@@ -408,7 +409,7 @@ router.get("/user_data", (req, res) => {
         //console.log(data)
         res.json(data);
       }).catch( err => {
-        console.log(err.errors[0].message)
+        console.log(err)
         res.status(404).json({ error: err.errors[0].message });
       })
     }else{
