@@ -23,6 +23,7 @@ class OrderForm extends Component{
         customerData: undefined,
         selectedCustomer: undefined,
         orderCart: undefined,
+        searchingCustomer: false,
     }
 
     static contextType = OrderContext;
@@ -58,16 +59,20 @@ class OrderForm extends Component{
 
     getCustomerInfo = (event) => {
         event.preventDefault();
+        this.setState({searchingCustomer: true})
         Api.getCustomerInfo({
             customer_account_number: this.state.account,
             business_phone_number: this.state.phone,
             restaurant_name_english: this.state.name
         }).then ( info => {
-            this.setState({customerData: info.data})
-            this.setState({displayCustomers: true})
-            this.setState({account: undefined})
-            this.setState({phone: undefined})
-            this.setState({name: undefined})
+            this.setState({
+                customerData: info.data,
+                displayCustomers: true,
+                account: undefined,
+                phone: undefined,
+                name: undefined,
+                searchingCustomer: false
+            })
         }).catch( err => {
             console.log(err)
         })
@@ -138,11 +143,10 @@ class OrderForm extends Component{
                         <h1>Order Form</h1>
                     </Col>
                     <Col>
-                        <Button variant="info" onClick={this.handleShow}>Find Customers</Button> <Button variant="info" onClick={() => this.handleEmptyCart()}>Empty Cart</Button>
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={7} style={myBorder}>
+                    <Col xs={6} style={myBorder}>
                         <Row>
                             <Col>
                                 <Button variant="info" onClick={() => this.context.storeSearchType("search")}>Search</Button> <Button variant="info" onClick={() => this.context.storeSearchType("selection")}>Selection</Button>
@@ -165,23 +169,35 @@ class OrderForm extends Component{
                     <Col>
                         <Row>
                             <Col>
-                            <p><b>Customer</b>
-                            {this.context.selectedCustomerData? 
-                                <>
-                                    <br/>{this.context.selectedCustomerData.restaurant_name_english} 
-                                    {this.context.selectedCustomerData.restaurant_name_chinese? <><br/>{this.context.selectedCustomerData.restaurant_name_chinese}</>: null}
-                                    <br/>{this.formatPhoneNumber(this.context.selectedCustomerData.business_phone_number)}
-                                    <br/>{this.context.selectedCustomerData.billing_street}
-                                    <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
-                                </>
-                                :
-                                <><br/>None</>
-                            }
-                            </p>
+                                <Row>
+                                    <Col>
+                                        <b>Customer</b>
+                                    </Col>
+                                    <Col>
+                                        <Button size="sm" variant="info" onClick={this.handleShow}>Find Customers</Button>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col>
+                                        {this.context.selectedCustomerData? 
+                                        <>
+                                            <br/>{this.context.selectedCustomerData.restaurant_name_english} 
+                                            {this.context.selectedCustomerData.restaurant_name_chinese? <><br/>{this.context.selectedCustomerData.restaurant_name_chinese}</>: null}
+                                            <br/>{this.formatPhoneNumber(this.context.selectedCustomerData.business_phone_number)}
+                                            <br/>{this.context.selectedCustomerData.billing_street}
+                                            <br/>{this.context.selectedCustomerData.billing_city}, {this.context.selectedCustomerData.billing_state} {this.context.selectedCustomerData.billing_zipcode}
+                                        </>
+                                        :
+                                        <><br/>None</>
+                                        }
+                                    </Col>
+                                </Row>
                             </Col>
                             <Col>
+                                <Button size="sm" variant="info" onClick={() => this.handleEmptyCart()}>Empty Cart</Button>
                             </Col>
                         </Row>
+                        <br />
                         <Row>
                             <OrderCart/>
                         </Row>
@@ -240,7 +256,26 @@ class OrderForm extends Component{
                                 <Col></Col>
                             </Row>
                         </Container>
-                        <Button onClick={event => this.getCustomerInfo(event)}>Get Info</Button>
+                        <Button 
+                            onClick={event => this.getCustomerInfo(event)}
+                            variant=
+                                {this.state.searchingCustomer?
+                                    "warning"
+                                    :
+                                    "info"
+                                }
+                            disabled=
+                                {this.state.searchingCustomer?
+                                    true
+                                    :
+                                    false
+                                }
+                        >
+                            {this.state.searchingCustomer?
+                            "Searching..."
+                            :
+                            "Search"}
+                        </Button>
                     </Modal.Body>
                     <Modal.Footer>
                         {this.state.displayCustomers?

@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import {Table, Container, Row, Col} from "react-bootstrap";
+import {Table, Container, Row, Col, Button} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
 function OrderCart () {
@@ -62,7 +62,7 @@ function OrderCart () {
                         orderContext.cartData.map((cartItem, Index)=>{
                             return(
                                 <tr key={Index}>
-                                    <td>{cartItem.quantity}</td>
+                                    <td><Button size="sm" variant="outline-danger">X</Button> {cartItem.quantity}</td>
                                     <td>{cartItem.name_english} {cartItem.name_chinese}</td>
                                     <td>{cartItem.sale_price}</td>
                                     <td>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
