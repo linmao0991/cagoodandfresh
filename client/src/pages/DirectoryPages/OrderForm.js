@@ -19,6 +19,8 @@ class OrderForm extends Component{
         name: undefined,
         account: undefined,
         show: false,
+        messageShow: false,
+        messageType: undefined,
         displayCustomers: false,
         customerData: undefined,
         selectedCustomer: undefined,
@@ -31,6 +33,7 @@ class OrderForm extends Component{
     handleEmptyCart = () =>{
         let emptyCart = []
         this.context.storeCart(emptyCart)
+        this.messageModalHandler()
     }
 
     handleAccountInput = input =>{
@@ -94,6 +97,42 @@ class OrderForm extends Component{
         }
         return null
       }
+
+    messageModalHandler = (messageType) =>  {
+        this.setState({messageType: messageType})
+        this.setState({messageShow: !this.state.messageShow})
+    }
+    
+    messageModalSwitch = (messageType) => {
+        switch (messageType){
+            case "empty-cart":
+                return(
+                    <>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Empty Cart</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Are you Sure?
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Row>
+                            <Col>
+                                <Button onClick={this.handleEmptyCart}variant="danger">Yes</Button>
+                            </Col>
+                            <Col>
+                                <Button onClick={this.messageModalHandler} variant="success">No</Button>
+                            </Col>
+                        </Row>
+                    </Modal.Footer>
+                    </>
+                )
+            default:
+                return(
+                null
+                )
+        }
+
+    }
 
     productSearchType = () => {
         switch (this.context.searchType) {
@@ -194,7 +233,7 @@ class OrderForm extends Component{
                                 </Row>
                             </Col>
                             <Col>
-                                <Button size="sm" variant="info" onClick={() => this.handleEmptyCart()}>Empty Cart</Button>
+                                <Button size="sm" variant="danger" onClick={() => this.messageModalHandler("empty-cart")}>Empty Cart</Button>
                             </Col>
                         </Row>
                         <br />
@@ -291,6 +330,19 @@ class OrderForm extends Component{
                         : 
                         null}
                     </Modal.Footer>
+                </Modal>
+
+                <Modal
+                    show={this.state.messageShow} 
+                    onHide={this.messageModalHandler}
+                    backdrop="static"
+                    keyboard={false}
+                    size ="sm">
+                    {this.state.messageShow? 
+                        this.messageModalSwitch(this.state.messageType)
+                        :
+                        null
+                    }
                 </Modal>
             </>
         )

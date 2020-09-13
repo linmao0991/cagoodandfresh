@@ -5,12 +5,16 @@ import OrderContext from "../../Context/OrderContext";
 function OrderCart () {
     const orderContext = useContext(OrderContext);
 
+    const removeCartItem = (cartIndex) => {
+        let newCart = [...orderContext.cartData]
+        newCart.splice(cartIndex,1)
+        orderContext.storeCart(newCart)
+    }
+
     return(
         <Container fluid>
-            {console.log(orderContext.cartData)}
             <Table
                 bordered
-                hover
                 size = "sm"
                 variant="dark"
                 style={{
@@ -34,7 +38,8 @@ function OrderCart () {
                     </tr>
                 </thead>
             </Table>
-            <Table 
+            <Table
+                striped
                 bordered
                 hover
                 size = "sm"
@@ -44,13 +49,15 @@ function OrderCart () {
                 }}
             >
                 <colgroup>
-                    <col style={{width: "10%"}}/>
+                    <col style={{width: "5%"}}/>
+                    <col style={{width: "5%"}}/>
                     <col style={{width: "60%"}}/>
                     <col style={{width: "15%"}}/>
                     <col style={{width: "15%"}}/>
                 </colgroup>
                 <thead>
                     <tr>
+                        <th></th>
                         <th>Count</th>
                         <th>Item Name</th>
                         <th>Price</th>
@@ -59,10 +66,11 @@ function OrderCart () {
                 </thead>
                 <tbody>
                     {orderContext.cartData.length > 0? 
-                        orderContext.cartData.map((cartItem, Index)=>{
+                        orderContext.cartData.map((cartItem, index)=>{
                             return(
-                                <tr key={Index}>
-                                    <td><Button size="sm" variant="outline-danger">X</Button> {cartItem.quantity}</td>
+                                <tr key={index}>
+                                    <td><Button onClick={() => removeCartItem(index)} size="sm" variant="outline-danger">X</Button></td>
+                                    <td style={{textAlign: "center"}}>{cartItem.quantity}</td>
                                     <td>{cartItem.name_english} {cartItem.name_chinese}</td>
                                     <td>{cartItem.sale_price}</td>
                                     <td>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
@@ -71,6 +79,7 @@ function OrderCart () {
                         })
                     : 
                         <tr>
+                            <td />
                             <td></td>
                             <td>Empty Cart</td>
                             <td></td>
