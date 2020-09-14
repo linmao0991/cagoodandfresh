@@ -13,6 +13,7 @@ const client = yelp.client(process.env.YELP_KEY);
 var bcrypt = require("bcryptjs");
 const e = require('express');
 const cli = require('cli');
+const { sequelize } = require('../../models');
 const saltRounds = 10;
 
 
@@ -350,6 +351,13 @@ router.get("/user_data", (req, res) => {
     if (checkPermission(req.user, permission_req)){
       //Find all products from category
       db.products.findAll({
+        // include: [
+        //   [
+        //     sequelize.literal(`(
+        //       SELECT COUNT(*)
+        //     )`)
+        //   ]
+        // ],
         where: {
           category: req.body.category
         }

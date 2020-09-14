@@ -38,6 +38,9 @@ Object.keys(db).forEach(modelName => {
 });
 //Associations
 
+//Products has many inventory assocications
+db.products.hasMany(db.inventory, {sourceKey: 'id', foreignKey: 'product_code'});
+
 //customers has many accounts_receivable_invoices association
 db.customers.hasMany(db.accounts_receivable_invoices, {sourceKey: 'customer_account_number', foreignKey: 'customer_account_number'});
 

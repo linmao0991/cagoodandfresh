@@ -48,7 +48,7 @@ class Directory extends Component{
     getProductCate = () => {
         Api.getProductCate().then(res => {
             this.setState({productCate: res.data});
-            console.log(this.state.productCate)
+            //console.log(this.state.productCate)
         }).catch(err => {
             console.log("Something went wrong in getProductCate api call")
         })
@@ -57,10 +57,10 @@ class Directory extends Component{
     //Stores the selected category to be stored into OrderContext.
     //--Called from ProductSelection.js
     orderContextCateSelStore  = (category, productData,searchType) => {
-        console.log("[Directory - orderContextCateSelStore]")
-        console.log(category)
-        console.log(productData)
-        console.log(searchType)
+        // console.log("[Directory - orderContextCateSelStore]")
+        // console.log(category)
+        // console.log(productData)
+        // console.log(searchType)
         this.setState({
             categorySelection: category,
             productData: productData,

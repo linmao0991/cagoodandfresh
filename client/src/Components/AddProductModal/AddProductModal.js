@@ -1,6 +1,7 @@
 import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
+import Inventory from "../../Pages/DirectoryPages/Inventory";
 
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
@@ -8,16 +9,42 @@ function AddProductModal (props) {
     //Function to set the intial count of the inventory with default values and inventory data from conetext
     const setInitialCount = () =>{
         let initialCountState = []
-        for (let [index, inventory] of props.productInven.entries()){
+        let dbInventory = [...props.productInven]
+        for (let [index, inventory] of dbInventory.entries()){
             initialCountState.push({index: index, quantity: 0, newSalePrice: parseFloat(inventory.sale_price).toFixed(2), inventory: inventory})
         }
         return initialCountState;
     }
 
+    // const setInitialInventory = () => {
+    //     let cartData = [...orderContext.cartData]
+    //     const dbInventory = [...props.productInven]
+    //     if(cartData.length > 0){
+    //         console.log("[Cart Data]")
+    //         console.log(cartData);
+    //         console.log("[Inventory Data]")
+    //         console.log(dbInventory);
+
+    //         let initialInventory = dbInventory.map((inventory, index) => {
+    //             console.log("-----Index: "+index)
+    //             console.log(inventory)
+    //             let cartItem = cartData.find(cartItem => cartItem.inventory_id === inventory.id)
+    //             inventory.current_quantity = inventory.current_quantity-cartItem.quantity
+    //             return inventory
+    //         })
+    //         return initialInventory
+    //     }else{
+    //         return [...dbInventory]
+    //     }
+    // }
+
     const [show, toggleShow] = useState(props.show);
     const [count, setCount] = useState(setInitialCount());
     const [totalCount, setTotalCount] = useState(undefined)
     const [totalSale, setTotalSale] = useState(undefined)
+    //const [productInventory, setProductInventory] = useState(setInitialInventory())
+    console.log(orderContext.cartData)
+    //console.log(productInventory);
 
     //Function to add selected product into the cart then stores updated cart to OrderContext
     const addProductToCart = (event) => {

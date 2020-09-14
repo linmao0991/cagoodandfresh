@@ -1,5 +1,5 @@
-import React, {useContext, useState} from "react";
-import {Table, Container, Row, Col, Button} from "react-bootstrap";
+import React, {useContext} from "react";
+import {Table, Container, Button} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
 function OrderCart () {
@@ -31,7 +31,6 @@ function OrderCart () {
                             return accumulator+currentValue.quantity}, 0)}
                         </th>
                         <th>Total: ${(orderContext.cartData.reduce((accumulator, currentValue) => {
-                            console.log(accumulator+" : "+(currentValue.quantity * currentValue.sale_price).toFixed(2))
                             return accumulator+(currentValue.quantity * currentValue.sale_price)
                             }, 0)).toFixed(2)}
                         </th>

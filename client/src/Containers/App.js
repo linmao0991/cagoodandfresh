@@ -46,7 +46,6 @@ class App extends Component {
       this.setState({permissionLevel: user.data.permission_level})
       this.setState({isLoggedin: true});
     }).catch(err => {
-      console.log(err)
       console.log("[Not Logged in]")
     })
   }

@@ -170,7 +170,6 @@ class OrderForm extends Component{
     }
 
     render() {
-        console.log("[OrderForm.js]")
         return(
             <>
             <Container fluid>

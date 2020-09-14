@@ -1,28 +1,49 @@
-import React, {useState} from "react";
+import React, {useState, useContext} from "react";
 import {Table, Button} from "react-bootstrap";
 import Api from "../../Utils/Api";
 import AddProductModal from "../AddProductModal/AddProductModal";
+import OrderConext from '../../Context/OrderContext';
 
-//--display detailed information
 function ProductListing (props){
+    const orderContext = useContext(OrderConext)
+
     const [show, toggleShow] = useState(false)
     const [productInven, storeInven] = useState(undefined)
     const [productData, storeProduct] = useState(undefined)
 
     const getInventoryData = (product) =>{
         storeProduct(product)
-        console.log(product.id);
         Api.getInventoryByProductID({
             productCode: product.id
         }).then( inventory => {
-            console.log(inventory.data)
-            storeInven(inventory.data);
+            storeInven(setInitialInventory(inventory.data));
             toggleShow(!show)
         }).catch( err => {
             console.log("Something went wrong in get inventory by product");
             console.log(err)
         })
 
+    }
+
+    const setInitialInventory = (inventory) => {
+        console.log(inventory)
+        let cartData = [...orderContext.cartData]
+        let dbInventory = [...inventory]
+        if(cartData.length > 0){
+            let initialInventory = dbInventory.map((inventory, index) => {
+                let updateInventory = {...inventory}
+                let cartItem = cartData.find(cartItem => cartItem.inventory_id === updateInventory.id)
+                if(cartItem){
+                    updateInventory.current_quantity = (updateInventory.current_quantity-cartItem.quantity).toFixed(2)
+                    return updateInventory
+                }else{
+                    return updateInventory
+                }
+            })
+            return initialInventory
+        }else{
+            return [...dbInventory]
+        }
     }
 
     const handleModalToggle = () => toggleShow(!show);
