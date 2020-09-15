@@ -61,14 +61,16 @@ function ProductListing (props){
         >
             <colgroup>
                 <col style={{width: "10%"}}/>
+                <col style={{width: "5%"}}/>
                 <col style={{width: "35%"}}/>
-                <col style={{width: "35%"}}/>
+                <col style={{width: "30%"}}/>
                 <col style={{width: "10%"}}/>
                 <col style={{width: "10%"}}/>
             </colgroup>
             <thead>
                 <tr>
                     <td style={{fontSize: "16px", fontWeight: "bold"}}>{props.categorySelection}</td>
+                    <td>Inventory</td>
                     <td>Product Name English</td>
                     <td>Product Name Chinese</td>
                     <td>Holding</td>
@@ -80,6 +82,17 @@ function ProductListing (props){
                     return(
                         <tr key={index}>
                             <td><Button size="sm" variant="outline-success" onClick={() => getInventoryData(product)}>Select</Button></td>
+                            <td>{
+                                product.inventory_count - orderContext.cartData.reduce(
+                                    (accumulator, currentValue) => {
+                                        if(currentValue.product_code == product.id){
+                                            return accumulator + currentValue.quantity
+                                        }else{
+                                            return accumulator;
+                                        }
+                                    },0
+                                    )
+                                }</td>
                             <td>{product.name_english}</td>
                             <td>{product.name_chinese}</td>
                             <td>{product.holding}</td>

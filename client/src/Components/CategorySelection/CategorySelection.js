@@ -1,7 +1,8 @@
-import React, {useState, useContext, Component} from "react";
+import React, {useContext, Component} from "react";
 import OrderContext from "../../Context/OrderContext";
 import Api from "../../Utils/Api";
-import {Container, Row, Col, Button, Modal, Card} from "react-bootstrap"
+import {Button} from "react-bootstrap";
+import './CategorySelection.css';
 
 function CategorySelection (props){
     const orderContext = useContext(OrderContext);
@@ -19,14 +20,16 @@ function CategorySelection (props){
     }
 
     return(
-        <Button
-            style={{width: "100 px"}, {height: "50 px"}}
+        <div className="w3-hover-shadow w3-card w3-quarter w3-margin"
             onClick = {() => 
                 getProductData()
             }
         >
-            {props.category}
-        </Button>
+            <img src="\assets\images\produce.jpg" className="w3-round w3-image" alt="Produce"/>
+            <div className="w3-container w3-center">
+                <p>{props.category.toUpperCase()}</p>
+            </div>
+        </div>
     )
 }
 

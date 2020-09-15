@@ -349,44 +349,33 @@ router.get("/user_data", (req, res) => {
   router.post("/get_products_by_category", (req, res) =>{
     let permission_req = 1;
     if (checkPermission(req.user, permission_req)){
-      //Find all products from category
-      // db.products.findAll({
-      //   include: [
-      //     [
-      //       sequelize.literal(`(
-      //         SELECT * FROM cagoodandfresh.products
-      //         LEFT JOIN cagoodandfresh.inventory
-      //         ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
-      //         WHERE cagoodandfresh.products.category = '${req.body.category}';
-      //       )`)
-      //     ]
-      //   ],
-      //   where: {
-      //     category: req.body.category
-      //   }
-      // }).then(data => {
-      //   res.json(data)
-      // }).catch((err) => {
-      //   console.log(err.errors[0].message)
-      //   res.status(404).json({ error: err.errors[0].message });
-      // })
 
-      //Still working on joining sum of current quantity with products then send to client
-      //--Maybe sum up current quantity then right join with products table.
-      
-      // SELECT * FROM cagoodandfresh.products
-      // LEFT JOIN (
-      // SELECT SUM(current_quantity)
-      // FROM cagoodandfresh.inventory
-      // ) AS total_current_quantity
-      // ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
-      // WHERE cagoodandfresh.products.category = 'produce';
-
+      //Raw sql query
+      //-Select product table columns
+      //-Sum inventory table at current_quantity columns by product code
+      //-Left join tables
+      //-Where product table column category = category string sent by client
+      //-Group results by product id
       db.sequelize.query(
-        `SELECT * FROM products
-        LEFT JOIN inventory
-        ON products.id = inventory.product_code
-        WHERE products.category = '${req.body.category}'`,{type: db.sequelize.QueryTypes.SELECT}
+        `SELECT	cagoodandfresh.products.id,
+                cagoodandfresh.products.upc,
+                cagoodandfresh.products.location,
+                cagoodandfresh.products.category,
+                cagoodandfresh.products.holding,
+                cagoodandfresh.products.image,
+                cagoodandfresh.products.measurement_system,
+                cagoodandfresh.products.name_chinese,
+                cagoodandfresh.products.name_english,
+                cagoodandfresh.products.supplier_primary_id,
+                cagoodandfresh.products.supplier_secondary_id,
+                cagoodandfresh.products.supplier_tertiary_id,
+                cagoodandfresh.products.weight,
+                IFNULL(SUM(cagoodandfresh.inventory.current_quantity),0) as inventory_count
+        FROM cagoodandfresh.products
+        LEFT JOIN cagoodandfresh.inventory
+        ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
+        WHERE cagoodandfresh.products.category = '${req.body.category}'
+        GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then(data => {
         res.json(data)
       }).catch((err) => {

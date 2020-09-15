@@ -13,6 +13,7 @@ function OrderCart () {
 
     return(
         <Container fluid>
+            {console.log(orderContext.cartData)}
             <Table
                 bordered
                 size = "sm"
