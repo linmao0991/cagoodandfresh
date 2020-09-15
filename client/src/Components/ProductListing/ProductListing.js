@@ -48,60 +48,91 @@ function ProductListing (props){
 
     const handleModalToggle = () => toggleShow(!show);
 
+    const listingStyle = {
+        tbody: {
+            display:'block',
+            position: 'relative',
+            fontSize: "14px",
+            overflowY: "scroll",
+            height: "500px",
+            borderStyle: 'solid',
+            width: '100%'
+            },
+        thead: {
+            fontSize: "14px",
+            display:'block',
+            position: 'relative',
+            width: '100%'
+        },
+        scroll: {
+            display: 'block',
+            emptyCells: 'show'
+        },
+        tr: {
+            width: '100%',
+            display: 'flex'
+        },
+        tdth: {
+            flexBasis: '100%',
+            flexGrow: 2,
+            display: 'block',
+            textAlign: 'left'
+        },
+    }
+
     return( 
-        <>               
-        <Table
-            striped 
-            bordered 
-            hover
-            variant="dark"
-            style={{
-                fontSize: "14px"
-            }}
-        >
-            <colgroup>
-                <col style={{width: "10%"}}/>
-                <col style={{width: "5%"}}/>
-                <col style={{width: "35%"}}/>
-                <col style={{width: "30%"}}/>
-                <col style={{width: "10%"}}/>
-                <col style={{width: "10%"}}/>
-            </colgroup>
-            <thead>
-                <tr>
-                    <td style={{fontSize: "16px", fontWeight: "bold"}}>{props.categorySelection}</td>
-                    <td>Inventory</td>
-                    <td>Product Name English</td>
-                    <td>Product Name Chinese</td>
-                    <td>Holding</td>
-                    <td>Size</td>
-                </tr>
-            </thead>
-            <tbody>
-                {props.allProductData.map((product, index) => {
-                    return(
-                        <tr key={index}>
-                            <td><Button size="sm" variant="outline-success" onClick={() => getInventoryData(product)}>Select</Button></td>
-                            <td>{
-                                product.inventory_count - orderContext.cartData.reduce(
-                                    (accumulator, currentValue) => {
-                                        if(currentValue.product_code == product.id){
-                                            return accumulator + currentValue.quantity
-                                        }else{
-                                            return accumulator;
-                                        }
-                                    },0
-                                    )
-                                }</td>
-                            <td>{product.name_english}</td>
-                            <td>{product.name_chinese}</td>
-                            <td>{product.holding}</td>
-                            <td>{product.weight} {product.measurement_system}</td>
-                        </tr>
-                    )
-                })}
-            </tbody>
-        </Table>
+        <>   
+            <Table
+                striped 
+                bordered 
+                hover
+                variant="dark"
+            >
+                <colgroup>
+                    <col style={{width: "10%"}}/>
+                    <col style={{width: "5%"}}/>
+                    <col style={{width: "35%"}}/>
+                    <col style={{width: "30%"}}/>
+                    <col style={{width: "10%"}}/>
+                    <col style={{width: "10%"}}/>
+                </colgroup>
+                <thead style={listingStyle.thead}>
+                    <tr style={listingStyle.tr}>
+                        <td style={{fontSize: "16px", fontWeight: "bold"},listingStyle.tdth}>{props.categorySelection}</td>
+                        <td style={listingStyle.tdth}>Inventory</td>
+                        <td style={listingStyle.tdth}>Product Name English</td>
+                        <td style={listingStyle.tdth}>Product Name Chinese</td>
+                        <td style={listingStyle.tdth}>Holding</td>
+                        <td style={listingStyle.tdth}>Size</td>
+                    </tr>
+                </thead>
+                <tbody style={listingStyle.tbody}>
+                    {props.allProductData.map((product, index) => {
+                        return(
+                            <tr key={index} style={listingStyle.tr}>
+                                <td style={listingStyle.tdth}><Button size="sm" variant="outline-success" onClick={() => getInventoryData(product)}>Select</Button></td>
+                                <td
+                                    style={listingStyle.tdth}
+                                >{
+                                    product.inventory_count - orderContext.cartData.reduce(
+                                        (accumulator, currentValue) => {
+                                            if(currentValue.product_code == product.id){
+                                                return accumulator + currentValue.quantity
+                                            }else{
+                                                return accumulator;
+                                            }
+                                        },0
+                                        )
+                                    }</td>
+                                <td style={listingStyle.tdth}>{product.name_english}</td>
+                                <td style={listingStyle.tdth}>{product.name_chinese}</td>
+                                <td style={listingStyle.tdth}>{product.holding}</td>
+                                <td style={listingStyle.tdth}>{product.weight} {product.measurement_system}</td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
+            </Table>
         {show? 
             <AddProductModal
                 show = {show}

@@ -8,11 +8,6 @@ import CategorySelection from "../../Components/CategorySelection/CategorySelect
 import ProductListing from "../../Components/ProductListing/ProductListing";
 import SearchProduct from '../../Components/SearchProduct/SearchProduct';
 
-const myBorder = {
-    //    borderStyle: "solid",
-    //    borderColor: "white"
-}
-
 class OrderForm extends Component{
     state = {
         phone: undefined,
@@ -112,7 +107,7 @@ class OrderForm extends Component{
                         <Modal.Title>Empty Cart</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        Are you Sure?
+                        Empty Cart?
                     </Modal.Body>
                     <Modal.Footer>
                         <Row>
@@ -156,7 +151,14 @@ class OrderForm extends Component{
                     );
             case "selection-product":
                 return(
-                    <Container fluid>
+                    <Container 
+                        fluid
+                        style={
+                            {fontSize: "14px"},
+                            {overflowY: "auto"},
+                            {height:"500px"}
+                        }
+                    >
                         <ProductListing 
                             allProductData = {this.context.productData}
                             categorySelection = {this.context.categorySelection.toUpperCase()}
@@ -184,7 +186,7 @@ class OrderForm extends Component{
                     </Col>
                 </Row>
                 <Row>
-                    <Col xs={6} style={myBorder}>
+                    <Col xs={7}>
                         <Row>
                             <Col>
                                 <Button variant="info" onClick={() => this.context.storeSearchType("search")}>Search</Button> <Button variant="info" onClick={() => this.context.storeSearchType("selection")}>Selection</Button>

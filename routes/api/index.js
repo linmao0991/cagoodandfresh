@@ -393,15 +393,37 @@ router.get("/user_data", (req, res) => {
   router.post("/search_inventory_by_input", (req, res) => {
     let permission_req = 1;
     if(checkPermission(req.user, permission_req)){
-      db.products.findAll({
-        where:{
-          [Op.or]: [
-            {id: req.body.searchInput},
-            {name_english: {[Op.substring]: req.body.searchInput}}, 
-            {name_chinese: {[Op.substring]: req.body.searchInput}}
-          ]
-        }
-      }).then( result => {
+      // db.products.findAll({
+      //   where:{
+      //     [Op.or]: [
+      //       {id: req.body.searchInput},
+      //       {name_english: {[Op.substring]: req.body.searchInput}}, 
+      //       {name_chinese: {[Op.substring]: req.body.searchInput}}
+      //     ]
+      //   }
+      db.sequelize.query(
+        `SELECT	cagoodandfresh.products.id,
+                cagoodandfresh.products.upc,
+                cagoodandfresh.products.location,
+                cagoodandfresh.products.category,
+                cagoodandfresh.products.holding,
+                cagoodandfresh.products.image,
+                cagoodandfresh.products.measurement_system,
+                cagoodandfresh.products.name_chinese,
+                cagoodandfresh.products.name_english,
+                cagoodandfresh.products.supplier_primary_id,
+                cagoodandfresh.products.supplier_secondary_id,
+                cagoodandfresh.products.supplier_tertiary_id,
+                cagoodandfresh.products.weight,
+                IFNULL(SUM(cagoodandfresh.inventory.current_quantity),0) as inventory_count
+        FROM cagoodandfresh.products
+        LEFT JOIN cagoodandfresh.inventory
+        ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
+        WHERE cagoodandfresh.products.id LIKE '%${req.body.searchInput}&'
+        OR cagoodandfresh.products.name_english LIKE '%${req.body.searchInput}%'
+        OR cagoodandfresh.products.name_chinese LIKE '%${req.body.searchInput}%'
+        GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
+      ).then( result => {
         console.log(result[0])
         res.json(result)
       }).catch( error => {

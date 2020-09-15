@@ -20,12 +20,12 @@ function CategorySelection (props){
     }
 
     return(
-        <div className="w3-hover-shadow w3-card w3-quarter w3-margin"
+        <div className="w3-hover-shadow w3-card w3-quarter"
             onClick = {() => 
                 getProductData()
             }
         >
-            <img src="\assets\images\produce.jpg" className="w3-round w3-image" alt="Produce"/>
+            <img src="\assets\images\produce.jpg" className="w3-round w3-image w3-hover-sepia" alt="Produce"/>
             <div className="w3-container w3-center">
                 <p>{props.category.toUpperCase()}</p>
             </div>

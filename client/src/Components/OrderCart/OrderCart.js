@@ -11,9 +11,41 @@ function OrderCart () {
         orderContext.storeCart(newCart)
     }
 
+    const listingStyle = {
+        tbody: {
+            display:'block',
+            position: 'relative',
+            fontSize: "14px",
+            overflowY: "scroll",
+            height: "450px",
+            borderStyle: 'solid',
+            borderColor: 'white',
+            width: '100%'
+            },
+        thead: {
+            fontSize: "14px",
+            display:'block',
+            position: 'relative',
+            width: '100%'
+        },
+        scroll: {
+            display: 'block',
+            emptyCells: 'show'
+        },
+        tr: {
+            width: '100%',
+            display: 'flex'
+        },
+        tdth: {
+            flexBasis: '100%',
+            flexGrow: 2,
+            display: 'block',
+            textAlign: 'left'
+        },
+    }
+
     return(
         <Container fluid>
-            {console.log(orderContext.cartData)}
             <Table
                 bordered
                 size = "sm"
@@ -26,12 +58,16 @@ function OrderCart () {
                     <col style={{width: "50%"}}/>
                     <col style={{width: "50%"}}/>
                 </colgroup>
-                <thead>
-                    <tr>
-                        <th>Total Items: {orderContext.cartData.reduce((accumulator, currentValue) => {
+                <thead style={listingStyle.thead}>
+                    <tr style={listingStyle.tr}>
+                        <th 
+                            style={listingStyle.tdth}
+                        >Total Items: {orderContext.cartData.reduce((accumulator, currentValue) => {
                             return accumulator+currentValue.quantity}, 0)}
                         </th>
-                        <th>Total: ${(orderContext.cartData.reduce((accumulator, currentValue) => {
+                        <th
+                            style={listingStyle.tdth}
+                        >Total: ${(orderContext.cartData.reduce((accumulator, currentValue) => {
                             return accumulator+(currentValue.quantity * currentValue.sale_price)
                             }, 0)).toFixed(2)}
                         </th>
@@ -55,35 +91,35 @@ function OrderCart () {
                     <col style={{width: "15%"}}/>
                     <col style={{width: "15%"}}/>
                 </colgroup>
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Count</th>
-                        <th>Item Name</th>
-                        <th>Price</th>
-                        <th>Total</th>
+                <thead style={listingStyle.thead}>
+                    <tr style={listingStyle.tr}>
+                        <th style={listingStyle.tdth}></th>
+                        <th style={listingStyle.tdth}>Count</th>
+                        <th style={listingStyle.tdth}>Item Name</th>
+                        <th style={listingStyle.tdth}>Price</th>
+                        <th style={listingStyle.tdth}>Total</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={listingStyle.tbody}>
                     {orderContext.cartData.length > 0? 
                         orderContext.cartData.map((cartItem, index)=>{
                             return(
-                                <tr key={index}>
-                                    <td><Button onClick={() => removeCartItem(index)} size="sm" variant="outline-danger">X</Button></td>
-                                    <td style={{textAlign: "center"}}>{cartItem.quantity}</td>
-                                    <td>{cartItem.name_english} {cartItem.name_chinese}</td>
-                                    <td>{cartItem.sale_price}</td>
-                                    <td>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
+                                <tr key={index} style={listingStyle.tr}>
+                                    <td style={listingStyle.tdth}><Button onClick={() => removeCartItem(index)} size="sm" variant="outline-danger">X</Button></td>
+                                    <td style={listingStyle.tdth,{textAlign: "center"}}>{cartItem.quantity}</td>
+                                    <td style={listingStyle.tdth}>{cartItem.name_english} {cartItem.name_chinese}</td>
+                                    <td style={listingStyle.tdth}>{cartItem.sale_price}</td>
+                                    <td style={listingStyle.tdth}>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
                                 </tr>
                             )
                         })
                     : 
-                        <tr>
-                            <td />
-                            <td></td>
-                            <td>Empty Cart</td>
-                            <td></td>
-                            <td></td>
+                        <tr style={listingStyle.tr}>
+                            <td style={listingStyle.tdth}/>
+                            <td style={listingStyle.tdth}/>
+                            <td style={listingStyle.tdth}>Empty Cart</td>
+                            <td style={listingStyle.tdth}/>
+                            <td style={listingStyle.tdth}/>
                         </tr>
                     }
                 </tbody>

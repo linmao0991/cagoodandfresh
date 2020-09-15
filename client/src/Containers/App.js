@@ -4,17 +4,13 @@ import LoginContext from "../Context/LoginContext";
 import DirectoryContext from "../Context/DirectoryContext";
 import Directory from "../Pages/Directory";
 import Api from "../Utils/Api";
-import {Container, Row, Col, Button} from "react-bootstrap";
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      isLoggedin: false,
-      permissionLevel: null,
-      currentDir: "main",
-      previousDir: "main"
-    }
+  state = {
+    isLoggedin: false,
+    permissionLevel: null,
+    currentDir: "main",
+    previousDir: "main"
   }
 
   //Login context
@@ -27,9 +23,12 @@ class App extends Component {
   logoutHandler = () => {
     this.setState({
       isLoggedin: false,
-      permissionLevel: null
+      permissionLevel: null,
+      currentDir: 'main',
+      previousDir: 'main'
     })
     Api.logOut().then(() => {
+
     })
   }
   //Function to set state of log in
