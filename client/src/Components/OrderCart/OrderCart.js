@@ -2,7 +2,7 @@ import React, {useContext} from "react";
 import {Table, Container, Button} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
-function OrderCart () {
+function OrderCart (props) {
     const orderContext = useContext(OrderContext);
 
     const removeCartItem = (cartIndex) => {
@@ -17,7 +17,7 @@ function OrderCart () {
             position: 'relative',
             fontSize: "14px",
             overflowY: "scroll",
-            height: "450px",
+            height: "425px",
             borderStyle: 'solid',
             borderColor: 'white',
             // width: '100%'
@@ -102,7 +102,9 @@ function OrderCart () {
                 </colgroup> */}
                 <thead style={listingStyle.thead}>
                     <tr style={listingStyle.tr}>
-                        <th style={{...listingStyle.col_1_width,...listingStyle.tdth}}></th>
+                        <th style={{...listingStyle.col_1_width,...listingStyle.tdth}}>
+                            <Button size="sm" variant="outline-danger" onClick={() => props.emptyCart("empty-cart")}>Empty</Button>
+                        </th>
                         <th style={{...listingStyle.col_2_width,...listingStyle.tdth}}>Count</th>
                         <th style={{...listingStyle.col_3_width,...listingStyle.tdth}}>Item Name</th>
                         <th style={{...listingStyle.col_4_width,...listingStyle.tdth}}>Price</th>

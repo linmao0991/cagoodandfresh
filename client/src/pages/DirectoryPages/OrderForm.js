@@ -175,13 +175,9 @@ class OrderForm extends Component{
         return(
             <>
             <Container fluid>
-                <Row>
-                    <Col>
-                    </Col>
-                    <Col>
+                <Row className="justify-content-md-center">
+                    <Col md='auto'>
                         <h1>Order Form</h1>
-                    </Col>
-                    <Col>
                     </Col>
                 </Row>
                 <Row>
@@ -213,14 +209,9 @@ class OrderForm extends Component{
                                         <b>Customer</b>
                                     </Col>
                                     <Col>
-                                        <Button size="sm" variant="info" onClick={this.handleShow}>Find Customers</Button>
-                                    </Col>
-                                </Row>
-                                <Row>
-                                    <Col>
                                         {this.context.selectedCustomerData? 
                                         <>
-                                            <br/>{this.context.selectedCustomerData.restaurant_name_english} 
+                                            {this.context.selectedCustomerData.restaurant_name_english} 
                                             {this.context.selectedCustomerData.restaurant_name_chinese? <><br/>{this.context.selectedCustomerData.restaurant_name_chinese}</>: null}
                                             <br/>{this.formatPhoneNumber(this.context.selectedCustomerData.business_phone_number)}
                                             <br/>{this.context.selectedCustomerData.billing_street}
@@ -231,14 +222,21 @@ class OrderForm extends Component{
                                         }
                                     </Col>
                                 </Row>
+                                <Row>
+                                    <Col>
+                                    </Col>
+                                </Row>
                             </Col>
                             <Col>
-                                <Button size="sm" variant="danger" onClick={() => this.messageModalHandler("empty-cart")}>Empty Cart</Button>
+                                <Button variant="info" onClick={this.handleShow} block>Find Customers</Button><br/>
+                                <Button variant='warning'block>Submit Order</Button>
                             </Col>
                         </Row>
                         <br />
                         <Row>
-                            <OrderCart/>
+                            <OrderCart
+                                emptyCart = {this.messageModalHandler}
+                            />
                         </Row>
                     </Col>
                 </Row>

@@ -134,7 +134,8 @@ class Directory extends Component{
             <Container fluid>
                 <br />
                 <Row>
-                    <Col md="auto">
+                    <Col xs={3}></Col>
+                    <Col xs={6}>
                         <LoginContext.Consumer>
                             {login => (
                                 <>
@@ -163,7 +164,7 @@ class Directory extends Component{
                             )}
                         </LoginContext.Consumer>
                     </Col>
-                    <Col md="auto">
+                    <Col xs={3}>
                         <Button variant="danger" onClick={() => this.props.logoutHandler()}>Log Out</Button>
                     </Col>
                 </Row>
