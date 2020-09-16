@@ -20,26 +20,21 @@ function OrderCart (props) {
             height: "425px",
             borderStyle: 'solid',
             borderColor: 'white',
-            // width: '100%'
             },
         thead: {
             overflowY: 'scroll',
             fontSize: "14px",
             display:'block',
             position: 'relative',
-            // width: '100%'
         },
         scroll: {
             display: 'block',
             emptyCells: 'show'
         },
         tr: {
-            // width: '100%',
             display: 'flex'
         },
         tdth: {
-            // flexBasis: '100%',
-            // flexGrow: 2,
             display: 'block',
             textAlign: 'left'
         },

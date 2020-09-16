@@ -464,4 +464,21 @@ router.get("/user_data", (req, res) => {
     }
   });
 
+  //Order Submission
+  router.post('/submit_order', (req,res)=>{
+    let permission_req = 1
+    const waitTimer = () =>{
+      res.json({
+        message: 'Ding Ding Ding'
+      })
+    }
+    if(checkPermission(req.user, permission_req)){
+      setTimeout(waitTimer,5000)
+    }else{
+      res.json({
+        messege: "Permission level too low"
+      })
+    }
+  })
+
 module.exports = router;

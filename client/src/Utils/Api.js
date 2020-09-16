@@ -74,5 +74,10 @@ export default {
     searchInventoryByInput: (input) => {
         console.log("[Filter Search Results]")
         return axios.post("/api/search_inventory_by_input", input)
+    },
+
+    submitOrder: (cartData) => {
+        console.log('[Submit Order]')
+        return axios.post('/api/submit_order', cartData)
     }
 }

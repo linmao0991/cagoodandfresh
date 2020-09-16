@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import Api from "../../Utils/Api";
-import {Modal, Button, Container, Row, Col, Table} from "react-bootstrap";
+import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
@@ -21,6 +21,7 @@ class OrderForm extends Component{
         selectedCustomer: undefined,
         orderCart: undefined,
         searchingCustomer: false,
+        orderProcess: false,
     }
 
     static contextType = OrderContext;
@@ -96,6 +97,19 @@ class OrderForm extends Component{
     messageModalHandler = (messageType) =>  {
         this.setState({messageType: messageType})
         this.setState({messageShow: !this.state.messageShow})
+    }
+
+    submitOrder = () => {
+        console.log('[Submit Order]')
+        console.log(this.context.cartData)
+        this.setState({
+            orderProcess: true,
+        })
+        Api.submitOrder({
+            cartData: this.context.cartData
+        }).then(response => {
+            console.log(response.data)
+        })
     }
     
     messageModalSwitch = (messageType) => {
@@ -229,7 +243,17 @@ class OrderForm extends Component{
                             </Col>
                             <Col>
                                 <Button variant="info" onClick={this.handleShow} block>Find Customers</Button><br/>
-                                <Button variant='warning'block>Submit Order</Button>
+                                <Button 
+                                    variant={this.context.cartData.length>0 && !this.context.orderProcess? 'success': 'secondary'} 
+                                    disabled={this.context.cartData.length>0 && !this.context.orderProcess? false: true}
+                                    onClick = {this.submitOrder}
+                                    block>
+                                        {this.context.orderProcess?
+                                            'Processing...'
+                                            :
+                                            'Submit Order'
+                                        }
+                                    </Button>
                             </Col>
                         </Row>
                         <br />
