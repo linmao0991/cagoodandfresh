@@ -1,5 +1,5 @@
 import React, {Component}from 'react';
-import {Container, Row, Col, Button, InputGroup, FormControl} from 'react-bootstrap';
+import {Container, Row, InputGroup, FormControl} from 'react-bootstrap';
 import Api from '../../Utils/Api';
 import OrderContext from '../../Context/OrderContext';
 import ProductListing from '../../Components/ProductListing/ProductListing';

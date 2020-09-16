@@ -175,7 +175,6 @@ class OrderForm extends Component{
         return(
             <>
             <Container fluid>
-                <br />
                 <Row>
                     <Col>
                     </Col>

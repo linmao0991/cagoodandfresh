@@ -4,15 +4,10 @@ import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 
 class Inventory extends Component{
     static contextType = DirectoryContext;
-    // const [email, emailNameInput] = useState("");
-    // const [password, passwordInput] = useState("");
 
     render(){
         return(
-            <Container>
-                <Row>
-                    
-                </Row>
+            <Container fluid>
                 <Row>
                     <Col>
                     </Col>

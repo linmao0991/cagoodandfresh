@@ -138,9 +138,6 @@ class Directory extends Component{
                         <LoginContext.Consumer>
                             {login => (
                                 <>
-                                    <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>{" "}
-                                    <Button onClick={() => this.context.switchDir("inventory")}>Inventory</Button>{" "}
-                                    <Button onClick={() => this.context.switchDir("customers")}>Customers</Button>{" "}
                                     {login.permissionLevel >= 1?
                                         <>
                                         <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>{" "}
