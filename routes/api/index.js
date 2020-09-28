@@ -153,7 +153,7 @@ router.post("/create_restaurant_csv",(req, res)=>{
       {id: 'address3', title: 'Address3'},
       {id: 'city', title: 'City'},
       {id: 'state', title: 'State'},
-      {id: 'zipcode', title: 'Zip'},
+      {id: 'zip_code', title: 'Zip'},
       {id: 'phone', title: 'Phone'},
       {id: 'latitude', title: 'Latitude'},
       {id: 'longitude', title: 'Longitude'},
@@ -169,7 +169,7 @@ router.post("/create_restaurant_csv",(req, res)=>{
       address3: restaurant.location.address3,
       city: restaurant.location.city,
       state: restaurant.location.state,
-      zip: restaurant.location.zip_code,
+      zip_code: restaurant.location.zip_code,
       phone: restaurant.phone,
       latitude: restaurant.coordinates.latitude,
       longitude: restaurant.coordinates.longitude

@@ -25,6 +25,7 @@ function FindRestaurantResults (props){
                     <th>Street Address</th>
                     <th>City</th>
                     <th>State</th>
+                    <th>Zipcode</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -37,6 +38,7 @@ function FindRestaurantResults (props){
                                 <td>{restaurant.location.address1}, {restaurant.location.address2? restaurant.location.address2+", ": null}{restaurant.location.address3? restaurant.location.address3+", ": null}</td>
                                 <td>{restaurant.location.city}</td>
                                 <td>{restaurant.location.state}</td>
+                                <td>{restaurant.location.zip_code}</td>
                             </tr>
                         )
                     })}
