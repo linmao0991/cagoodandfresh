@@ -40,7 +40,7 @@ class Customers extends Component{
         Api.searchYelp({
             //Trim search paramters before sending to server
                 term: "restaurants",
-                categories: "chinese, japanese, sushi",
+                categories: "chinese,japanese",
                 radius: "40000",
                 location: this.state.location,
                 limit: "50",

@@ -1,5 +1,5 @@
 import React, {Component}from 'react';
-import {Container, Row, InputGroup, FormControl} from 'react-bootstrap';
+import {Container, Row, InputGroup, FormControl, Spinner} from 'react-bootstrap';
 import Api from '../../Utils/Api';
 import OrderContext from '../../Context/OrderContext';
 import ProductListing from '../../Components/ProductListing/ProductListing';
@@ -44,8 +44,20 @@ class SearchProduct extends Component{
                     onChange={event => this.handleSearchInput(event)}
                 >
                     <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">
-                            {this.state.searching? "Searching...": "Search\xa0\xa0\xa0\xa0\xa0\xa0"}
+                        <InputGroup.Text id="basic-addon1" style={{width:"100px"}}>
+                            {this.state.searching? 
+                            <>
+                            <span>Search&nbsp;</span>
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="sm"
+                                role="status"
+                                aria-hidden="true"
+                                variant="success"
+                            />
+                            </>
+                            : "Search"}
                         </InputGroup.Text>
                     </InputGroup.Prepend>
                     <FormControl

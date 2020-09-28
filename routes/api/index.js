@@ -424,7 +424,6 @@ router.get("/user_data", (req, res) => {
         OR cagoodandfresh.products.name_chinese LIKE '%${req.body.searchInput}%'
         GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( result => {
-        console.log(result[0])
         res.json(result)
       }).catch( error => {
         console.log(error)

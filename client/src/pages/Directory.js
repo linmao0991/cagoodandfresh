@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 import LoginContext from "../Context/LoginContext";
 import DirectoryContext from "../Context/DirectoryContext";
-//import MainDirectory from "./DirectoryPages/MainDirectory";
 import AccountsPay from "./DirectoryPages/AccountsPay";
 import AccountsRec from "./DirectoryPages/AccountsRec";
 import AdminTools from "./DirectoryPages/AdminTools";

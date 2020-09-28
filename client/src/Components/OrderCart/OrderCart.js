@@ -38,18 +38,23 @@ function OrderCart (props) {
             display: 'block',
             textAlign: 'left'
         },
+        //Button Column Width
         col_1_width :{
-            width: '10%'
+            width: '11%'
         },
+        //Count Column
         col_2_width :{
-            width: '10%'
+            width: '9%'
         },
+        //Product Column
         col_3_width :{
             width: '50%'
         },
+        //Unit Price
         col_4_width :{
             width: '15%'
         },
+        //Total Sale Price
         col_5_width :{
             width: '15%'
         }

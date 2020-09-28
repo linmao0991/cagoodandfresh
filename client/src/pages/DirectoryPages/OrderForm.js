@@ -1,12 +1,13 @@
 import React, {Component} from "react";
 import Api from "../../Utils/Api";
-import {Modal, Button, Container, Row, Col} from "react-bootstrap";
+import {Modal, Button, Container, Row, Col, Spinner} from "react-bootstrap";
 import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
 import OrderCart from "../../Components/OrderCart/OrderCart";
 import OrderContext from "../../Context/OrderContext";
 import CategorySelection from "../../Components/CategorySelection/CategorySelection";
 import ProductListing from "../../Components/ProductListing/ProductListing";
 import SearchProduct from '../../Components/SearchProduct/SearchProduct';
+import Loading from '../../Components/Loading/Loading';
 
 class OrderForm extends Component{
     state = {
@@ -102,13 +103,21 @@ class OrderForm extends Component{
     submitOrder = () => {
         console.log('[Submit Order]')
         console.log(this.context.cartData)
+        this.context.storeSearchType(undefined)
         this.setState({
             orderProcess: true,
         })
+        this.messageModalHandler('submit-order')
         Api.submitOrder({
             cartData: this.context.cartData
         }).then(response => {
             console.log(response.data)
+            this.setState({
+                orderProcess: false,
+            })
+            this.context.storeCustomer(undefined)
+            this.context.storeCart([])
+            this.setState({messageShow: !this.state.messageShow})
         })
     }
     
@@ -133,6 +142,30 @@ class OrderForm extends Component{
                             </Col>
                         </Row>
                     </Modal.Footer>
+                    </>
+                )
+            case "submit-order":
+                return(
+                    <>
+                    <Modal.Header style={{display:'flex', justifyContent:'center'}}>
+                        <Modal.Title>Submitting Order</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <div
+                            style={{display:'flex', justifyContent:'center'}}
+                        >
+                            <Spinner
+                                as="span"
+                                animation="border"
+                                size="lg"
+                                role="status"
+                                aria-hidden="true"
+                                variant="light"
+                            >
+                            </Spinner>
+                            <span className="sr-only">Processing</span>
+                        </div>
+                    </Modal.Body>
                     </>
                 )
             default:
@@ -244,11 +277,11 @@ class OrderForm extends Component{
                             <Col>
                                 <Button variant="info" onClick={this.handleShow} block>Find Customers</Button><br/>
                                 <Button 
-                                    variant={this.context.cartData.length>0 && !this.context.orderProcess? 'success': 'secondary'} 
-                                    disabled={this.context.cartData.length>0 && !this.context.orderProcess? false: true}
+                                    variant={this.context.cartData.length>0 && !this.state.orderProcess? 'success': 'secondary'} 
+                                    disabled={this.context.cartData.length>0 && !this.state.orderProcess? false: true}
                                     onClick = {this.submitOrder}
                                     block>
-                                        {this.context.orderProcess?
+                                        {this.state.orderProcess?
                                             'Processing...'
                                             :
                                             'Submit Order'
