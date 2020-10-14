@@ -15,9 +15,6 @@ module.exports = function ( sequelize, DataTypes){
         invoice_quantity: {
             type: DataTypes.DECIMAL(10,2)
         },
-        current_quantity: {
-            type: DataTypes.DECIMAL(10,2)
-        },
         purchase_order_number: {
             type: DataTypes.STRING,
             allowNull: true

@@ -26,6 +26,7 @@ function FindRestaurantResults (props){
                     <th>City</th>
                     <th>State</th>
                     <th>Zipcode</th>
+                    <th>Distance</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -39,6 +40,7 @@ function FindRestaurantResults (props){
                                 <td>{restaurant.location.city}</td>
                                 <td>{restaurant.location.state}</td>
                                 <td>{restaurant.location.zip_code}</td>
+                                <td>{(restaurant.distance/1760).toFixed(2)}</td>
                             </tr>
                         )
                     })}

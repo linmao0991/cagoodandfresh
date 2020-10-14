@@ -6,9 +6,9 @@ module.exports = function ( sequelize, DataTypes){
         // ar_invoice_line_item_id: {
         //     type: DataTypes.INTEGER
         // },
-        inventory_id: {
-            type: DataTypes.INTEGER
-        },
+        // inventory_id: {
+        //     type: DataTypes.INTEGER
+        // },
         product_code: {
             type: DataTypes.STRING,
         },

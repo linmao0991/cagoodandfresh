@@ -54,7 +54,10 @@ db.accounts_receivable_invoices.hasMany(db.ar_invoice_line_item, { sourceKey: 'i
 db.accounts_receivable_invoices.hasMany(db.collections, { sourceKey: 'invoice_number', foreignKey: "ar_invoice_number"});
 
 //ar_invoice_line_item has one inventory_transaction
-db.ar_invoice_line_item.hasOne(db.inventory_transaction, { foreignKey: 'ar_invoice_line_item_id'});
+//db.ar_invoice_line_item.hasOne(db.inventory_transaction, { foreignKey: 'ar_invoice_line_item_id'});
+
+//inventory has many inventory_transactions
+db.inventory.hasMany(db.inventory_transaction, {foreignKey: 'inventory_id'})
 
 //suppliers has many accounts_payable_invoices
 db.suppliers.hasMany(db.accounts_payable_invoices, {foreignKey: 'supplier_id'});

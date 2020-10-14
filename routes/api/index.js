@@ -370,17 +370,27 @@ router.get("/user_data", (req, res) => {
                 cagoodandfresh.products.supplier_secondary_id,
                 cagoodandfresh.products.supplier_tertiary_id,
                 cagoodandfresh.products.weight,
-                IFNULL(SUM(cagoodandfresh.inventory.current_quantity),0) as inventory_count
+                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
         FROM cagoodandfresh.products
-        LEFT JOIN cagoodandfresh.inventory
-        ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
+        LEFT JOIN (
+          SELECT product_code,
+                 SUM(quantity) AS total_quantity
+          FROM cagoodandfresh.inventory_transaction
+          GROUP BY product_code
+        ) transaction ON transaction.product_code = cagoodandfresh.products.id
+        LEFT JOIN (
+          SELECT product_code,
+                 SUM(invoice_quantity) as total_quantity
+          FROM cagoodandfresh.inventory
+          GROUP BY product_code
+        ) inventory ON inventory.product_code = cagoodandfresh.products.id
         WHERE cagoodandfresh.products.category = '${req.body.category}'
         GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then(data => {
         res.json(data)
       }).catch((err) => {
-        console.log(err.errors[0].message)
-        res.status(404).json({ error: err.errors[0].message });
+        console.log(err)
+        //res.status(404).json({ error: err.errors[0].message });
       })
     }else{
       res.json({
@@ -415,10 +425,20 @@ router.get("/user_data", (req, res) => {
                 cagoodandfresh.products.supplier_secondary_id,
                 cagoodandfresh.products.supplier_tertiary_id,
                 cagoodandfresh.products.weight,
-                IFNULL(SUM(cagoodandfresh.inventory.current_quantity),0) as inventory_count
+                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
         FROM cagoodandfresh.products
-        LEFT JOIN cagoodandfresh.inventory
-        ON cagoodandfresh.products.id = cagoodandfresh.inventory.product_code
+        LEFT JOIN (
+          SELECT product_code,
+                 SUM(quantity) AS total_quantity
+          FROM cagoodandfresh.inventory_transaction
+          GROUP BY product_code
+        ) transaction ON transaction.product_code = cagoodandfresh.products.id
+        LEFT JOIN (
+          SELECT product_code,
+                 SUM(invoice_quantity) as total_quantity
+          FROM cagoodandfresh.inventory
+          GROUP BY product_code
+        ) inventory ON inventory.product_code = cagoodandfresh.products.id
         WHERE cagoodandfresh.products.id LIKE '%${req.body.searchInput}&'
         OR cagoodandfresh.products.name_english LIKE '%${req.body.searchInput}%'
         OR cagoodandfresh.products.name_chinese LIKE '%${req.body.searchInput}%'
@@ -448,10 +468,14 @@ router.get("/user_data", (req, res) => {
             {product_code: req.body.productCode},
             {current_quantity: {[Op.gt]: 0}}
           ]
+        },
+        include: {
+          model: db.inventory_transaction
         }
-      }).then( data =>{
-        //console.log(data)
-        res.json(data);
+      }).then( results =>{
+        console.log(results)
+
+        //res.json(data);
       }).catch( err => {
         console.log(err)
         res.status(404).json({ error: err.errors[0].message });
