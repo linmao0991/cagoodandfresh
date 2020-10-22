@@ -462,23 +462,43 @@ router.get("/user_data", (req, res) => {
     console.log(req.body.productCode)
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
+        // group: ['inventory.id'],
+        // attributes: {
+        //   include: [
+        //     [sequelize.fn('SUM', sequelize.col('quantity')), 'transactions_quantity']
+        //   ]
+        // },
         where: {
+          product_code: req.body.productCode
           //Where product code equal code snet and inventory current quantity > 0
-          [Op.and]: [
-            {product_code: req.body.productCode},
-            {current_quantity: {[Op.gt]: 0}}
-          ]
+          // [Op.and]: [
+          //   {product_code: req.body.productCode},
+          //   {invoice_quantity: {[Op.gt]: 0}}
+          // ]
         },
         include: {
-          model: db.inventory_transaction
+          model: db.inventory_transaction,
+          as: 'inventory_transactions',
         }
       }).then( results =>{
-        console.log(results)
-
-        //res.json(data);
+        //Map through inventory
+        var newResults = results.map(inventory => {
+          //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
+          if(inventory.inventory_transactions.length > 0){
+            var transactions_quantity = inventory.inventory_transactions.reduce((accumulator, currentValue) => parseInt(accumulator) + parseInt(currentValue.quantity), 0)
+            var currentQuantity = (inventory.invoice_quantity - transactions_quantity).toFixed(2)
+          }else{
+            //Else set current quantity to equal invoice quantity
+            var currentQuantity = inventory.invoice_quantity
+          }
+          //Create new index object and insert current_quantity key value pair
+          var newInventory = {current_quantity: currentQuantity,...inventory.dataValues}
+          return newInventory
+        })
+        //Send new inventory with current quantities to client
+        res.json(newResults);
       }).catch( err => {
         console.log(err)
-        res.status(404).json({ error: err.errors[0].message });
       })
     }else{
       res.json({
@@ -496,7 +516,33 @@ router.get("/user_data", (req, res) => {
       })
     }
     if(checkPermission(req.user, permission_req)){
-      setTimeout(waitTimer,5000)
+      console.log("=====Cart Data=====")
+      console.log(req.body.orderData)
+      console.log("===================")
+      //Create new accounts recievable record
+      //--Needed to get a invoice number in order to create new ar invoice line items
+      //--Generate a invoice number, possible format: mmyyhhmmss-customer_id (0921-042511-0001)
+      //--User sequelize hooks after update
+      db.accounts_receivable_invoices.create({
+        customer_account_number: req.body.orderData.customerData.customer_account_number,
+        order_date: req.body.orderData.orderDate,
+        //delivery_date: req.body,
+        //pickup_date: req.body,
+        invoice_total: req.body.orderData.cartTotalSale,
+        //payment_status: req.body,
+        employee_id: req.user.id
+      }).then( results => {
+        console.log(results);
+        res.json(results)
+      })
+
+      //Create new ar line items and correlating new inventory transactions
+      //--Using accounts recievable invoice number to attach tp ar line items and inventory transactions
+
+      //Get new accounts recievable record using the invoice number and send back to client.
+      //--Possibly add a discrepency check on orderdata and new accounts recieveable record.
+
+      //setTimeout(waitTimer,5000)
     }else{
       res.json({
         messege: "Permission level too low"

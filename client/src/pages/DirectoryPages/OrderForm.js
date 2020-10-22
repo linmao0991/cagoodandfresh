@@ -30,6 +30,7 @@ class OrderForm extends Component{
     handleEmptyCart = () =>{
         let emptyCart = []
         this.context.storeCart(emptyCart)
+        this.context.storeCartTotalSales(0)
         this.messageModalHandler()
     }
 
@@ -101,22 +102,38 @@ class OrderForm extends Component{
     }
 
     submitOrder = () => {
-        console.log('[Submit Order]')
-        console.log(this.context.cartData)
+        //resets search type context
         this.context.storeSearchType(undefined)
+        //Sets orderProcess to true, this toggles the submut button to show processing
         this.setState({
             orderProcess: true,
         })
+        // Create orderData to send to server
+        let orderDate = new Date().toString()
+
+        let orderData = {
+            customerData: this.context.selectedCustomerData,
+            cartData: this.context.cartData,
+            cartTotalSale: this.context.cartTotalSales,
+            orderDate: orderDate,
+        }
+        console.log(orderData)
+        //Toggles the submit order modal to show a loading animation
         this.messageModalHandler('submit-order')
+        //API call to submit order
         Api.submitOrder({
-            cartData: this.context.cartData
+            orderData
         }).then(response => {
             console.log(response.data)
+            //Toogles the submit button to active
             this.setState({
                 orderProcess: false,
             })
+            //Resets context for a new order
             this.context.storeCustomer(undefined)
             this.context.storeCart([])
+            this.context.storeCartTotalSales(0)
+            //toggles off the loading modal
             this.setState({messageShow: !this.state.messageShow})
         })
     }
@@ -253,9 +270,7 @@ class OrderForm extends Component{
                             <Col>
                                 <Row>
                                     <Col>
-                                        <b>Customer</b>
-                                    </Col>
-                                    <Col>
+                                        <b>Customer</b><br/>
                                         {this.context.selectedCustomerData? 
                                         <>
                                             {this.context.selectedCustomerData.restaurant_name_english} 

@@ -40,32 +40,34 @@ class SearchProduct extends Component{
         return (
             <>
             <Row>
-                <InputGroup
-                    onChange={event => this.handleSearchInput(event)}
-                >
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1" style={{width:"100px"}}>
-                            {this.state.searching? 
-                            <>
-                            <span>Search&nbsp;</span>
-                            <Spinner
-                                as="span"
-                                animation="border"
-                                size="sm"
-                                role="status"
-                                aria-hidden="true"
-                                variant="success"
-                            />
-                            </>
-                            : "Search"}
-                        </InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
-                        placeholder="Product Name"
-                        aria-label="product"
-                        aria-describedby="product-search"
-                    />
-                </InputGroup>
+                <Container>
+                    <InputGroup
+                        onChange={event => this.handleSearchInput(event)}
+                    >
+                        <InputGroup.Prepend>
+                            <InputGroup.Text id="basic-addon1" style={{width:"100px"}}>
+                                {this.state.searching? 
+                                <>
+                                <span>Search&nbsp;</span>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    variant="success"
+                                />
+                                </>
+                                : "Search"}
+                            </InputGroup.Text>
+                        </InputGroup.Prepend>
+                        <FormControl
+                            placeholder="Product Name"
+                            aria-label="product"
+                            aria-describedby="product-search"
+                        />
+                    </InputGroup>
+                </Container>
             </Row>
             <br/>
             <Row>

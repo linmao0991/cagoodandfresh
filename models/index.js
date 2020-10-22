@@ -63,7 +63,7 @@ db.inventory.hasMany(db.inventory_transaction, {foreignKey: 'inventory_id'})
 db.suppliers.hasMany(db.accounts_payable_invoices, {foreignKey: 'supplier_id'});
 
 //accounts_payable_invoices has many inventory
-db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number', foreignKey: 'ar_invoice_number'});
+db.accounts_payable_invoices.hasMany(db.inventory, {sourceKey: 'invoice_number', foreignKey: 'ap_invoice_number'});
 
 //accounts_payable_invoices has many accounts_payable_notes
 db.accounts_payable_invoices.hasMany(db.accounts_payable_notes, {sourceKey: 'invoice_number', foreignKey: 'ap_invoice_number'});

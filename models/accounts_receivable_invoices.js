@@ -10,7 +10,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true,
         },
         order_date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.STRING,
             allowNull: false
         },
         delivery_date: {
@@ -36,7 +36,39 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: false,
             defaultValue: 0,
         }
-    },{
+    },
+    {
+        hooks: {
+            beforeValidate: (accounts_receivable_invoices, options) => {
+                let date = new Date();
+                let year = date.getFullYear().toString().slice(2);
+                let month = () => {
+                  let m = date.getMonth()+1
+                  console.log(m.toString().length)
+                  return(m.toString().length > 1? m : ''+0+m)
+                };
+                let day = () => {
+                  let d = date.getDate()
+                  return(d.toString().length > 1? d : ''+0+d)
+                };
+                let hour = () => {
+                  let h = date.getHours()
+                  return(h.toString().length > 1? h : ''+0+h)
+                };
+                let minute = () => {
+                  let m = date.getMinutes()
+                  return(m.toString().length > 1? m : ''+0+m)
+                };
+                let second = () => {
+                  let s = date.getSeconds()
+                  return(s.toString().length > 1? s : ''+0+s)
+                };
+                accounts_receivable_invoices.invoice_number = year+month()+'-'+day()+hour()+minute()+second()
+                    //possible format: yymmddhhmmss-customer_id (0921-042511-0001)
+            }
+        }
+    },
+    {
         freezeTableName: true
     });
     return accounts_receivable_invoices;

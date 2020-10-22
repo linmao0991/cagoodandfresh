@@ -67,6 +67,12 @@ function AddProductModal (props) {
                 }
             }
         }
+        //Update order cart total sales
+        let totalCartSales = cartData.reduce((accumulator, currentValue) => {
+            return (accumulator+(currentValue.sale_price*currentValue.quantity))
+        },0).toFixed(2)
+        // Store new cart total sales
+        orderContext.storeCartTotalSales(totalCartSales)
         // Store the updated cart to OrderContext
         orderContext.storeCart(cartData)
         // Calls the toggleShow function in the parent component ProductListing to hide the modal

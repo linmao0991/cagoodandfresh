@@ -76,8 +76,8 @@ export default {
         return axios.post("/api/search_inventory_by_input", input)
     },
 
-    submitOrder: (cartData) => {
+    submitOrder: (orderData) => {
         console.log('[Submit Order]')
-        return axios.post('/api/submit_order', cartData)
+        return axios.post('/api/submit_order', orderData)
     }
 }

@@ -16,6 +16,7 @@ function ProductListing (props){
         Api.getInventoryByProductID({
             productCode: product.id
         }).then( inventory => {
+            console.log(inventory)
             storeInven(setInitialInventory(inventory.data));
             toggleShow(!show)
         }).catch( err => {

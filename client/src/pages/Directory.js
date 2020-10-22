@@ -20,6 +20,7 @@ class Directory extends Component{
         categorySelection: undefined,
         searchType: undefined,
         productData: undefined,
+        cartTotalSales: undefined,
     }
     static contextType = DirectoryContext;
 
@@ -67,6 +68,10 @@ class Directory extends Component{
         })
     }
 
+    orderContextCartTotalSales = sales => {
+        this.setState({cartTotalSales: sales})
+    }
+
     orderContextSearchStore = type => {
         this.setState({searchType: type})
     }
@@ -93,6 +98,8 @@ class Directory extends Component{
                             categorySelection: this.state.categorySelection,
                             searchType: this.state.searchType,
                             productData: this.state.productData,
+                            cartTotalSales: this.state.cartTotalSales,
+                            storeCartTotalSales: this.orderContextCartTotalSales,
                             storeCustomer: this.orderContextCustStore,
                             storeCategory: this.orderContextCateStore,
                             storeCart: this.orderContextCartStore,
@@ -113,6 +120,8 @@ class Directory extends Component{
                             categorySelection: this.state.categorySelection,
                             searchType: this.state.searchType,
                             productData: this.state.productData,
+                            cartTotalSales: this.state.cartTotalSales,
+                            storeCartTotalSales: this.orderContextCartTotalSales,
                             storeCustomer: this.orderContextCustStore,
                             storeCategory: this.orderContextCateStore,
                             storeCart: this.orderContextCartStore,

@@ -7,7 +7,14 @@ function OrderCart (props) {
 
     const removeCartItem = (cartIndex) => {
         let newCart = [...orderContext.cartData]
+        //Remove cart item at cartIndex
         newCart.splice(cartIndex,1)
+        //Set totalCartSales to total sales of cart
+        let totalCartSales = newCart.reduce((accumulator, currentValue) => {
+            return (accumulator+(currentValue.sale_price*currentValue.quantity))
+        },0).toFixed(2)
+        //Store Context
+        orderContext.storeCartTotalSales(totalCartSales)
         orderContext.storeCart(newCart)
     }
 
@@ -79,9 +86,11 @@ function OrderCart (props) {
                         <th >Total Items: {orderContext.cartData.reduce((accumulator, currentValue) => {
                             return accumulator+currentValue.quantity}, 0)}
                         </th>
-                        <th>Total: ${(orderContext.cartData.reduce((accumulator, currentValue) => {
-                            return accumulator+(currentValue.quantity * currentValue.sale_price)
-                            }, 0)).toFixed(2)}
+                        <th>Total: ${orderContext.cartTotalSales
+                            // (orderContext.cartData.reduce((accumulator, currentValue) => {
+                            // return accumulator+(currentValue.quantity * currentValue.sale_price)
+                            // }, 0)).toFixed(2)
+                            }
                         </th>
                     </tr>
                 </thead>
