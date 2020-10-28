@@ -14,6 +14,7 @@ var bcrypt = require("bcryptjs");
 const e = require('express');
 const cli = require('cli');
 const { sequelize } = require('../../models');
+const { error } = require('cli');
 const saltRounds = 10;
 
 
@@ -95,9 +96,9 @@ router.post("/new_customer_search_yelp", (req, res) => {
       }
     })
   }else{
-    res.json({
-      messege: "Permission level too low"
-    })
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
   }
 })
 
@@ -246,9 +247,9 @@ router.post("/create_employee", (req, res) => {
           res.status(401).json({ error: err.errors[0].message });
         });
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
 });
 
@@ -313,9 +314,9 @@ router.get("/user_data", (req, res) => {
         res.status(404).json({ error: err.errors[0].message });
       })
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   });
 
@@ -339,9 +340,9 @@ router.get("/user_data", (req, res) => {
         res.status(404).json({ error: err.errors[0].message });
       })
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   });
 
@@ -390,12 +391,12 @@ router.get("/user_data", (req, res) => {
         res.json(data)
       }).catch((err) => {
         console.log(err)
-        //res.status(404).json({ error: err.errors[0].message });
+        res.status(404).json({ error: err});
       })
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   });
 
@@ -403,14 +404,6 @@ router.get("/user_data", (req, res) => {
   router.post("/search_inventory_by_input", (req, res) => {
     let permission_req = 1;
     if(checkPermission(req.user, permission_req)){
-      // db.products.findAll({
-      //   where:{
-      //     [Op.or]: [
-      //       {id: req.body.searchInput},
-      //       {name_english: {[Op.substring]: req.body.searchInput}}, 
-      //       {name_chinese: {[Op.substring]: req.body.searchInput}}
-      //     ]
-      //   }
       db.sequelize.query(
         `SELECT	cagoodandfresh.products.id,
                 cagoodandfresh.products.upc,
@@ -445,14 +438,14 @@ router.get("/user_data", (req, res) => {
         GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( result => {
         res.json(result)
-      }).catch( error => {
-        console.log(error)
-        res.json(error)
+      }).catch( err => {
+        console.log(err)
+        res.status(404).json({ error: err});
       })
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   })
 
@@ -462,91 +455,189 @@ router.get("/user_data", (req, res) => {
     console.log(req.body.productCode)
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
-        // group: ['inventory.id'],
-        // attributes: {
-        //   include: [
-        //     [sequelize.fn('SUM', sequelize.col('quantity')), 'transactions_quantity']
-        //   ]
-        // },
         where: {
           product_code: req.body.productCode
-          //Where product code equal code snet and inventory current quantity > 0
-          // [Op.and]: [
-          //   {product_code: req.body.productCode},
-          //   {invoice_quantity: {[Op.gt]: 0}}
-          // ]
         },
         include: {
           model: db.inventory_transaction,
           as: 'inventory_transactions',
         }
       }).then( results =>{
-        //Map through inventory
-        var newResults = results.map(inventory => {
+        //Old Way of adding current quantity to results
+        // let newResults = results.map(inventory => {
+        //   //Set current quantity to invoice_quantity
+        //   let currentQuantity = inventory.invoice_quantity
+        //   //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
+        //   if(inventory.inventory_transactions.length > 0){
+        //     //Sum all transaction quantities in inventory_transactions to get total product already sold
+        //     let transactions_quantity = inventory.inventory_transactions.reduce((accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.quantity), 0)
+        //     //Current quantity is invoice quanitity minus total product quantity already sold
+        //     currentQuantity = (inventory.invoice_quantity - transactions_quantity).toFixed(2)
+        //   }
+
+        //   //If there are 0 or less current quantities then set index value to null to be filtered out of the array
+        //   if( current_quantity <= 0){
+        //     let newInventory = null
+        //     return newInventory
+        //   }else{
+        //   //If current quantities is greater then 0
+        //   //Create new index object and insert current_quantity key value pair
+        //   let newInventory = {current_quantity: currentQuantity,...inventory.dataValues}
+        //   return newInventory
+        //   }
+        // })
+
+        let newResults = results.reduce((accumulator, currentValue) => {
+          console.log(currentValue)
+          //Set current quantity to invoice_quantity
+          let currentQuantity = currentValue.invoice_quantity
           //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
-          if(inventory.inventory_transactions.length > 0){
-            var transactions_quantity = inventory.inventory_transactions.reduce((accumulator, currentValue) => parseInt(accumulator) + parseInt(currentValue.quantity), 0)
-            var currentQuantity = (inventory.invoice_quantity - transactions_quantity).toFixed(2)
-          }else{
-            //Else set current quantity to equal invoice quantity
-            var currentQuantity = inventory.invoice_quantity
+          if(currentValue.inventory_transactions.length > 0){
+            //Sum all transaction quantities in inventory_transactions to get total product already sold
+            let transactions_quantity = currentValue.inventory_transactions.reduce((accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.quantity), 0)
+            //Current quantity is invoice quanitity minus total product quantity already sold
+            currentQuantity = (currentValue.invoice_quantity - transactions_quantity).toFixed(2)
           }
+          //Create new inventory object with current quantity
+          let newInventory = {current_quantity: currentQuantity,...currentValue.dataValues}
+          console.log(newInventory);
+          //If there are more than 0 current quantity, then push into accumulator
+          if( currentQuantity > 0){
+            accumulator.push(newInventory)
+          }
+          //If current quantities is greater then 0
           //Create new index object and insert current_quantity key value pair
-          var newInventory = {current_quantity: currentQuantity,...inventory.dataValues}
-          return newInventory
-        })
+          return accumulator
+        },[])
         //Send new inventory with current quantities to client
         res.json(newResults);
       }).catch( err => {
         console.log(err)
+        res.status(404).json({ error: err});
       })
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   });
 
   //Order Submission
   router.post('/submit_order', (req,res)=>{
     let permission_req = 1
-    const waitTimer = () =>{
-      res.json({
-        message: 'Ding Ding Ding'
+
+    //Promise to create transaction record in inventory_transaction table
+    const inventoryTransaction = (invoiceNumber, data) => {
+      return new Promise((reslove, reject) => {
+        db.inventory_transaction.create({
+          ar_invoice_number: invoiceNumber,
+          inventory_id: data.inventory_id,
+          product_code: data.product_code,
+          product_name_english: data.name_english,
+          product_name_chinese: data.name_chinese,
+          upc: data.upc,
+          quantity: data.quantity,
+          measurement_system: data.measurement_system,
+          weight: data.weight,
+          sale_price: data.sale_price,
+          cost: data.cost,
+          transaction_type: data.transaction_type,
+          location: data.location
+        }).then( result => {
+          reslove(result)
+        }).catch( err => {
+          reject(err)
+        })
       })
     }
+
+    //Promise to record payment in collections table
+    const recordPayment = async (invoice) => {
+      return new Promise((reslove, reject) => {
+        //Checks for payment type of check by looking for check number, then settng checkBoolean based on if check number is true or false
+        let checkBoolean = () => {
+          return (req.body.orderData.paymentInfo.checkNumber? 1: 0)
+        }
+        //Calcualtes change from payment and total sales sets to change.
+        let change = () => {
+          return( (req.body.orderData.paymentInfo.paymentAmount >= req.body.orderData.cartTotalSale)?
+            req.body.orderData.paymentInfo.paymentAmount - req.body.orderData.cartTotalSale:0)
+        }
+        //Create transaction record
+        db.collections.create({
+          date: req.body.orderData.orderDate,
+          collection_amount: req.body.orderData.paymentInfo.paymentAmount,
+          check: checkBoolean(),
+          cash: !checkBoolean(),
+          check_number: req.body.orderData.paymentInfo.checkNumber,
+          check_memo: null,
+          change: change(),
+          note: null,
+          employee_id: req.user.id,
+          ar_invoice_number: invoice.invoice_number, 
+        }).then( dbCollection => {
+          console.log(dbCollection)
+          reslove(dbCollection)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    }
+
+    //Function to get invoice and all assoicated tables.
+    const getCompletedOrder = (invoice) => {
+      db.accounts_receivable_invoices.findOne({
+        where: {
+          invoice_number: invoice.invoice_number
+        },
+        include:[
+          {model: db.inventory_transaction},
+          {model: db.collections}
+        ]
+      }).then( result => {
+        res.json(result)
+      }).catch( err => {
+        console.log(err)
+        res.status(404).json({ error: err});
+      })
+    }
+
     if(checkPermission(req.user, permission_req)){
-      console.log("=====Cart Data=====")
-      console.log(req.body.orderData)
-      console.log("===================")
-      //Create new accounts recievable record
-      //--Needed to get a invoice number in order to create new ar invoice line items
-      //--Generate a invoice number, possible format: mmyyhhmmss-customer_id (0921-042511-0001)
-      //--User sequelize hooks after update
+      //Creates new accounts receivable invoice record
       db.accounts_receivable_invoices.create({
         customer_account_number: req.body.orderData.customerData.customer_account_number,
         order_date: req.body.orderData.orderDate,
         //delivery_date: req.body,
         //pickup_date: req.body,
         invoice_total: req.body.orderData.cartTotalSale,
-        //payment_status: req.body,
-        employee_id: req.user.id
-      }).then( results => {
-        console.log(results);
-        res.json(results)
+        employee_id: req.user.id,
+        payment_status: req.body.orderData.paymentStatus
+      }).then( dbInvoice => {
+      //Create inventory transactions
+        
+        // transactionsData will hold array of inventoryTransaction promises passing in each transaction
+        let transactionData = req.body.orderData.cartData.map(transaction => {
+          return inventoryTransaction(dbInvoice.invoice_number, transaction)
+        })
+
+        //Promise all using the array transactionData to create each transaction records asynchronously  
+        Promise.all(transactionData).then( dbTransactions => {
+          //If function to record payment if there was a payment, otherwise run function getCompletedOrder function to get
+          //invoice data and send back to client
+          if(["Paid","Partial"].indexOf(req.body.orderData.paymentStatus) >= 0){
+            console.log("Record Payment")
+            recordPayment(dbInvoice).then( result => {
+              getCompletedOrder(dbInvoice)
+            })
+          }else{
+            getCompletedOrder(dbInvoice)
+          }
+        })
       })
-
-      //Create new ar line items and correlating new inventory transactions
-      //--Using accounts recievable invoice number to attach tp ar line items and inventory transactions
-
-      //Get new accounts recievable record using the invoice number and send back to client.
-      //--Possibly add a discrepency check on orderdata and new accounts recieveable record.
-
-      //setTimeout(waitTimer,5000)
     }else{
-      res.json({
-        messege: "Permission level too low"
-      })
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
     }
   })
 

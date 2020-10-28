@@ -22,9 +22,9 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true
         },
         invoice_total: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             allowNull: false,
-            defaultValue: 0
+            defaultValue: 0.0000
         },
         payment_status: {
             type: DataTypes.STRING,
@@ -38,6 +38,7 @@ module.exports = function ( sequelize, DataTypes){
         }
     },
     {
+        //Hooks to generate invoice number before validation.
         hooks: {
             beforeValidate: (accounts_receivable_invoices, options) => {
                 let date = new Date();

@@ -1,9 +1,18 @@
-import React, {useContext} from "react";
-import {Table, Container, Button} from "react-bootstrap";
+import React, {useContext, useState} from "react";
+import {Table, Container, Button, InputGroup, FormControl, Row, Col, Dropdown} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
 
 function OrderCart (props) {
     const orderContext = useContext(OrderContext);
+
+    const [payInputState, setPayInputState] = useState(true)
+  
+    const handlePaymentInfo = (info, data) => {
+        let paymentInfo = {...orderContext.paymentInfo, [info]: data}
+        if(data === "Cash"){paymentInfo.checkNumber = null}
+        console.log(paymentInfo)
+        orderContext.storePaymentInfo(paymentInfo)
+    }
 
     const removeCartItem = (cartIndex) => {
         let newCart = [...orderContext.cartData]
@@ -68,7 +77,7 @@ function OrderCart (props) {
     }
 
     return(
-        <Container fluid>
+        <Container>
             <Table
                 bordered
                 size = "sm"
@@ -78,8 +87,8 @@ function OrderCart (props) {
                 }}
             >
                 <colgroup>
-                    <col style={{width: "50%"}}/>
-                    <col style={{width: "50%"}}/>
+                    <col style={{width: "33%"}}/>
+                    <col style={{width: "33%"}}/>
                 </colgroup>
                 <thead>
                     <tr>
@@ -95,6 +104,55 @@ function OrderCart (props) {
                     </tr>
                 </thead>
             </Table>
+            <Row style={{height: "50px"}}>
+                <Col>
+                    <Dropdown>
+                        <Dropdown.Toggle variant="info" id="dropdown-basic">
+                            {orderContext.paymentInfo.paymentType}
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="#/action-1" onClick={() => {handlePaymentInfo("paymentType","Cash"); setPayInputState(false)}}>Cash</Dropdown.Item>
+                            <Dropdown.Item href="#/action-2" onClick={() => {handlePaymentInfo("paymentType","Check"); setPayInputState(false)}}>Check</Dropdown.Item>
+                            <Dropdown.Item href="#/action-2" onClick={() => {handlePaymentInfo("paymentType","Account"); setPayInputState(true)}}>Account</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </Col>
+                <Col>
+                    {
+                        orderContext.paymentInfo.paymentType === "Check"?
+                            <InputGroup className="mb-3">
+                                <InputGroup.Prepend>
+                                    <InputGroup.Text>Check#</InputGroup.Text>
+                                </InputGroup.Prepend>
+                                <FormControl 
+                                    type="number"
+                                    onChange = {(event) => handlePaymentInfo("checkNumber",event.target.value)}
+                                />
+                            </InputGroup>
+                        :
+                            null
+                    }
+                </Col>
+                <Col>
+                    {
+                        payInputState === false?
+                        <InputGroup className="mb-3">
+                            <InputGroup.Prepend>
+                                <InputGroup.Text>$</InputGroup.Text>
+                            </InputGroup.Prepend>
+                            <FormControl 
+                                type="number"
+                                value={orderContext.paymentInfo.paymentAmount}
+                                onChange = {(event) => handlePaymentInfo("paymentAmount",event.target.value)}
+                                disabled = {payInputState}
+                            />
+                        </InputGroup>
+                        :
+                        null
+                    }
+                </Col>
+            </Row>
             <Table
                 striped
                 bordered

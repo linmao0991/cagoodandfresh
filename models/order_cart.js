@@ -20,11 +20,11 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING
         },
         sales_price: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             defaultValue: 0
         },
         cost: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             defaultValue: 0
         },
         product_name_english: {

@@ -16,7 +16,6 @@ function ProductListing (props){
         Api.getInventoryByProductID({
             productCode: product.id
         }).then( inventory => {
-            console.log(inventory)
             storeInven(setInitialInventory(inventory.data));
             toggleShow(!show)
         }).catch( err => {
@@ -25,24 +24,29 @@ function ProductListing (props){
         })
 
     }
-
+    
+    //Sets the initial inventory count for each inventory of product and 
+    //updates current quantity if selected product is already in the cart
     const setInitialInventory = (inventory) => {
-        console.log(inventory)
         let cartData = [...orderContext.cartData]
         let dbInventory = [...inventory]
+        //Checks for a empty cart
         if(cartData.length > 0){
+            //If there is existing cart items, then loop through each and find any that matched the selected product
+            //and update current quantity based on the quantity of selected items already in cart
             let initialInventory = dbInventory.map((inventory, index) => {
-                let updateInventory = {...inventory}
-                let cartItem = cartData.find(cartItem => cartItem.inventory_id === updateInventory.id)
+                let updatedInventory = {...inventory}
+                let cartItem = cartData.find(cartItem => cartItem.inventory_id === updatedInventory.id)
                 if(cartItem){
-                    updateInventory.current_quantity = (updateInventory.current_quantity-cartItem.quantity).toFixed(2)
-                    return updateInventory
+                    updatedInventory.current_quantity = (inventory.current_quantity-cartItem.quantity)
+                    return updatedInventory
                 }else{
-                    return updateInventory
+                    return updatedInventory
                 }
             })
             return initialInventory
         }else{
+            //Returns inventory from database unedited
             return [...dbInventory]
         }
     }

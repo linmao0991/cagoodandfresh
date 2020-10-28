@@ -8,6 +8,7 @@ import CategorySelection from "../../Components/CategorySelection/CategorySelect
 import ProductListing from "../../Components/ProductListing/ProductListing";
 import SearchProduct from '../../Components/SearchProduct/SearchProduct';
 import Loading from '../../Components/Loading/Loading';
+import orderContext from "../../Context/OrderContext";
 
 class OrderForm extends Component{
     state = {
@@ -110,12 +111,24 @@ class OrderForm extends Component{
         })
         // Create orderData to send to server
         let orderDate = new Date().toString()
+        let paymentStatus = () => {
+            if( this.context.cartTotalSales > this.context.paymentInfo.paymentAmount && this.context.paymentInfo.paymentAmount > 0){
+                return "Partial"
+            }
+            if( this.context.cartTotalSales = this.context.paymentInfo.paymentAmount ){
+                return "Paid"
+            }
+            return "Unpaid"
+        }
 
         let orderData = {
             customerData: this.context.selectedCustomerData,
             cartData: this.context.cartData,
             cartTotalSale: this.context.cartTotalSales,
             orderDate: orderDate,
+            paymentInfo: this.context.paymentInfo,
+            paymentStatus: paymentStatus(),
+            transaction_type: "sale"
         }
         console.log(orderData)
         //Toggles the submit order modal to show a loading animation
@@ -124,7 +137,7 @@ class OrderForm extends Component{
         Api.submitOrder({
             orderData
         }).then(response => {
-            console.log(response.data)
+            console.log(response)
             //Toogles the submit button to active
             this.setState({
                 orderProcess: false,
@@ -133,6 +146,14 @@ class OrderForm extends Component{
             this.context.storeCustomer(undefined)
             this.context.storeCart([])
             this.context.storeCartTotalSales(0)
+            this.context.storeCategory(undefined)
+            this.context.storeCategorySelection(undefined)
+            this.context.storeSearchType(undefined)
+            this.context.storePaymentInfo({
+                paymentAmount: 0,
+                paymentType: "Pay Type",
+                checkNumber: null,
+            })
             //toggles off the loading modal
             this.setState({messageShow: !this.state.messageShow})
         })

@@ -8,12 +8,18 @@ const orderContext = React.createContext({
     categorySelection: undefined,
     searchType: undefined,
     productData: undefined,
+    paymentInfo: {
+        paymentAmount: 0,
+        paymentType: "Pay Type",
+        checkNumber: null,
+    },
     storeCustomer: () => {},
     storeCategory: () => {},
     storeCart: () => {},
     storeCategorySelection: () => {},
     storeSearchType: () => {},
     storeCartTotalSales: () => {},
+    storePaymentInfo: () => {},
 })
 
 export default orderContext

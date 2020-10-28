@@ -1,5 +1,3 @@
-const { daemon } = require("cli");
-
 module.exports = function ( sequelize, DataTypes){
     var products = sequelize.define("products", {
         location: {
@@ -27,7 +25,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true,
         },
         weight: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.INTEGER,
             allowNull: true,
         },
         description: {

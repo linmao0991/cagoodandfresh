@@ -16,10 +16,6 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.DATEONLY,
             allowNull: true
         },
-        inventory_id: {
-            type: DataTypes.INTEGER,
-        }
-        ,
         product_code: {
             type: DataTypes.STRING,
             allowNull: true
@@ -30,10 +26,6 @@ module.exports = function ( sequelize, DataTypes){
         product_name_chinese: {
             type: DataTypes.STRING
         },
-        location: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
         upc: {
             type: DataTypes.STRING
         },
@@ -42,11 +34,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: false
         },
         sale_price: {
-            type: DataTypes.DECIMAL(10,2),
-            defaultValue: 0
-        },
-        cost: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.INTEGER,
             defaultValue: 0
         }
     },{

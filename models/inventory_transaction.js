@@ -1,30 +1,39 @@
 module.exports = function ( sequelize, DataTypes){
     var inventory_transaction = sequelize.define("inventory_transaction", {
-        ar_invoice_number: {
-            type: DataTypes.STRING
-        },
-        // ar_invoice_line_item_id: {
-        //     type: DataTypes.INTEGER
-        // },
-        // inventory_id: {
-        //     type: DataTypes.INTEGER
-        // },
         product_code: {
             type: DataTypes.STRING,
+        },
+        product_name_english: {
+            type: DataTypes.STRING,
+        },
+        product_name_chinese: {
+            type: DataTypes.STRING
+        },
+        upc: {
+            type: DataTypes.STRING
         },
         quantity: {
             type: DataTypes.DECIMAL(10,2)
         },
         sale_price: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             defaultValue: 0
         },
         cost: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             defaultValue: 0
         },
         transaction_type: {
             type: DataTypes.STRING
+        },
+        weight: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
+        location: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            defaultValue: null
         }
     },{
         freezeTableName: true

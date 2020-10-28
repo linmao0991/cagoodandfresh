@@ -5,10 +5,6 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: false,
             unique: true
         },
-        // supplier_id: {
-        //     type: DataTypes.STRING,
-        //     allowNull: true
-        // },
         purchase_order_number: {
             type: DataTypes.STRING,
             allowNull: true
@@ -30,7 +26,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true,
         },
         invoice_total: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             allowNull: true
         },
         payment_status: {

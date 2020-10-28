@@ -1,11 +1,11 @@
 module.exports = function ( sequelize, DataTypes){
     var collections = sequelize.define("collections", {
         date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.STRING,
             allowNull: true
         },
         collection_amount: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             allowNull: false
         },
         check: {
@@ -20,8 +20,8 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING,
             allowNull: true
         },
-        cash: {
-            type: DataTypes.DECIMAL(10,2),
+        change: {
+            type: DataTypes.DECIMAL(19,4),
             allowNull: true,
         },
         note: {

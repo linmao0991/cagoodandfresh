@@ -30,7 +30,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true,
         },
         invoice_total: {
-            type: DataTypes.DECIMAL(10,2),
+            type: DataTypes.DECIMAL(19,4),
             allowNull: true
         },
         payment_status: {

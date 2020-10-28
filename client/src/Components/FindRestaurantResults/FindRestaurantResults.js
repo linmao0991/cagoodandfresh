@@ -1,5 +1,4 @@
 import React from 'react';
-import Api from '../../Utils/Api';
 import {Container, Button, Modal, Row, Col, Table} from 'react-bootstrap';
 
 function FindRestaurantResults (props){

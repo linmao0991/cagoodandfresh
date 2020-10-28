@@ -21,6 +21,11 @@ class Directory extends Component{
         searchType: undefined,
         productData: undefined,
         cartTotalSales: undefined,
+        paymentInfo: {
+            paymentAmount: 0,
+            paymentType: "Pay Type",
+            checkNumber: null,
+        }
     }
     static contextType = DirectoryContext;
 
@@ -64,7 +69,7 @@ class Directory extends Component{
         this.setState({
             categorySelection: category,
             productData: productData,
-            searchType: searchType
+            searchType: searchType,
         })
     }
 
@@ -74,6 +79,10 @@ class Directory extends Component{
 
     orderContextSearchStore = type => {
         this.setState({searchType: type})
+    }
+
+    orderContextPaymentInfo = data => {
+        this.setState({paymentInfo: {...data}})
     }
 
     directoryDisplay = () =>{
@@ -99,6 +108,7 @@ class Directory extends Component{
                             searchType: this.state.searchType,
                             productData: this.state.productData,
                             cartTotalSales: this.state.cartTotalSales,
+                            paymentInfo: this.state.paymentInfo,
                             storeCartTotalSales: this.orderContextCartTotalSales,
                             storeCustomer: this.orderContextCustStore,
                             storeCategory: this.orderContextCateStore,
@@ -121,12 +131,14 @@ class Directory extends Component{
                             searchType: this.state.searchType,
                             productData: this.state.productData,
                             cartTotalSales: this.state.cartTotalSales,
+                            paymentInfo: this.state.paymentInfo,
                             storeCartTotalSales: this.orderContextCartTotalSales,
                             storeCustomer: this.orderContextCustStore,
                             storeCategory: this.orderContextCateStore,
                             storeCart: this.orderContextCartStore,
                             storeCategorySelection: this.orderContextCateSelStore,
                             storeSearchType: this.orderContextSearchStore,
+                            storePaymentInfo: this.orderContextPaymentInfo,
                         }}
                     >
                         <OrderForm />

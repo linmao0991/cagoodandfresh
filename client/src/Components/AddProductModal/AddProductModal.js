@@ -1,7 +1,6 @@
 import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
 import OrderContext from "../../Context/OrderContext";
-import Inventory from "../../Pages/DirectoryPages/Inventory";
 
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);
@@ -11,7 +10,7 @@ function AddProductModal (props) {
         let initialCountState = []
         let dbInventory = [...props.productInven]
         for (let [index, inventory] of dbInventory.entries()){
-            initialCountState.push({index: index, quantity: 0, newSalePrice: parseFloat(inventory.sale_price).toFixed(2), inventory: inventory})
+            initialCountState.push({index: index, quantity: 0, newSalePrice: inventory.sale_price, inventory: inventory})
         }
         return initialCountState;
     }
@@ -24,6 +23,7 @@ function AddProductModal (props) {
     //Function to add selected product into the cart then stores updated cart to OrderContext
     const addProductToCart = (event) => {
         event.preventDefault()
+        console.log(count)
         //Create new object with combined product data and inventory data
         let newCartItems = 
             count.map(item => {
@@ -84,7 +84,9 @@ function AddProductModal (props) {
     const handleSetCount = (index, event) => {
         event.preventDefault()
         let newState = [...count]
-        newState[index].quantity = parseFloat(event.target.value)
+        newState[index].quantity = Number(event.target.value)
+        console.log(newState[index].quantity)
+        console.log(typeof newState[index].quantity)
         calculateTotals(newState)
         setCount(newState)
     }
@@ -118,7 +120,11 @@ function AddProductModal (props) {
     //Takes in current basket and calculates total count and sales, then set state
     const calculateTotals = (newState) => {
         let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
-        let newTotalSales = newState.reduce((accumulator, currentValue) => {return accumulator + (currentValue.quantity * currentValue.newSalePrice)},0)
+        let newTotalSales = newState.reduce((accumulator, currentValue) => {
+            let total = (currentValue.quantity * Number(currentValue.newSalePrice)).toFixed(4)
+            console.log(Number(total))
+            return accumulator + (currentValue.quantity * Number(currentValue.newSalePrice))
+        },0)
         setTotalCount(newTotalCount)
         setTotalSale(newTotalSales.toFixed(2))
     }
@@ -189,7 +195,7 @@ function AddProductModal (props) {
                                         <td>
                                             <InputGroup>
                                                 <FormControl
-                                                    value={count[index].newSalePrice}
+                                                    value={(count[index].newSalePrice)}
                                                     onChange={(event)=> handleSetNewSalePrice(index, event)}
                                                     aria-label="product-sale-price"
                                                     type="number"
@@ -197,7 +203,7 @@ function AddProductModal (props) {
                                                 </FormControl>
                                             </InputGroup>
                                         </td>
-                                        <td>${inventory.cost}</td>
+                                        <td>${Number(inventory.cost).toFixed(2)}</td>
                                         <td>{inventory.receive_date}</td>
                                         <td>{inventory.supplier_name}</td>
                                     </tr>

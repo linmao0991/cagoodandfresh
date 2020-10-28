@@ -58,7 +58,7 @@ module.exports = function ( sequelize, DataTypes){
             allowNUll: true
         },
         pay_rate: {
-            type: DataTypes.STRING,
+            type: DataTypes.DECIMAL(19,4),
             allowNUll: true
         },
         start_date: {
