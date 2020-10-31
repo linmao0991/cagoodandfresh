@@ -9,7 +9,9 @@ function OrderCart (props) {
   
     const handlePaymentInfo = (info, data) => {
         let paymentInfo = {...orderContext.paymentInfo, [info]: data}
-        if(data === "Cash"){paymentInfo.checkNumber = null}
+        if(data === "Cash"){
+            paymentInfo.checkNumber = null
+        }
         console.log(paymentInfo)
         orderContext.storePaymentInfo(paymentInfo)
     }
@@ -21,7 +23,7 @@ function OrderCart (props) {
         //Set totalCartSales to total sales of cart
         let totalCartSales = newCart.reduce((accumulator, currentValue) => {
             return (accumulator+(currentValue.sale_price*currentValue.quantity))
-        },0).toFixed(2)
+        },0)
         //Store Context
         orderContext.storeCartTotalSales(totalCartSales)
         orderContext.storeCart(newCart)
@@ -95,11 +97,7 @@ function OrderCart (props) {
                         <th >Total Items: {orderContext.cartData.reduce((accumulator, currentValue) => {
                             return accumulator+currentValue.quantity}, 0)}
                         </th>
-                        <th>Total: ${orderContext.cartTotalSales
-                            // (orderContext.cartData.reduce((accumulator, currentValue) => {
-                            // return accumulator+(currentValue.quantity * currentValue.sale_price)
-                            // }, 0)).toFixed(2)
-                            }
+                        <th>Total: ${orderContext.cartTotalSales.toFixed(2)}
                         </th>
                     </tr>
                 </thead>
@@ -112,7 +110,7 @@ function OrderCart (props) {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/action-1" onClick={() => {handlePaymentInfo("paymentType","Cash"); setPayInputState(false)}}>Cash</Dropdown.Item>
+                            <Dropdown.Item onClick={() => {handlePaymentInfo("paymentType","Cash"); setPayInputState(false)}}>Cash</Dropdown.Item>
                             <Dropdown.Item href="#/action-2" onClick={() => {handlePaymentInfo("paymentType","Check"); setPayInputState(false)}}>Check</Dropdown.Item>
                             <Dropdown.Item href="#/action-2" onClick={() => {handlePaymentInfo("paymentType","Account"); setPayInputState(true)}}>Account</Dropdown.Item>
                         </Dropdown.Menu>
@@ -186,7 +184,7 @@ function OrderCart (props) {
                                     <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}><Button onClick={() => removeCartItem(index)} size="sm" variant="outline-danger">X</Button></td>
                                     <td style={{textAlign: "center",...listingStyle.col_2_width,...listingStyle.tdth}}>{cartItem.quantity}</td>
                                     <td style={{...listingStyle.col_3_width,...listingStyle.tdth}}>{cartItem.name_english} {cartItem.name_chinese}</td>
-                                    <td style={{...listingStyle.col_4_width,...listingStyle.tdth}}>{cartItem.sale_price}</td>
+                                    <td style={{...listingStyle.col_4_width,...listingStyle.tdth}}>{cartItem.sale_price.toFixed(2)}</td>
                                     <td style={{...listingStyle.col_5_width,...listingStyle.tdth}}>{(cartItem.quantity * cartItem.sale_price).toFixed(2)}</td>
                                 </tr>
                             )

@@ -14,6 +14,9 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.BOOLEAN,
             defaultValue: true
         },
+        cod_account:{
+            type: DataTypes.BOOLEAN,
+        },
         customer_representative: {
             type: DataTypes.STRING,
             allowNUll: true

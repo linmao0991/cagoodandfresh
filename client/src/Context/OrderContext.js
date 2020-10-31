@@ -3,7 +3,7 @@ import React from "react";
 const orderContext = React.createContext({
     selectedCustomerData: undefined,
     cartData: [],
-    cartTotalSales: 0,
+    cartTotalSales: 0.00,
     productCate: undefined,
     categorySelection: undefined,
     searchType: undefined,

@@ -27,7 +27,7 @@ function AddProductModal (props) {
         //Create new object with combined product data and inventory data
         let newCartItems = 
             count.map(item => {
-                //Spreadt both inventory, product, and quantity data into new cartItem
+                //Spread both inventory, product, and quantity data into new cartItem
                 let cartItem ={
                     ...props.productData,
                     product_code: item.inventory.product_code,
@@ -55,22 +55,28 @@ function AddProductModal (props) {
         if (cartData.length === 0){
             cartData=[...newCartItems]
         }else{
-            //If not empty then loop through each newCartItems and carData indexes and find matching inventory id.
+            //If not empty then loop through each newCartItems and cartData indexes and find matching inventory id.
             for(let newCartItem of newCartItems){
-                let oldCartIndex = cartData.findIndex( oldCartItem => oldCartItem.inventory_id === newCartItem.inventory_id)
-                //If no match found, push newCartItem into cartData array
-                if ( oldCartIndex === -1){
-                    cartData.push(newCartItem)
-                //Otherwise returned index of findIndex() is used to add quantity of the newCartItem to cartData
-                }else{
+                //find index in old cart where inventory_id and sale_price are the same
+                let oldCartIndex = cartData.findIndex( oldCartItem => 
+                    oldCartItem.inventory_id === newCartItem.inventory_id
+                    &&
+                    Number(oldCartItem.sale_price) === Number(newCartItem.sale_price)
+                )
+                if ( oldCartIndex > -1){
+                    //If index is found then add new cart item to the old cart item witht eh same sale_price and inventory_id
                     cartData[oldCartIndex].quantity += newCartItem.quantity
+                    //cartData.push(newCartItem)
+                }else{
+                    //Otherwise add newCartItem to the old cart
+                    cartData.push(newCartItem)
                 }
             }
         }
         //Update order cart total sales
         let totalCartSales = cartData.reduce((accumulator, currentValue) => {
             return (accumulator+(currentValue.sale_price*currentValue.quantity))
-        },0).toFixed(2)
+        },0)
         // Store new cart total sales
         orderContext.storeCartTotalSales(totalCartSales)
         // Store the updated cart to OrderContext
@@ -96,7 +102,7 @@ function AddProductModal (props) {
     const handleSetNewSalePrice = (index, event) => {
         event.preventDefault()
         let newState = [...count]
-        newState[index].newSalePrice = event.target.value
+        newState[index].newSalePrice = Number(event.target.value)
         calculateTotals(newState)
         setCount(newState)
     }
@@ -121,8 +127,6 @@ function AddProductModal (props) {
     const calculateTotals = (newState) => {
         let newTotalCount = newState.reduce((accumulator, currentValue) => {return accumulator + currentValue.quantity},0)
         let newTotalSales = newState.reduce((accumulator, currentValue) => {
-            let total = (currentValue.quantity * Number(currentValue.newSalePrice)).toFixed(4)
-            console.log(Number(total))
             return accumulator + (currentValue.quantity * Number(currentValue.newSalePrice))
         },0)
         setTotalCount(newTotalCount)

@@ -8,7 +8,15 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.DECIMAL(19,4),
             allowNull: false
         },
+        invoice_total: {
+            type: DataTypes.DECIMAL(19,4),
+            allowNull: false
+        },
         check: {
+            type: DataTypes.BOOLEAN,
+            allowNull: true
+        },
+        cash: {
             type: DataTypes.BOOLEAN,
             allowNull: true
         },

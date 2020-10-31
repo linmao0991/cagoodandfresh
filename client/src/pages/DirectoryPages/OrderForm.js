@@ -7,17 +7,17 @@ import OrderContext from "../../Context/OrderContext";
 import CategorySelection from "../../Components/CategorySelection/CategorySelection";
 import ProductListing from "../../Components/ProductListing/ProductListing";
 import SearchProduct from '../../Components/SearchProduct/SearchProduct';
-import Loading from '../../Components/Loading/Loading';
-import orderContext from "../../Context/OrderContext";
+//import Loading from '../../Components/Loading/Loading';
 
 class OrderForm extends Component{
     state = {
-        phone: undefined,
-        name: undefined,
-        account: undefined,
+        phone: "",
+        name: "",
+        account: "",
         show: false,
         messageShow: false,
         messageType: undefined,
+        simpleMessage: undefined,
         displayCustomers: false,
         customerData: undefined,
         selectedCustomer: undefined,
@@ -35,16 +35,19 @@ class OrderForm extends Component{
         this.messageModalHandler()
     }
 
-    handleAccountInput = input =>{
-        this.setState({account: input})
+    handleAccountInput = event =>{
+        event.preventDefault()
+        this.setState({account: event.target.value})
     }
 
-    handlePhoneInput = input =>{
-        this.setState({phone: input})
+    handlePhoneInput = event =>{
+        event.preventDefault()
+        this.setState({phone: event.target.value})
     }
 
-    handleNameInput = input =>{
-        this.setState({name: input})
+    handleNameInput = event =>{
+        event.preventDefault()
+        this.setState({name: event.target.value})
     }
 
     handleClose = () => {
@@ -70,9 +73,9 @@ class OrderForm extends Component{
             this.setState({
                 customerData: info.data,
                 displayCustomers: true,
-                account: undefined,
-                phone: undefined,
-                name: undefined,
+                account: "",
+                phone: "",
+                name: "",
                 searchingCustomer: false
             })
         }).catch( err => {
@@ -97,12 +100,19 @@ class OrderForm extends Component{
         return null
       }
 
-    messageModalHandler = (messageType) =>  {
-        this.setState({messageType: messageType})
+    messageModalHandler = (messageType, messageData) =>  {
+        this.setState({messageType: messageType, simpleMessage: messageData})
         this.setState({messageShow: !this.state.messageShow})
     }
 
     submitOrder = () => {
+        if(Number(this.context.paymentInfo.paymentAmount) < Number(this.context.cartTotalSales) && 
+            this.state.selectedCustomer.cod_account === true){
+            return this.messageModalHandler("payment-error", "Full Payment Required")
+        }
+        if(this.context.paymentInfo.paymentType === "Check" && this.context.paymentInfo.checkNumber === null){
+            return this.messageModalHandler("payment-error", "Missing Check Number")
+        }
         //resets search type context
         this.context.storeSearchType(undefined)
         //Sets orderProcess to true, this toggles the submut button to show processing
@@ -159,7 +169,7 @@ class OrderForm extends Component{
         })
     }
     
-    messageModalSwitch = (messageType) => {
+    messageModalSwitch = (messageType, messageData) => {
         switch (messageType){
             case "empty-cart":
                 return(
@@ -203,6 +213,23 @@ class OrderForm extends Component{
                             </Spinner>
                             <span className="sr-only">Processing</span>
                         </div>
+                    </Modal.Body>
+                    </>
+                )
+            case "payment-error":
+                return(
+                    <>
+                    <Modal.Header closeButton style={{display:'flex', justifyContent:'center'}}>
+                    <Modal.Title>Payment Error</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Container>
+                            <Row style={{display:'flex', justifyContent:'center'}}>
+                                <Col style={{display:'flex', justifyContent:'center'}}>
+                                    {messageData}
+                                </Col>
+                            </Row>
+                        </Container>
                     </Modal.Body>
                     </>
                 )
@@ -271,17 +298,13 @@ class OrderForm extends Component{
                             <Col>
                                 <Button variant="info" onClick={() => this.context.storeSearchType("search")}>Search</Button> <Button variant="info" onClick={() => this.context.storeSearchType("selection")}>Selection</Button>
                             </Col>
-                            <Col>
-                            </Col>
-                            <Col>
-                            </Col>
+                            <Col></Col>
+                            <Col></Col>
                         </Row>
                         {/* Item Selection */}
                         <br />
                         <Row>
-                            {/* <Container fluid> */}
-                                {this.productSearchType()}
-                            {/* </Container> */}
+                            {this.productSearchType()}
                         </Row>
                     </Col>
 
@@ -313,11 +336,20 @@ class OrderForm extends Component{
                             <Col>
                                 <Button variant="info" onClick={this.handleShow} block>Find Customers</Button><br/>
                                 <Button 
-                                    variant={this.context.cartData.length>0 && !this.state.orderProcess? 'success': 'secondary'} 
-                                    disabled={this.context.cartData.length>0 && !this.state.orderProcess? false: true}
+                                    variant={
+                                        this.context.selectedCustomerData &&
+                                        this.context.cartData.length>0 && 
+                                        !this.state.orderProcess? 
+                                        'success': 'secondary'} 
+                                    disabled={
+                                        this.context.selectedCustomerData&&
+                                        this.context.cartData.length>0 && 
+                                        !this.state.orderProcess? 
+                                        false: true}
                                     onClick = {this.submitOrder}
                                     block>
-                                        {this.state.orderProcess?
+                                        {
+                                        this.state.orderProcess?
                                             'Processing...'
                                             :
                                             'Submit Order'
@@ -350,73 +382,93 @@ class OrderForm extends Component{
                             <Row>
                                 <Col></Col>
                                 <Col xs={6}>
-                                    <form>
+                                    <div>
                                         <input
                                             value = {this.state.phone}
-                                            type = "text"
-                                            label = "phone number"
+                                            type = "number"
+                                            //label = "phone number"
                                             placeholder ="Phone Number"
-                                            //autoComplete= "text"
-                                            onChange = {event => this.handlePhoneInput(event.target.value)}
-                                            className="form-control validate"
+                                            onChange = {(event) => this.handlePhoneInput(event)}
+                                            className="form-control"
                                         />
                                         <br />
                                         <input
                                             value = {this.state.account}
-                                            type = "text"
-                                            label = "account number"
+                                            type = "number"
+                                            //label = "account number"
                                             placeholder ="Account Number"
                                             //autoComplete= "text"
-                                            onChange = {event => this.handleAccountInput(event.target.value)}
-                                            className="form-control validate"
+                                            onChange = {(event) => this.handleAccountInput(event)}
+                                            className="form-control"
                                         />
                                         <br />
                                         <input
                                             value = {this.state.name}
                                             type = "text"
-                                            label = "name"
+                                            //label = "name"
                                             placeholder = "Name"
                                             //autoComplete= "text"
-                                            onChange = {event => this.handleNameInput(event.target.value)}
-                                            className="form-control validate"
+                                            onChange = {event => this.handleNameInput(event)}
+                                            className="form-control"
                                         />
                                         <br />
-                                    </form>
+                                    </div>
+                                    <Row>
+                                        <Col>
+                                            <Button 
+                                                onClick={event => this.getCustomerInfo(event)}
+                                                variant=
+                                                    {this.state.searchingCustomer?
+                                                        "warning"
+                                                        :
+                                                        "info"
+                                                    }
+                                                disabled=
+                                                    {this.state.searchingCustomer?
+                                                        true
+                                                        :
+                                                        false
+                                                    }
+                                            >
+                                                {this.state.searchingCustomer?
+                                                "Searching..."
+                                                :
+                                                "Search"}
+                                            </Button>
+                                        </Col>
+                                        <Col>
+                                            <Button 
+                                                variant="info"
+                                                onClick={() => this.selectCustomer({
+                                                    restaurant_name_chinese: "Place Holder",
+                                                    restaurant_name_english: "No Account",
+                                                    customer_account_number: -1,
+                                                    cod_account: true,
+                                                    business_phone_number: "0000000000",
+                                                    billing_city: "none",
+                                                    billing_street: "none",
+                                                    billing_state: "none",
+                                                    billing_zipcode: "none"
+                                                })}
+                                            >
+                                                No Account
+                                            </Button>
+                                        </Col>
+                                        <Col></Col>
+                                    </Row>
                                 </Col>
-                                <Col></Col>
+                                <Col>
+                                </Col>
                             </Row>
                         </Container>
-                        <Button 
-                            onClick={event => this.getCustomerInfo(event)}
-                            variant=
-                                {this.state.searchingCustomer?
-                                    "warning"
-                                    :
-                                    "info"
-                                }
-                            disabled=
-                                {this.state.searchingCustomer?
-                                    true
-                                    :
-                                    false
-                                }
-                        >
-                            {this.state.searchingCustomer?
-                            "Searching..."
-                            :
-                            "Search"}
-                        </Button>
                     </Modal.Body>
                     <Modal.Footer>
                         {this.state.displayCustomers?
                             <Container>
-                                {this.state.customerData.map(data => (
-                                    <CustomerDisplay 
-                                        data = {data}
-                                        key = {data.id}
-                                        selectCustomer = {this.selectCustomer}
-                                    />
-                                ))}
+                                <CustomerDisplay 
+                                    data = {this.state.customerData}
+                                    selectCustomer = {this.selectCustomer}
+                                />
                             </Container>
                         : 
                         null}
@@ -430,7 +482,7 @@ class OrderForm extends Component{
                     keyboard={false}
                     size ="sm">
                     {this.state.messageShow? 
-                        this.messageModalSwitch(this.state.messageType)
+                        this.messageModalSwitch(this.state.messageType, this.state.simpleMessage)
                         :
                         null
                     }

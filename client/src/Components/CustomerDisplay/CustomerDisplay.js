@@ -1,5 +1,5 @@
 import React from "react";
-import {Row, Col, Button} from "react-bootstrap";
+import {Row, Col, Button, Table} from "react-bootstrap";
 
 function CustomerDisplay(props){
 
@@ -14,24 +14,30 @@ function CustomerDisplay(props){
 
     return(
         <div>
-            <hr />
-            <Row>
-                <Col xs={3}>
-                    <Button variant="info"
-                        onClick = {() => props.selectCustomer(props.data)}
-                    >Select</Button>
-                </Col>
-                <Col>
-                    <p>{props.data.restaurant_name_english}</p>
-                    <p>{props.data.restaurant_name_chinese}</p>
-                    <p>{formatPhoneNumber(props.data.business_phone_number)}</p>
-                </Col>
-                <Col>
-                    <p>{props.data.billing_street}</p>
-                    <p>{props.data.billing_city}, {props.data.billing_state} {props.data.billing_zipcode}</p>
-                </Col>
-            </Row>
-            <hr />
+            <Table striped bordered variant="dark">
+                <thead>
+                    <tr>
+                    <th>Select</th>
+                    <th>Name Chinese</th>
+                    <th>Name English</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {props.data.map((customer, index) => {
+                        return(
+                            <tr key={index}>
+                            <td><Button variant="info" onClick = {() => props.selectCustomer(customer)}>Select</Button></td>
+                            <td>{customer.restaurant_name_chinese}</td>
+                            <td>{customer.restaurant_name_english}</td>
+                            <td>{formatPhoneNumber(customer.business_phone_number)}</td>
+                            <td>{customer.billing_street}, {customer.billing_city}, {customer.billing_state} {customer.billing_zipcode}</td>
+                            </tr>
+                        )
+                    })}
+                </tbody>
+            </Table>
         </div>
     );
 }

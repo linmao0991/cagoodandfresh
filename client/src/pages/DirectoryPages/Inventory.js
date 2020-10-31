@@ -1,30 +1,36 @@
-import React, {useState, useContext, Component} from "react";
-import DirectoryContext from "../../Context/DirectoryContext"
+import React, {Component} from "react";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
+import InventoryDisplay from '../../Components/InventoryDisplay/InventoryDisplay';
+import InventoryContext from '../../Context/InventoryContext';
 
 class Inventory extends Component{
-    static contextType = DirectoryContext;
+    state = {
+        testValue: "blue",
+    }
+
+    changeTestValue = (value) => {
+        this.setState({testValue: value})
+    }
 
     render(){
         return(
             <Container fluid>
-                <Row>
-                    <Col>
-                    </Col>
-                    <Col>
+                <Row className="justify-content-md-center"> 
+                    <Col md="auto">
                         <h1>Inventory</h1>
-                    </Col>
-                    <Col>
                     </Col>
                 </Row>
                 <Row>
                     <Col>
-                        {/* <Button onClick={() => this.context.switchDir(this.context.previousDir)}>Back</Button> */}
+                        <Button variant="info">Button</Button>
                     </Col>
                     <Col>
-                        <Button>Button</Button>
                     </Col>
                     <Col></Col>
+                </Row>
+                <br />
+                <Row>
+                    <InventoryDisplay />
                 </Row>
             </Container>
         )

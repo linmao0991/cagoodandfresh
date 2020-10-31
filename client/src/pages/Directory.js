@@ -9,6 +9,7 @@ import Customers from "./DirectoryPages/Customers";
 import Inventory from "./DirectoryPages/Inventory";
 import OrderForm from "./DirectoryPages/OrderForm";
 import OrderContext from "../Context/OrderContext";
+import InventoryContext from '../Context/InventoryContext';
 import Api from "../Utils/Api"
 
 class Directory extends Component{
@@ -20,7 +21,7 @@ class Directory extends Component{
         categorySelection: undefined,
         searchType: undefined,
         productData: undefined,
-        cartTotalSales: undefined,
+        cartTotalSales: 0.00,
         paymentInfo: {
             paymentAmount: 0,
             paymentType: "Pay Type",
@@ -99,26 +100,13 @@ class Directory extends Component{
                 return (<Customers />);
             case "inventory":
                 return (
-                    <OrderContext.Provider
-                        value={{
-                            selectedCustomerData: this.state.orderCustomerData,
-                            cartData: this.state.cartData,
-                            productCate: this.state.productCate,
-                            categorySelection: this.state.categorySelection,
-                            searchType: this.state.searchType,
-                            productData: this.state.productData,
-                            cartTotalSales: this.state.cartTotalSales,
-                            paymentInfo: this.state.paymentInfo,
-                            storeCartTotalSales: this.orderContextCartTotalSales,
-                            storeCustomer: this.orderContextCustStore,
-                            storeCategory: this.orderContextCateStore,
-                            storeCart: this.orderContextCartStore,
-                            storeCategorySelection: this.orderContextCateSelStore,
-                            storeSearchType: this.orderContextSearchStore,
+                    <InventoryContext.Provider
+                        value = {{
+                            categories: this.state.productCate
                         }}
                     >
-                        <Inventory />
-                    </OrderContext.Provider>
+                        <Inventory/>
+                    </InventoryContext.Provider>
                 );
             case "orderform":
                 return (

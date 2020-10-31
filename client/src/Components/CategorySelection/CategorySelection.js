@@ -1,7 +1,6 @@
-import React, {useContext, Component} from "react";
+import React, {useContext} from "react";
 import OrderContext from "../../Context/OrderContext";
 import Api from "../../Utils/Api";
-import {Button} from "react-bootstrap";
 import './CategorySelection.css';
 
 function CategorySelection (props){

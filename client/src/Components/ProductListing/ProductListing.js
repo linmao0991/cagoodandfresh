@@ -2,10 +2,10 @@ import React, {useState, useContext} from "react";
 import {Table, Button} from "react-bootstrap";
 import Api from "../../Utils/Api";
 import AddProductModal from "../AddProductModal/AddProductModal";
-import OrderConext from '../../Context/OrderContext';
+import OrderContext from '../../Context/OrderContext';
 
 function ProductListing (props){
-    const orderContext = useContext(OrderConext)
+    const orderContext = useContext(OrderContext)
 
     const [show, toggleShow] = useState(false)
     const [productInven, storeInven] = useState(undefined)
@@ -31,24 +31,29 @@ function ProductListing (props){
         let cartData = [...orderContext.cartData]
         let dbInventory = [...inventory]
         //Checks for a empty cart
-        if(cartData.length > 0){
+        // if(cartData.length > 0){
             //If there is existing cart items, then loop through each and find any that matched the selected product
             //and update current quantity based on the quantity of selected items already in cart
             let initialInventory = dbInventory.map((inventory, index) => {
                 let updatedInventory = {...inventory}
                 let cartItem = cartData.find(cartItem => cartItem.inventory_id === updatedInventory.id)
+                updatedInventory.cost = Number(inventory.cost)
+                updatedInventory.invoice_quantity = Number(inventory.invoice_quantity)
+                updatedInventory.sale_price = Number(inventory.sale_price)
+                updatedInventory.current_quantity = Number(inventory.current_quantity)
                 if(cartItem){
-                    updatedInventory.current_quantity = (inventory.current_quantity-cartItem.quantity)
+                    updatedInventory.current_quantity = Number(inventory.current_quantity)-Number(cartItem.quantity)
                     return updatedInventory
                 }else{
                     return updatedInventory
                 }
             })
+            console.log(initialInventory)
             return initialInventory
-        }else{
-            //Returns inventory from database unedited
-            return [...dbInventory]
-        }
+        // }else{
+        //     //Returns inventory from database unedited
+        //     return [...dbInventory]
+        // }
     }
 
     const handleModalToggle = () => toggleShow(!show);

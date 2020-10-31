@@ -293,10 +293,10 @@ router.get("/user_data", (req, res) => {
           searchArray.push({
             [property]: {
               [Op.or]: {
-                //Find data that starts with search property
+                //Find data that starts with search property input
                 [Op.startsWith]: req.body[property],
-                //Find data that contains srarch property
-                [Op.like]: "%"+req.body[property]}
+                //Find data that contains search property input
+                [Op.like]: "%"+req.body[property]+"%"}
               }
             })
           }
@@ -310,7 +310,7 @@ router.get("/user_data", (req, res) => {
       }).then( (dbCustomer) => {
         res.json(dbCustomer)
       }).catch((err) => {
-        console.log(err.errors[0].message)
+        console.log(err)
         res.status(404).json({ error: err.errors[0].message });
       })
     }else{
@@ -556,7 +556,7 @@ router.get("/user_data", (req, res) => {
       return new Promise((reslove, reject) => {
         //Checks for payment type of check by looking for check number, then settng checkBoolean based on if check number is true or false
         let checkBoolean = () => {
-          return (req.body.orderData.paymentInfo.checkNumber? 1: 0)
+          return (req.body.orderData.paymentInfo.checkNumber? true: false)
         }
         //Calcualtes change from payment and total sales sets to change.
         let change = () => {
@@ -567,8 +567,9 @@ router.get("/user_data", (req, res) => {
         db.collections.create({
           date: req.body.orderData.orderDate,
           collection_amount: req.body.orderData.paymentInfo.paymentAmount,
-          check: checkBoolean(),
-          cash: !checkBoolean(),
+          invoice_total: req.body.orderData.cartTotalSale,
+          check: (req.body.orderData.paymentInfo.paymentType === "Check"? true: false),
+          cash: (req.body.orderData.paymentInfo.paymentType === "Cash"? true: false),
           check_number: req.body.orderData.paymentInfo.checkNumber,
           check_memo: null,
           change: change(),
