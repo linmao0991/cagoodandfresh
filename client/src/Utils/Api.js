@@ -37,6 +37,12 @@ export default {
         return axios.get("/api/get_product_categories")
     },
 
+    //Get all products
+    getAllProducts: () => {
+        console.log("[Get All Products")
+        return axios.get("/api/get_all_products")
+    },
+
     //Get all products by category
     getProductsByCate: (category) =>{
         console.log(["Get Products by Category"])

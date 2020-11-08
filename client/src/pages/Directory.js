@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Modal, Button, Container, Row, Col} from "react-bootstrap";
+import {Button, Container, Row, Col} from "react-bootstrap";
 import LoginContext from "../Context/LoginContext";
 import DirectoryContext from "../Context/DirectoryContext";
 import AccountsPay from "./DirectoryPages/AccountsPay";
@@ -63,10 +63,6 @@ class Directory extends Component{
     //Stores the selected category to be stored into OrderContext.
     //--Called from ProductSelection.js
     orderContextCateSelStore  = (category, productData,searchType) => {
-        // console.log("[Directory - orderContextCateSelStore]")
-        // console.log(category)
-        // console.log(productData)
-        // console.log(searchType)
         this.setState({
             categorySelection: category,
             productData: productData,

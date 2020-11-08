@@ -27,6 +27,18 @@ function InventoryDisplay (){
         })
     }
 
+    const getAllProducts = () =>{
+        setShowDisplay(false)
+        Api.getAllProducts({
+        }).then( products => {
+            console.log(products.data)
+            setInventoryData(products.data)
+            setShowDisplay(true)
+        }).catch(err => {
+            console.log("something went wrong")
+        })
+    }
+
     const InventoryDisplaySwitch = () => {
         switch (showDisplay){
             case true:
@@ -44,7 +56,7 @@ function InventoryDisplay (){
     }
 
     return(
-        <Container>
+        <Container fluid>
             <Row>
                 <Col>
                     <InputGroup className="mb-3">
@@ -57,13 +69,22 @@ function InventoryDisplay (){
                     </InputGroup>
                 </Col>
                 <Col>
-                    <Button>All Products</Button>
+                    <Button
+                        onClick={() => getAllProducts()}
+                    >
+                        All Products
+                    </Button>
                 </Col>
                 <Col>
                     <DropdownButton id="dropdown-item-button" title={dropDownTitle}>
                         {inventoryContext.categories.map((category, index) => {
                             return(
-                                <Dropdown.Item key={index} onClick={() => getProductData(category)}>{category.toUpperCase()}</Dropdown.Item>
+                                <Dropdown.Item 
+                                    key={index} 
+                                    onClick={() => getProductData(category)}
+                                >
+                                    {category.toUpperCase()}
+                                </Dropdown.Item>
                             )
                         })}
                     </DropdownButton>
