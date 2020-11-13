@@ -7,9 +7,13 @@ function OrderCart (props) {
 
     const [payInputState, setPayInputState] = useState(true)
   
-    const handlePaymentInfo = (info, data) => {
-        let paymentInfo = {...orderContext.paymentInfo, [info]: data}
-        if(data === "Cash"){
+    const handlePaymentInfo = (objectKey, objectValue) => {
+        let paymentInfo = {...orderContext.paymentInfo, [objectKey]: objectValue}
+        if(objectValue === "Cash"){
+            paymentInfo.checkNumber = null
+        }
+        if(objectValue === "Account"){
+            paymentInfo.paymentAmount = 0
             paymentInfo.checkNumber = null
         }
         console.log(paymentInfo)

@@ -514,30 +514,6 @@ router.get("/user_data", (req, res) => {
           as: 'inventory_transactions',
         }
       }).then( results =>{
-        //Old Way of adding current quantity to results
-        // let newResults = results.map(inventory => {
-        //   //Set current quantity to invoice_quantity
-        //   let currentQuantity = inventory.invoice_quantity
-        //   //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
-        //   if(inventory.inventory_transactions.length > 0){
-        //     //Sum all transaction quantities in inventory_transactions to get total product already sold
-        //     let transactions_quantity = inventory.inventory_transactions.reduce((accumulator, currentValue) => parseFloat(accumulator) + parseFloat(currentValue.quantity), 0)
-        //     //Current quantity is invoice quanitity minus total product quantity already sold
-        //     currentQuantity = (inventory.invoice_quantity - transactions_quantity).toFixed(2)
-        //   }
-
-        //   //If there are 0 or less current quantities then set index value to null to be filtered out of the array
-        //   if( current_quantity <= 0){
-        //     let newInventory = null
-        //     return newInventory
-        //   }else{
-        //   //If current quantities is greater then 0
-        //   //Create new index object and insert current_quantity key value pair
-        //   let newInventory = {current_quantity: currentQuantity,...inventory.dataValues}
-        //   return newInventory
-        //   }
-        // })
-
         let newResults = results.reduce((accumulator, currentValue) => {
           console.log(currentValue)
           //Set current quantity to invoice_quantity
@@ -552,12 +528,11 @@ router.get("/user_data", (req, res) => {
           //Create new inventory object with current quantity
           let newInventory = {current_quantity: currentQuantity,...currentValue.dataValues}
           console.log(newInventory);
-          //If there are more than 0 current quantity, then push into accumulator
-          if( currentQuantity > 0){
+          //If there are more than 0 current quantity, then push into accumulator or If req.body.allInventory is true, include 0 current quantities
+          if( currentQuantity > 0 || req.body.allInventory === true){
             accumulator.push(newInventory)
           }
-          //If current quantities is greater then 0
-          //Create new index object and insert current_quantity key value pair
+
           return accumulator
         },[])
         //Send new inventory with current quantities to client

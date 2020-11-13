@@ -88,7 +88,9 @@ function InventoryList (props){
         setDisplayType('loading')
         setModalShow(true)
         Api.getInventoryByProductID({
-            productCode: product.id
+            productCode: product.id,
+            //allInventory means get all inventory including 0 quantity left.
+            allInventory: true,
         }).then( results => {
             setInventory(results.data)
             setTimeout(() => {

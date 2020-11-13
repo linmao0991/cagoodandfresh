@@ -126,16 +126,18 @@ function VewTransactions (props){
                     {props.inventory.inventory_transactions.map((transaction, index) => {
                         return (
                             <tr key={index}>
-                                <td style={{width: "10%"}}>{transaction.createdAt}</td>
+                                <td style={{width: "10%"}}>{
+                                    transaction.createdAt.slice(0,10)
+                                    }</td>
                                 <td style={{width: "10%"}}>{transaction.quantity}</td>
-                                <td style={{width: "13%"}}>${Number(transaction.sale_price).toFixed(2)}</td>
-                                <td style={{width: "13%"}}>${Number(transaction.cost).toFixed(2)}</td>
-                                <td style={{width: "10%"}}>{transaction.ar_invoice_number}</td>
-                                <td style={{width: "15%"}}>{(Number(transaction.quantity)*Number(transaction.sale_price)).toFixed(2)}</td>
-                                <td style={{width: "15%"}}>{(Number(transaction.quantity)*Number(transaction.cost)).toFixed(2)}</td>
+                                <td style={{width: "11%"}}>${Number(transaction.sale_price).toFixed(2)}</td>
+                                <td style={{width: "11%"}}>${Number(transaction.cost).toFixed(2)}</td>
+                                <td style={{width: "16%"}}>{transaction.ar_invoice_number}</td>
+                                <td style={{width: "14%"}}>${(Number(transaction.quantity)*Number(transaction.sale_price)).toFixed(2)}</td>
+                                <td style={{width: "14%"}}>${(Number(transaction.quantity)*Number(transaction.cost)).toFixed(2)}</td>
                                 <td style={{width: "14%"}}>
                                     {
-                                    (Number(transaction.quantity)*Number(transaction.sale_price)-Number(transaction.quantity)*Number(transaction.cost).toFixed(2))
+                                    (Number(transaction.quantity)*Number(transaction.sale_price)-Number(transaction.quantity)*Number(transaction.cost)).toFixed(2)
                                     }
                                 </td>
                             </tr>
@@ -144,7 +146,11 @@ function VewTransactions (props){
                 </tbody>
                 </Table>
             </Modal.Body>
-            <Modal.Footer></Modal.Footer>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={props.closeModal}>
+                    Close
+                </Button>
+            </Modal.Footer>
         </>
     )
 }
