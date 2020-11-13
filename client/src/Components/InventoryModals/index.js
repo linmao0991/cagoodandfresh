@@ -21,7 +21,7 @@ export function ViewProductModal(props){
         switch (modalFunction){
             case 'view-transactions':
                 return(
-                    <VewTransactions
+                    <ViewTransactions
                         inventory = {selectedInventory}
                         closeModal = {closeModal}
                         product = {props.product}
@@ -59,12 +59,21 @@ export function ViewProductModal(props){
                                 return (
                                     <tr key={index}>
                                         <td style={{width: "10%"}}>{inventory.current_quantity}</td>
-                                        <td style={{width: "13%"}}>${Number(inventory.sale_price).toFixed(2)} <Badge variant="warning">Edit</Badge></td>
+                                        <td style={{width: "13%"}}>
+                                            ${Number(inventory.sale_price).toFixed(2)} 
+                                            <Badge variant="warning">
+                                                Edit
+                                            </Badge>
+                                        </td>
                                         <td style={{width: "13%"}}>${Number(inventory.cost).toFixed(2)}</td>
                                         <td style={{width: "10%"}}>
-                                            {inventory.inventory_transactions.length} <Badge 
+                                            {inventory.inventory_transactions.length} 
+                                                <Badge 
                                                 onClick={() => {switchModalFunction('view-transactions', inventory)}} 
-                                                variant="warning">View</Badge></td>
+                                                variant="warning">
+                                                    View
+                                                </Badge>
+                                        </td>
                                         <td style={{width: "15%"}}>{inventory.receive_date}</td>
                                         <td style={{width: "10%"}}>{inventory.invoice_quantity}</td>
                                         <td style={{width: "15%"}}>{inventory.supplier_name}</td>
@@ -98,7 +107,7 @@ export function ViewProductModal(props){
     )
 }
 
-function VewTransactions (props){
+function ViewTransactions (props){
     return (
         <>
             <Modal.Header closeButton>
