@@ -73,6 +73,7 @@ class App extends Component {
             >
               <Directory
                 logoutHandler = {this.logoutHandler}
+                permission_level = {this.state.permissionLevel}
               />
             </DirectoryContext.Provider>
             : 

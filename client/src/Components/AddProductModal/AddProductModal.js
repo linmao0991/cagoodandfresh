@@ -199,7 +199,7 @@ function AddProductModal (props) {
                                         <td>
                                             <InputGroup>
                                                 <FormControl
-                                                    value={(count[index].newSalePrice)}
+                                                    value={Number(count[index].newSalePrice).toFixed(2)}
                                                     onChange={(event)=> handleSetNewSalePrice(index, event)}
                                                     aria-label="product-sale-price"
                                                     type="number"
@@ -223,7 +223,8 @@ function AddProductModal (props) {
                         <Col>Total Count: {totalCount}</Col>
                         <Col>Total Sales: ${totalSale}</Col>
                         <Col>
-                            <Button size="sm" variant="success" onClick={(event)=>addProductToCart(event)}>ADD TO CART</Button>
+                            <Button size="sm" variant="success" style={{float: 'left'}} onClick={(event)=>addProductToCart(event)}>Add To Cart</Button>{''}
+                            <Button size="sm" variant="danger" style={{float: 'right'}} onClick={()=>props.toggleShow(!show)}>Cancel</Button>
                         </Col>
                     </Row>
                 </Container>

@@ -1,9 +1,11 @@
-import React, {useState} from 'react';
-import {Button,Table, Modal, Spinner} from "react-bootstrap";
-import {ViewProductModal, ViewTransactionModal} from '../../InventoryModals/index';
-import Api from '../../../Utils/Api'
+import React, {useState, useContext} from 'react';
+import {Button,Table, Modal, Spinner, Badge} from "react-bootstrap";
+import {ViewInventoryModal, ViewProductModal} from '../../InventoryModals/index';
+import Api from '../../../Utils/Api';
+import LoginContext from '../../../Context/LoginContext'
 
 function InventoryList (props){
+    const loginContext = useContext(LoginContext)
 
     const [modalShow, setModalShow] = useState(false)
     const [product, setProduct] = useState(undefined)
@@ -47,7 +49,7 @@ function InventoryList (props){
         },
         //Stock
         col_2_width :{
-            width: '4%'
+            width: '10%'
         },
         //Name English
         col_3_width :{
@@ -63,7 +65,7 @@ function InventoryList (props){
         },
         //Holding
         col_6_width :{
-            width: '9%'
+            width: '7%'
         },
         //Size
         col_7_width :{
@@ -71,11 +73,11 @@ function InventoryList (props){
         },
         //Location
         col_8_width :{
-            width: '8%'
+            width: '6%'
         },
         //UPC
         col_9_width :{
-            width: '10%'
+            width: '8%'
         }
     }
 
@@ -83,7 +85,7 @@ function InventoryList (props){
         setModalShow(false)
     }
 
-    const selectProduct = product => {
+    const selectProduct = (product, modal) => {
         setProduct(product)
         setDisplayType('loading')
         setModalShow(true)
@@ -93,25 +95,30 @@ function InventoryList (props){
             allInventory: true,
         }).then( results => {
             setInventory(results.data)
-            setTimeout(() => {
-                setDisplayType('product')
-        },1000)
+            setDisplayType(modal)
         }).catch( err =>{
             console.log(err)
         })
     }
 
     const handleToggleModal = () =>{
-        console.log(productInventory)
         switch (displayType){
-            case 'product':
+            case 'inventory':
                 return(
-                        <ViewProductModal 
+                        <ViewInventoryModal 
                             product = {product}
                             productInventory = {productInventory}
                             handleClose = {closeModal}
                         />
                 )
+            case 'view product': 
+                    return(
+                        <ViewProductModal 
+                            product = {product}
+                            productInventory ={productInventory}
+                            handleClose = {closeModal}
+                        />
+                    )
             case 'loading':
                 return(
                     <>
@@ -148,8 +155,8 @@ function InventoryList (props){
             >
                 <thead style={listingStyle.thead}>
                     <tr style={listingStyle.tr}>
-                        <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}>{props.category.toUpperCase()}</td>
-                        <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>Stock</td>
+                        <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}></td>
+                        <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>Inventory</td>
                         <td style={{...listingStyle.col_3_width,...listingStyle.tdth}}>Product Name English</td>
                         <td style={{...listingStyle.col_4_width,...listingStyle.tdth}}>Product Name Chinese</td>
                         <td style={{...listingStyle.col_5_width,...listingStyle.tdth}}>Category</td>
@@ -163,8 +170,13 @@ function InventoryList (props){
                     {props.inventoryData.map((product, index) => {
                         return(
                             <tr key={index} style={listingStyle.tr}>
-                                <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}><Button size="sm" onClick={() => selectProduct(product)} variant="outline-success">Select</Button></td>
-                                <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>{product.inventory_count}</td>
+                                <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}>
+                                    {loginContext.permissionLevel > 2? 
+                                        <Badge variant='warning' as='button' style={{margin: 'auto'}} onClick={() => selectProduct(product, 'view product')}>Edit</Badge>
+                                    : null}
+                                </td>
+                                <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>
+                                    {product.inventory_count} <Badge variant='warning' as='button' style={{float: 'right'}} onClick={() => selectProduct(product, 'inventory')}>View</Badge></td>
                                 <td style={{...listingStyle.col_3_width,...listingStyle.tdth}}>{product.name_english}</td>
                                 <td style={{...listingStyle.col_4_width,...listingStyle.tdth}}>{product.name_chinese}</td>
                                 <td style={{...listingStyle.col_5_width,...listingStyle.tdth}}>{product.category}</td>
@@ -183,6 +195,7 @@ function InventoryList (props){
                 onHide={closeModal}
                 backdrop="static"
                 size="xl"
+                enforceFocus={false}
                 keyboard={false}>
                     {handleToggleModal()}
                 </Modal>

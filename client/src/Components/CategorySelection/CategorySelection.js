@@ -9,7 +9,8 @@ function CategorySelection (props){
     //Gets all products from selected category and sends it to be stored to context
     const getProductData = () =>{
         Api.getProductsByCate({
-            category: props.category
+            searchType: 'category',
+            searchData: props.category.trim()
         }).then( products => {
             console.log(products.data)
             orderContext.storeCategorySelection(props.category, products.data,"selection-product")

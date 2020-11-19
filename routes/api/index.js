@@ -346,6 +346,31 @@ router.get("/user_data", (req, res) => {
     }
   });
 
+  //Update Inventory record
+  router.post("/update_inventory", (req, res) => {
+    let permission_req = 2;
+
+    if(checkPermission(req.user, permission_req)){
+      db.inventory.update(
+        req.body.updates,
+        {
+          where: {
+            id: req.body.id
+          }
+        }
+      ).then( result => {
+        res.json(result)
+      }).catch(err => {
+        console.log(err)
+        res.status(404).json({ error: err});
+      })
+    }else{
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
+    }
+  })
+
   //Get all products
   router.get("/get_all_products", (req, res) => {
     let permission_req = 1;
@@ -365,6 +390,7 @@ router.get("/user_data", (req, res) => {
                 cagoodandfresh.products.supplier_secondary_id,
                 cagoodandfresh.products.supplier_tertiary_id,
                 cagoodandfresh.products.weight,
+                cagoodandfresh.products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
         FROM cagoodandfresh.products
         LEFT JOIN (
@@ -420,6 +446,7 @@ router.get("/user_data", (req, res) => {
                 cagoodandfresh.products.supplier_secondary_id,
                 cagoodandfresh.products.supplier_tertiary_id,
                 cagoodandfresh.products.weight,
+                cagoodandfresh.products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
         FROM cagoodandfresh.products
         LEFT JOIN (
@@ -434,7 +461,7 @@ router.get("/user_data", (req, res) => {
           FROM cagoodandfresh.inventory
           GROUP BY product_code
         ) inventory ON inventory.product_code = cagoodandfresh.products.id
-        WHERE cagoodandfresh.products.category = '${req.body.category}'
+        WHERE cagoodandfresh.products.${[req.body.searchType]} = '${req.body.searchData}'
         GROUP BY cagoodandfresh.products.id
         ORDER BY holding DESC;`
         ,{type: db.sequelize.QueryTypes.SELECT}
@@ -469,6 +496,7 @@ router.get("/user_data", (req, res) => {
                 cagoodandfresh.products.supplier_secondary_id,
                 cagoodandfresh.products.supplier_tertiary_id,
                 cagoodandfresh.products.weight,
+                cagoodandfresh.products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
         FROM cagoodandfresh.products
         LEFT JOIN (
@@ -503,7 +531,7 @@ router.get("/user_data", (req, res) => {
   //Get inventory by product code (product id)
   router.post("/get_inventory_by_product_code",(req, res) => {
     let permission_req = 1
-    console.log(req.body.productCode)
+    //console.log(req.body.productCode)
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
         where: {
@@ -515,7 +543,7 @@ router.get("/user_data", (req, res) => {
         }
       }).then( results =>{
         let newResults = results.reduce((accumulator, currentValue) => {
-          console.log(currentValue)
+          //console.log(currentValue)
           //Set current quantity to invoice_quantity
           let currentQuantity = currentValue.invoice_quantity
           //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
@@ -527,7 +555,7 @@ router.get("/user_data", (req, res) => {
           }
           //Create new inventory object with current quantity
           let newInventory = {current_quantity: currentQuantity,...currentValue.dataValues}
-          console.log(newInventory);
+          //console.log(newInventory);
           //If there are more than 0 current quantity, then push into accumulator or If req.body.allInventory is true, include 0 current quantities
           if( currentQuantity > 0 || req.body.allInventory === true){
             accumulator.push(newInventory)
@@ -603,7 +631,7 @@ router.get("/user_data", (req, res) => {
           employee_id: req.user.id,
           ar_invoice_number: invoice.invoice_number, 
         }).then( dbCollection => {
-          console.log(dbCollection)
+          //console.log(dbCollection)
           reslove(dbCollection)
         }).catch(err => {
           reject(err)

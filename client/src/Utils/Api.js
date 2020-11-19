@@ -44,9 +44,9 @@ export default {
     },
 
     //Get all products by category
-    getProductsByCate: (category) =>{
+    getProductsByCate: (data) =>{
         console.log(["Get Products by Category"])
-        return axios.post("/api/get_products_by_category", category)
+        return axios.post("/api/get_products_by_category", data)
     },
 
     //Get inventory by product code
@@ -56,17 +56,25 @@ export default {
         return axios.post("/api/get_inventory_by_product_code", productCode)
     },
 
+    //Update inventory record
+    updateInventory: (data) => {
+        console.log("[Update Inventory Record]")
+        return axios.post('/api/update_inventory', data)
+    },
+
     //Search help for restaurants nearby zipcode or city
     searchYelp: (searchParam) => {
         console.log("[Search Yelp]")
         return axios.post("/api/new_customer_search_yelp", searchParam)
     },
 
+    //Exports restaurant search as a csv
     exportRestaurantCSV: (restaurants) => {
         console.log("[Create New Restaruant CSV]")
         return axios.post("/api/create_restaurant_csv", restaurants);
     },
 
+    //Download exported csv
     downloadCSV: (csvName) =>{
         console.log("[Getting CSV "+csvName+"]")
         return axios.get("/api/download_csv/"+csvName)

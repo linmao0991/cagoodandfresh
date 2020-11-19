@@ -21,6 +21,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.list-group-item{
+  background-color: #404040;
+}
+
 .modal-content{
   background-color: #404040;
 }

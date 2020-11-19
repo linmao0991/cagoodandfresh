@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Button, Container, Row, Col} from "react-bootstrap";
+import {Button, Container, Row, Col, Navbar, Nav} from "react-bootstrap";
 import LoginContext from "../Context/LoginContext";
 import DirectoryContext from "../Context/DirectoryContext";
 import AccountsPay from "./DirectoryPages/AccountsPay";
@@ -98,7 +98,8 @@ class Directory extends Component{
                 return (
                     <InventoryContext.Provider
                         value = {{
-                            categories: this.state.productCate
+                            categories: this.state.productCate,
+                            permission_level: this.props.permission_level
                         }}
                     >
                         <Inventory/>
@@ -138,38 +139,45 @@ class Directory extends Component{
             <Container fluid>
                 <br />
                 <Row>
-                    <Col xs={3}></Col>
-                    <Col xs={6}>
-                        <LoginContext.Consumer>
+                    <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'left', fontWeight: 'bold'}}>
+                    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
+                        {/* <Navbar.Brand href="#home">Main Menu</Navbar.Brand> */}
+                        <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+                        <Navbar.Collapse id="responsive-navbar-nav">
+                            <Nav className="mr-auto">
+                            <LoginContext.Consumer>
                             {login => (
                                 <>
                                     {login.permissionLevel >= 1?
                                         <>
-                                        <Button onClick={() => this.context.switchDir("orderform")}>Order Form</Button>{" "}
-                                        <Button onClick={() => this.context.switchDir("inventory")}>Inventory</Button>{" "}
-                                        <Button onClick={() => this.context.switchDir("customers")}>Customers</Button>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("orderform")}>Order Form</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("customers")}>Customers</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Button onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Button>{" "}
-                                        <Button onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Button>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("inventory")}>Inventory</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
                                     <>
-                                        <Button onClick={() => this.context.switchDir("admintools")}>Admin Tools</Button>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("admintools")}>Admin Tools</Nav.Link>{" "}
                                     </>
                                     :
                                     null}
                                 </>
                             )}
-                        </LoginContext.Consumer>
-                    </Col>
-                    <Col xs={3}>
-                        <Button variant="danger" onClick={() => this.props.logoutHandler()}>Log Out</Button>
+                            </LoginContext.Consumer>
+                            </Nav>
+                            <Nav>
+                                <Nav.Link variant="danger" href='' stye={{float: 'right'}}onClick={() => this.props.logoutHandler()}>Log Out</Nav.Link>
+                            </Nav>
+                        </Navbar.Collapse>
+                    </Navbar>
                     </Col>
                 </Row>
                 <Row>

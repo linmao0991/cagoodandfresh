@@ -22,7 +22,8 @@ class Inventory extends Component{
                 </Row>
                 <Row>
                     <Col>
-                        <Button variant="info">Button</Button>
+                        <Button variant="info">Add New Product</Button>{' '}
+                        <Button variant='info'>Add Inventory</Button>{' '}
                     </Col>
                     <Col>
                     </Col>
