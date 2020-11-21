@@ -84,17 +84,15 @@ class Directory extends Component{
 
     directoryDisplay = () =>{
         switch (this.context.currentDir) {
-            case "main":
-                return (null);
-            case "accountspay":
+            case "Accounts Payable":
                 return (<AccountsPay />);
-            case "accountsrec":
+            case "Accounts Receivable":
                 return (<AccountsRec />);
-            case "admintools":
+            case "Admin Tools":
                 return (<AdminTools />);
-            case "customers":
+            case "Customers":
                 return (<Customers />);
-            case "inventory":
+            case "Inventory":
                 return (
                     <InventoryContext.Provider
                         value = {{
@@ -105,7 +103,7 @@ class Directory extends Component{
                         <Inventory/>
                     </InventoryContext.Provider>
                 );
-            case "orderform":
+            case "Order Form":
                 return (
                     <OrderContext.Provider
                         value={{
@@ -139,9 +137,9 @@ class Directory extends Component{
             <Container fluid>
                 <br />
                 <Row>
-                    <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'left', fontWeight: 'bold'}}>
+                    <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold'}}>
                     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
-                        {/* <Navbar.Brand href="#home">Main Menu</Navbar.Brand> */}
+                        <Navbar.Brand href='' style={{width: '25%'}}>{this.context.currentDir}</Navbar.Brand>
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                         <Navbar.Collapse id="responsive-navbar-nav">
                             <Nav className="mr-auto">
@@ -150,22 +148,22 @@ class Directory extends Component{
                                 <>
                                     {login.permissionLevel >= 1?
                                         <>
-                                        <Nav.Link onClick={() => this.context.switchDir("orderform")}>Order Form</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("customers")}>Customers</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Order Form")}>Order Form</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Customers")}>Customers</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Nav.Link onClick={() => this.context.switchDir("inventory")}>Inventory</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("accountsrec")}>Accounts Recieveable</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("accountspay")}>Accounts Payable</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Inventory")}>Inventory</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Accounts Receivable")}>Accounts Receivable</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Accounts Payable")}>Accounts Payable</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
                                     <>
-                                        <Nav.Link onClick={() => this.context.switchDir("admintools")}>Admin Tools</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => this.context.switchDir("Admin Tools")}>Admin Tools</Nav.Link>{" "}
                                     </>
                                     :
                                     null}
@@ -174,12 +172,13 @@ class Directory extends Component{
                             </LoginContext.Consumer>
                             </Nav>
                             <Nav>
-                                <Nav.Link variant="danger" href='' stye={{float: 'right'}}onClick={() => this.props.logoutHandler()}>Log Out</Nav.Link>
+                                <Nav.Link variant="danger" href='' stye={{float: 'right', width: '25%'}}onClick={() => this.props.logoutHandler()}>Log Out</Nav.Link>
                             </Nav>
                         </Navbar.Collapse>
                     </Navbar>
                     </Col>
                 </Row>
+                <br />
                 <Row>
                     <Col>
                         {this.directoryDisplay()}

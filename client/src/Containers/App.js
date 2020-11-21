@@ -9,8 +9,8 @@ class App extends Component {
   state = {
     isLoggedin: false,
     permissionLevel: null,
-    currentDir: "main",
-    previousDir: "main"
+    currentDir: '',
+    previousDir: '',
   }
 
   //Login context

@@ -1,7 +1,7 @@
 import React from "react";
 
 const directoryContext = React.createContext({
-    currentDir: "main",
+    currentDir: '',
     previousDir: "none",
     switchDir: () => {}
 })

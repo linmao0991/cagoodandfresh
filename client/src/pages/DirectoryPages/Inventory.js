@@ -1,29 +1,34 @@
 import React, {Component} from "react";
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
-import InventoryDisplay from '../../Components/InventoryDisplay/InventoryDisplay';
+import SearchInventory from '../../Components/SearchInventory/SearchInventory';
 import InventoryContext from '../../Context/InventoryContext';
 
 class Inventory extends Component{
     state = {
-        testValue: "blue",
+        displayType: '',
     }
 
-    changeTestValue = (value) => {
-        this.setState({testValue: value})
+    switchDisplay = () => {
+        switch(this.state.displayType){
+            case 'Search Inventory':
+                return(
+                    <SearchInventory />
+                )
+            default:
+                return(
+                    <></>
+                )
+        }
     }
 
     render(){
         return(
             <Container fluid>
-                <Row className="justify-content-md-center"> 
-                    <Col md="auto">
-                        <h1>Inventory</h1>
-                    </Col>
-                </Row>
                 <Row>
                     <Col>
-                        <Button variant="info">Add New Product</Button>{' '}
-                        <Button variant='info'>Add Inventory</Button>{' '}
+                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Search Inventory'})}>Search Inventory</Button>{' '}
+                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Add Product'})}>Add New Product</Button>{' '}
+                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Add Inventory'})}>Add Inventory</Button>{' '}
                     </Col>
                     <Col>
                     </Col>
@@ -31,7 +36,7 @@ class Inventory extends Component{
                 </Row>
                 <br />
                 <Row>
-                    <InventoryDisplay />
+                    {this.switchDisplay()}
                 </Row>
             </Container>
         )

@@ -4,7 +4,7 @@ import InventoryContext from '../../Context/InventoryContext';
 import Api from '../../Utils/Api'
 import InventoryList from './SubComponent/InventoryList';
 
-function InventoryDisplay (){
+function SearchInventory (){
     const inventoryContext = useContext(InventoryContext)
     const searchInputRef = useRef(null)
     const [searchTitle, setSearchTitle] = useState(undefined)
@@ -91,8 +91,8 @@ function InventoryDisplay (){
                     </InputGroup>
                 </Col>
                 <Col>
-                    <Button style={{display: 'inline-block'}} onClick={() => getAllProducts()}>All Products</Button>{' '}
-                    <DropdownButton style={{display: 'inline-block'}} id="dropdown-item-button" title="Category">
+                    <Button style={{display: 'inline-block'}} variant='secondary' onClick={() => getAllProducts()}>All Products</Button>{' '}
+                    <DropdownButton style={{display: 'inline-block'}} variant='secondary' id="dropdown-item-button" title="Category">
                         {inventoryContext.categories.map((category, index) => {
                             return(
                                 <Dropdown.Item 
@@ -110,7 +110,7 @@ function InventoryDisplay (){
             </Row>
             <Row>
                 <Col style={{textAlign: 'center'}}>
-                    <h3>{searchTitle? searchTitle: null}</h3>
+                    <h4>{searchTitle? searchTitle: null}</h4>
                 </Col>
             </Row>
             <br/>
@@ -125,4 +125,4 @@ function InventoryDisplay (){
     )
 }
 
-export default InventoryDisplay
+export default SearchInventory

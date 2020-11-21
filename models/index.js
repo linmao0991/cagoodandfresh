@@ -8,10 +8,11 @@ const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + "/../config/config.json")[env];
 const db = {};
 
-// if (process.env.NODE_ENV === "production") {
-//   config = require(__dirname + "/../config/config.js")[env];
-// }else{
-//   const config = require(__dirname + '/../config/config.json')[env];
+if (process.env.NODE_ENV === "production") {
+  config = require(__dirname + "/../config/config.js")[env];
+}
+// else{
+//   config = require(__dirname + '/../config/config.json')[env];
 // }
 
 let sequelize;

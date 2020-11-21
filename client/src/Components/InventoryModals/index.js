@@ -419,6 +419,14 @@ export function ViewProductModal (props) {
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({modalType: undefined, modalSize: 'xl'})
     const [selectedInventory, setInventory] = useState(null)
+    
+    const collapseStyle = {
+        width: '100%',
+        maxHeight: '0px', 
+        backgroundColor: 'grey', 
+        overflow: 'hidden', 
+        transition: 'max-height 0.2s ease-out'
+    }
 
     const switchModalFunction = (modalType, modalSize, inventory) => {
         setInventory(inventory)
@@ -428,6 +436,16 @@ export function ViewProductModal (props) {
 
     const closeModal = () => {
         setShowModal(false)
+    }
+
+    const handleCollapse = elId => {
+        let elem = document.getElementById(elId)
+        console.log('scroll height: '+elem.style.scrollHeight)
+        if(elem.style.maxHeight != '0px'){
+            elem.style.maxHeight = '0px'
+        }else{
+            elem.style.maxHeight = elem.scrollHeight+'px'
+        }
     }
 
     const handleProductFunctions = () => {
@@ -441,6 +459,7 @@ export function ViewProductModal (props) {
                     />
                 )
         }
+
     }
     return(
         <>
@@ -452,20 +471,99 @@ export function ViewProductModal (props) {
                     <Row>
                         <Col>
                             <ListGroup>
-                                <ListGroup.Item><b>Name English:</b><span style={{float: 'right'}}>{props.product.name_english}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Name Chinese:</b><span style={{float: 'right'}}>{props.product.name_chinese}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Category:</b><span style={{float: 'right'}}>{props.product.category}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Holding:</b><span style={{float: 'right'}}>{props.product.holding}</span></ListGroup.Item>
-                                <ListGroup.Item><b>UPC:</b><span style={{float: 'right'}}>{props.product.upc}</span></ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse0')}>Edit▼</Badge> <b>Name English:</b><span style={{float: 'right'}}>{props.product.name_english}</span>
+                                    </div>
+                                    <div id='collapse0' style={collapseStyle}>
+                                        <InputGroup>
+                                            <FormControl
+                                            placeholder={props.product.name_english}
+                                            aria-label="English Name"
+                                            />
+                                            <InputGroup.Append>
+                                                <Button variant="success">✓</Button>
+                                                <Button variant="danger">✗</Button>
+                                            </InputGroup.Append>
+                                        </InputGroup>
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse1')}>Edit▼</Badge> <b>Name Chinese:</b><span style={{float: 'right'}}>{props.product.name_chinese}</span>
+                                    </div>
+                                    <div id='collapse1' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse2')}>Edit▼</Badge> <b>Category:</b><span style={{float: 'right'}}>{props.product.category}</span>
+                                    </div>
+                                    <div id='collapse2' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse3')}>Edit▼</Badge> <b>Holding:</b><span style={{float: 'right'}}>{props.product.holding}</span>
+                                    </div>
+                                    <div id='collapse3' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse4')}>Edit▼</Badge> <b>UPC:</b><span style={{float: 'right'}}>{props.product.upc}</span>
+                                    </div>
+                                    <div id='collapse4' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
                             </ListGroup>
                         </Col>
                         <Col>
                             <ListGroup>
-                                <ListGroup.Item><b>Location:</b><span style={{float: 'right'}}>{props.product.location}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Weight:</b><span style={{float: 'right'}}>{props.product.weight} {props.product.measurement_system}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Supplier 1:</b><span style={{float: 'right'}}>{props.product.supplier_primary_id}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Supplier 2:</b><span style={{float: 'right'}}>{props.product.supplier_secondary_id}</span></ListGroup.Item>
-                                <ListGroup.Item><b>Supplier 3:</b><span style={{float: 'right'}}>{props.product.supplier_tertiary_id}</span></ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse5')}>Edit▼</Badge> <b>Location:</b><span style={{float: 'right'}}>{props.product.location}</span>
+                                    </div>
+                                    <div id='collapse5' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse6')}>Edit▼</Badge> <b>Weight:</b><span style={{float: 'right'}}>{props.product.weight} {props.product.measurement_system}</span>
+                                    </div>
+                                    <div id='collapse6' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse7')}>Edit▼</Badge> <b>Supplier 1:</b><span style={{float: 'right'}}>{props.product.supplier_primary_id}</span>
+                                    </div>
+                                    <div id='collapse7' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse8')}>Edit▼</Badge> <b>Supplier 2:</b><span style={{float: 'right'}}>{props.product.supplier_secondary_id}</span>
+                                    </div>
+                                    <div id='collapse8' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse9')}>Edit▼</Badge> <b>Supplier 3:</b><span style={{float: 'right'}}>{props.product.supplier_tertiary_id}</span>
+                                    </div>
+                                    <div id='collapse9' style={collapseStyle}>
+                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    </div>
+                                </ListGroup.Item>
                             </ListGroup>
                         </Col>
                     </Row>
@@ -480,7 +578,7 @@ export function ViewProductModal (props) {
                     <Row>
                         <Accordion style={{width:'100%'}}>
                             <Accordion.Toggle as={Button} size='sm' variant='warning' eventKey="0">
-                                <span style={{fontWeight: 'bold'}}>View Inventory</span>
+                                <span style={{fontWeight: 'bold'}}>View Inventory ▼</span>
                             </Accordion.Toggle>
                             <Accordion.Collapse eventKey="0">
                                 <ProductInventory 

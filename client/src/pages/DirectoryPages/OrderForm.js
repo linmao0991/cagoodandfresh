@@ -287,11 +287,11 @@ class OrderForm extends Component{
         return(
             <>
             <Container fluid>
-                <Row className="justify-content-md-center">
+                {/* <Row className="justify-content-md-center">
                     <Col md='auto'>
                         <h1>Order Form</h1>
                     </Col>
-                </Row>
+                </Row> */}
                 <Row>
                     <Col xs={7}>
                         <Row>
