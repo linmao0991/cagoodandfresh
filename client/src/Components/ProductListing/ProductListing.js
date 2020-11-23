@@ -1,8 +1,8 @@
 import React, {useState, useContext} from "react";
 import {Table, Button} from "react-bootstrap";
-import Api from "../../Utils/Api";
-import AddProductModal from "../AddProductModal/AddProductModal";
-import OrderContext from '../../Context/OrderContext';
+import Api from "../../utils/Api";
+import AddProductModal from "../addproductmodal/AddProductModal";
+import OrderContext from '../../context/OrderContext';
 
 function ProductListing (props){
     const orderContext = useContext(OrderContext)

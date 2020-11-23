@@ -1,8 +1,8 @@
 import React, {Component} from "react";
-import DirectoryContext from "../../Context/DirectoryContext"
+import DirectoryContext from "../../context/DirectoryContext"
 import {Modal, Button, Container, Row, Col, InputGroup, FormControl} from "react-bootstrap";
-import Api from "../../Utils/Api";
-import FindRestaurantResults from '../../Components/FindRestaurantResults/FindRestaurantResults';
+import Api from "../../utils/Api";
+import FindRestaurantResults from '../../components/findrestaurantresults/FindRestaurantResults';
 import download from "downloadjs";
 
 class Customers extends Component{

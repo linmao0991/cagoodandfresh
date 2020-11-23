@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import Login from "../Pages/Login";
-import LoginContext from "../Context/LoginContext";
-import DirectoryContext from "../Context/DirectoryContext";
-import Directory from "../Pages/Directory";
-import Api from "../Utils/Api";
+import Login from "../pages/Login";
+import LoginContext from "../context/LoginContext";
+import DirectoryContext from "../context/DirectoryContext";
+import Directory from "../pages/Directory";
+import Api from "../utils/Api";
 
 class App extends Component {
   state = {

@@ -1,5 +1,5 @@
 import React, {useState, useContext, Component} from "react";
-import DirectoryContext from "../../Context/DirectoryContext"
+import DirectoryContext from "../../context/DirectoryContext"
 import {Modal, Button, Container, Row, Col} from "react-bootstrap";
 
 class AccountsPay extends Component{

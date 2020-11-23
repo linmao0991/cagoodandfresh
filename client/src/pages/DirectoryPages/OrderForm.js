@@ -1,12 +1,12 @@
 import React, {Component} from "react";
-import Api from "../../Utils/Api";
+import Api from "../../utils/Api";
 import {Modal, Button, Container, Row, Col, Spinner} from "react-bootstrap";
-import CustomerDisplay from "../../Components/CustomerDisplay/CustomerDisplay";
-import OrderCart from "../../Components/OrderCart/OrderCart";
-import OrderContext from "../../Context/OrderContext";
-import CategorySelection from "../../Components/CategorySelection/CategorySelection";
-import ProductListing from "../../Components/ProductListing/ProductListing";
-import SearchProduct from '../../Components/SearchProduct/SearchProduct';
+import CustomerDisplay from "../../components/customerdisplay/CustomerDisplay";
+import OrderCart from "../../components/ordercart/OrderCart";
+import OrderContext from "../../context/OrderContext";
+import CategorySelection from "../../components/categoryselection/CategorySelection";
+import ProductListing from "../../components/productlisting/ProductListing";
+import SearchProduct from '../../components/searchproduct/SearchProduct';
 //import Loading from '../../Components/Loading/Loading';
 
 class OrderForm extends Component{

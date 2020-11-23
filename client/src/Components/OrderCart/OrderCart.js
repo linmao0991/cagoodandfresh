@@ -1,6 +1,6 @@
 import React, {useContext, useState} from "react";
 import {Table, Container, Button, InputGroup, FormControl, Row, Col, Dropdown} from "react-bootstrap";
-import OrderContext from "../../Context/OrderContext";
+import OrderContext from "../../context/OrderContext";
 
 function OrderCart (props) {
     const orderContext = useContext(OrderContext);

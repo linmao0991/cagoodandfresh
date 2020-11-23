@@ -1,6 +1,6 @@
 import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
-import OrderContext from "../../Context/OrderContext";
+import OrderContext from "../../context/OrderContext";
 
 function AddProductModal (props) {
     const orderContext = useContext(OrderContext);

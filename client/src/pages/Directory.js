@@ -1,16 +1,16 @@
 import React, { Component } from "react";
 import {Button, Container, Row, Col, Navbar, Nav} from "react-bootstrap";
-import LoginContext from "../Context/LoginContext";
-import DirectoryContext from "../Context/DirectoryContext";
+import LoginContext from "../context/LoginContext";
+import DirectoryContext from "../context/DirectoryContext";
 import AccountsPay from "./DirectoryPages/AccountsPay";
 import AccountsRec from "./DirectoryPages/AccountsRec";
 import AdminTools from "./DirectoryPages/AdminTools";
 import Customers from "./DirectoryPages/Customers";
 import Inventory from "./DirectoryPages/Inventory";
 import OrderForm from "./DirectoryPages/OrderForm";
-import OrderContext from "../Context/OrderContext";
-import InventoryContext from '../Context/InventoryContext';
-import Api from "../Utils/Api"
+import OrderContext from "../context/OrderContext";
+import InventoryContext from '../context/InventoryContext';
+import Api from "../utils/Api"
 
 class Directory extends Component{
     state = {

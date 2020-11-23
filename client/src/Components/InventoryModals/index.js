@@ -3,8 +3,8 @@ import {Modal, Button, InputGroup, FormControl,
         Table, Container, Badge, Card, Popover, 
         OverlayTrigger, Row, Col, Spinner, 
         ListGroup, Accordion, Dropdown, DropdownButton} from 'react-bootstrap';
-import Api from '../../Utils/Api'
-import InventoryContext from '../../Context/InventoryContext';
+import Api from '../../utils/Api'
+import InventoryContext from '../../context/InventoryContext';
 
 const popOverStyle = {
     backgroundColor: "#404040",

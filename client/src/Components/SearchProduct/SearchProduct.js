@@ -1,8 +1,8 @@
 import React, {Component}from 'react';
 import {Container, Row, InputGroup, FormControl, Spinner} from 'react-bootstrap';
-import Api from '../../Utils/Api';
-import OrderContext from '../../Context/OrderContext';
-import ProductListing from '../../Components/ProductListing/ProductListing';
+import Api from '../../utils/Api';
+import OrderContext from '../../context/OrderContext';
+import ProductListing from '../productlisting/ProductListing';
 
 class SearchProduct extends Component{
     state = {

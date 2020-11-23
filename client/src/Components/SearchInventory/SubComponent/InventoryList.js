@@ -1,9 +1,9 @@
 import React, {useState, useContext} from 'react';
 import {Table, Modal, Spinner, Badge} from "react-bootstrap";
-import {ViewInventoryModal, ViewProductModal} from '../../InventoryModals/index';
-import Api from '../../../Utils/Api';
-import LoginContext from '../../../Context/LoginContext'
-import InventoryContext from '../../../Context/InventoryContext'
+import {ViewInventoryModal, ViewProductModal} from '../../inventorymodals/index';
+import Api from '../../../utils/Api';
+import LoginContext from '../../../context/LoginContext'
+import InventoryContext from '../../../context/InventoryContext'
 
 function InventoryList (props){
     const loginContext = useContext(LoginContext)

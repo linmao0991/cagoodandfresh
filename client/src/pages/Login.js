@@ -1,6 +1,6 @@
 import React, {useState, useContext} from "react";
-import LoginContext from "../Context/LoginContext";
-import Api from "../Utils/Api";
+import LoginContext from "../context/LoginContext";
+import Api from "../utils/Api";
 import {Button, Container, Row, Col} from "react-bootstrap";
 
 function Login(){

@@ -1,6 +1,6 @@
 import React, {useContext} from "react";
-import OrderContext from "../../Context/OrderContext";
-import Api from "../../Utils/Api";
+import OrderContext from "../../context/OrderContext";
+import Api from "../../utils/Api";
 import './CategorySelection.css';
 
 function CategorySelection (props){
