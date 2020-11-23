@@ -1,15 +1,16 @@
 import React, {useState, useContext} from 'react';
-import {Button,Table, Modal, Spinner, Badge} from "react-bootstrap";
+import {Table, Modal, Spinner, Badge} from "react-bootstrap";
 import {ViewInventoryModal, ViewProductModal} from '../../InventoryModals/index';
 import Api from '../../../Utils/Api';
 import LoginContext from '../../../Context/LoginContext'
+import InventoryContext from '../../../Context/InventoryContext'
 
 function InventoryList (props){
     const loginContext = useContext(LoginContext)
-
+    const inventoryContext = useContext(InventoryContext)
     const [modalShow, setModalShow] = useState(false)
     const [product, setProduct] = useState(undefined)
-    const [productInventory, setInventory] = useState(undefined)
+    const [productIndex, setProductIndex] = useState(undefined)
     const [displayType, setDisplayType] =useState(undefined)
 
     const listingStyle = {
@@ -85,8 +86,9 @@ function InventoryList (props){
         setModalShow(false)
     }
 
-    const selectProduct = (product, modal) => {
+    const selectProduct = (product, modal, index) => {
         setProduct(product)
+        setProductIndex(index)
         setDisplayType('loading')
         setModalShow(true)
         Api.getInventoryByProductID({
@@ -94,7 +96,7 @@ function InventoryList (props){
             //allInventory means get all inventory including 0 quantity left.
             allInventory: true,
         }).then( results => {
-            setInventory(results.data)
+            inventoryContext.storeInventory(results.data)
             setDisplayType(modal)
         }).catch( err =>{
             console.log(err)
@@ -107,7 +109,7 @@ function InventoryList (props){
                 return(
                         <ViewInventoryModal 
                             product = {product}
-                            productInventory = {productInventory}
+                            productInventory = {inventoryContext.inventory}
                             handleClose = {closeModal}
                         />
                 )
@@ -115,7 +117,8 @@ function InventoryList (props){
                     return(
                         <ViewProductModal 
                             product = {product}
-                            productInventory ={productInventory}
+                            index = {productIndex}
+                            productInventory ={inventoryContext.inventory}
                             handleClose = {closeModal}
                         />
                     )
@@ -172,7 +175,7 @@ function InventoryList (props){
                             <tr key={index} style={listingStyle.tr}>
                                 <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}>
                                     {loginContext.permissionLevel > 2? 
-                                        <Badge variant='warning' as='button' style={{margin: 'auto'}} onClick={() => selectProduct(product, 'view product')}>Edit</Badge>
+                                        <Badge variant='warning' as='button' style={{margin: 'auto'}} onClick={() => selectProduct(product, 'view product', index)}>Edit</Badge>
                                     : null}
                                 </td>
                                 <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>

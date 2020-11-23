@@ -1,7 +1,6 @@
 import React, {Component} from "react";
-import {Modal, Button, Container, Row, Col} from "react-bootstrap";
+import {Button, Container, Row, Col} from "react-bootstrap";
 import SearchInventory from '../../Components/SearchInventory/SearchInventory';
-import InventoryContext from '../../Context/InventoryContext';
 
 class Inventory extends Component{
     state = {

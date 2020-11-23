@@ -8,21 +8,17 @@ function SearchInventory (){
     const inventoryContext = useContext(InventoryContext)
     const searchInputRef = useRef(null)
     const [searchTitle, setSearchTitle] = useState(undefined)
-    const [displayType, setDisplayType] = useState(undefined)
     const [showDisplay, setShowDisplay] = useState(false)
-    const [inventoryData, setInventoryData] = useState([])
 
     const getProductByCate = (searchType, searchData) =>{
         setShowDisplay('loading')
-        setDisplayType("category")
         setSearchTitle(searchData.toUpperCase())
         Api.getProductsByCate({
                 searchType: searchType,
                 searchData: searchData
             }
         ).then( products => {
-            console.log(products.data)
-            setInventoryData(products.data)
+            inventoryContext.storeProducts(products.data)
             setShowDisplay(true)
         }).catch(err => {
             console.log("something went wrong")
@@ -32,11 +28,11 @@ function SearchInventory (){
     const searchProductByInput = () => {
         setShowDisplay('loading')
         setSearchTitle(searchInputRef.current.value.trim())
+        //This API should be changed to searchProductByInput
         Api.searchInventoryByInput({
             searchInput: searchInputRef.current.value.trim()
         }).then(products => {
-            console.log(products.data)
-            setInventoryData(products.data)
+            inventoryContext.storeProducts(products.data)
             setShowDisplay(true)
         })
     }
@@ -46,10 +42,11 @@ function SearchInventory (){
         setSearchTitle('All Products')
         Api.getAllProducts({
         }).then( products => {
-            console.log(products.data)
-            setInventoryData(products.data)
+            console.log(products)
+            inventoryContext.storeProducts(products.data)
             setShowDisplay(true)
         }).catch(err => {
+            console.log(err)
             console.log("something went wrong")
         })
     }
@@ -59,7 +56,7 @@ function SearchInventory (){
             case true:
                 return(
                     <InventoryList 
-                        inventoryData = {inventoryData}
+                        inventoryData = {inventoryContext.products}
                         category = {searchTitle}
                     />
                 )

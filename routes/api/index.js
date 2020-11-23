@@ -371,6 +371,62 @@ router.get("/user_data", (req, res) => {
     }
   })
 
+  router.post('/update_product', (req, res) => {
+    let permission_req = 2;
+
+    if(checkPermission(req.user, permission_req)){
+      db.products.update(
+        req.body.update,
+        {
+          where: {
+            id: req.body.id
+          }
+        }
+      ).then( result => {
+        db.sequelize.query(
+          `SELECT	cagoodandfresh.products.id,
+                  cagoodandfresh.products.upc,
+                  cagoodandfresh.products.location,
+                  cagoodandfresh.products.category,
+                  cagoodandfresh.products.holding,
+                  cagoodandfresh.products.image,
+                  cagoodandfresh.products.measurement_system,
+                  cagoodandfresh.products.name_chinese,
+                  cagoodandfresh.products.name_english,
+                  cagoodandfresh.products.supplier_primary_id,
+                  cagoodandfresh.products.supplier_secondary_id,
+                  cagoodandfresh.products.supplier_tertiary_id,
+                  cagoodandfresh.products.weight,
+                  cagoodandfresh.products.description,
+                  IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+          FROM cagoodandfresh.products
+          LEFT JOIN (
+            SELECT product_code,
+                   SUM(quantity) AS total_quantity
+            FROM cagoodandfresh.inventory_transaction
+            GROUP BY product_code
+          ) transaction ON transaction.product_code = cagoodandfresh.products.id
+          LEFT JOIN (
+            SELECT product_code,
+                   SUM(invoice_quantity) as total_quantity
+            FROM cagoodandfresh.inventory
+            GROUP BY product_code
+          ) inventory ON inventory.product_code = cagoodandfresh.products.id
+          WHERE cagoodandfresh.products.id = ${req.body.id}`,{type: db.sequelize.QueryTypes.SELECT}
+        ).then( result => {
+          res.json(result)
+        })
+      }).catch(err => {
+        console.log(err)
+        res.status(404).json({ error: err});
+      })
+    }else{
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
+    }
+  })
+
   //Get all products
   router.get("/get_all_products", (req, res) => {
     let permission_req = 1;
@@ -521,6 +577,18 @@ router.get("/user_data", (req, res) => {
         console.log(err)
         res.status(404).json({ error: err});
       })
+    }else{
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
+    }
+  })
+
+  router.post('/get_product_suppliers', (req, res) => {
+    let permission_req = 1
+
+    if(checkPermission(req.user, permission_req)){
+
     }else{
       console.log("User Unauthorized")
       console.log("User: "+req.user.id)

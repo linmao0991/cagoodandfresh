@@ -62,6 +62,11 @@ export default {
         return axios.post('/api/update_inventory', data)
     },
 
+    updateProduct: data => {
+        console.log("[Update Product Record]")
+        return axios.post('/api/update_product', data)  
+    },
+
     //Search help for restaurants nearby zipcode or city
     searchYelp: (searchParam) => {
         console.log("[Search Yelp]")

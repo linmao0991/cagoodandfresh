@@ -2,9 +2,9 @@ import React, {useState, useContext} from 'react';
 import {Modal, Button, InputGroup, FormControl, 
         Table, Container, Badge, Card, Popover, 
         OverlayTrigger, Row, Col, Spinner, 
-        ListGroup, Accordion} from 'react-bootstrap';
+        ListGroup, Accordion, Dropdown, DropdownButton} from 'react-bootstrap';
 import Api from '../../Utils/Api'
-import InventoryContext from '../../Context/InventoryContext'
+import InventoryContext from '../../Context/InventoryContext';
 
 const popOverStyle = {
     backgroundColor: "#404040",
@@ -225,9 +225,18 @@ function PopOverComponent (props){
                 [props.column]: Number(newValue).toFixed(2)
             }
         }).then( result => {
-            setSpinner(false)
-            setCurrentValue(Number(newValue).toFixed(2))
-            document.body.click()
+            Api.getInventoryByProductID({
+                productCode: props.inventory.product_code,
+                //allInventory means get all inventory including 0 quantity left.
+                allInventory: true,
+            }).then( results => {
+                inventoryContext.storeInventory(results.data)
+                setSpinner(false)
+                setCurrentValue(Number(newValue).toFixed(2))
+                document.body.click()
+            }).catch( err =>{
+                console.log(err)
+            })
         }).catch( err => {
             console.log(err)
         })
@@ -371,7 +380,7 @@ function ViewTransactions (props){
                     hover
                     variant="dark">
                 <thead style={listingStyle.thead}>
-                    <tr tr style={listingStyle.tr}>
+                    <tr style={listingStyle.tr}>
                         <th style={{...listingStyle.col_1_width,...listingStyle.tdth}}>Date</th>
                         <th style={{...listingStyle.col_2_width,...listingStyle.tdth}}>Quantity</th>
                         <th style={{...listingStyle.col_3_width,...listingStyle.tdth}}>Sale Price</th>
@@ -415,11 +424,40 @@ function ViewTransactions (props){
     )
 }
 
+function EditProductSupplier (props) {
+    return(
+        <>
+        <Modal.Header closeButton>
+            <Modal.Title>Edit Product Supplier</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+            <Container fluid>
+                <Row>
+                    <Col>Current Supplier: <span>{props.fieldValue}</span></Col>
+                </Row>
+                <Row>
+                    <Col>New Supplier</Col>
+                </Row>
+            </Container>
+        </Modal.Body>
+        <Modal.Footer>
+            <Button variant="secondary" onClick={props.closeModal}>
+                Close
+            </Button>
+        </Modal.Footer>
+        </>
+    )
+}
+
 export function ViewProductModal (props) {
+    const inventoryContext = useContext(InventoryContext)
+    //const [productDetails, setProductDetails] = useState(inventoryContext.products[props.index])
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({modalType: undefined, modalSize: 'xl'})
     const [selectedInventory, setInventory] = useState(null)
     
+    let productDetails = inventoryContext.products[props.index]
+
     const collapseStyle = {
         width: '100%',
         maxHeight: '0px', 
@@ -428,10 +466,29 @@ export function ViewProductModal (props) {
         transition: 'max-height 0.2s ease-out'
     }
 
-    const switchModalFunction = (modalType, modalSize, inventory) => {
+    const ViewTransactions = (modalType, modalSize, inventory) => {
         setInventory(inventory)
         setModalData({modalType: modalType, modalSize: modalSize})
         setShowModal(true)
+    }
+
+    const editSupplier = (modalType, modalSize, fieldName, fieldValue, index) => {
+        setModalData({
+            modalType: modalType,
+            modalSize: modalSize,
+            modalCentered: true,
+            data: {
+                //field name in db
+                fieldName: fieldName,
+                //field value in db
+                fieldValue: fieldValue,
+                //index of product in products array located at InventoryContext
+                //--Needed for updating context
+                index: index
+            }
+        })
+        setShowModal(true)
+
     }
 
     const closeModal = () => {
@@ -440,7 +497,6 @@ export function ViewProductModal (props) {
 
     const handleCollapse = elId => {
         let elem = document.getElementById(elId)
-        console.log('scroll height: '+elem.style.scrollHeight)
         if(elem.style.maxHeight != '0px'){
             elem.style.maxHeight = '0px'
         }else{
@@ -455,16 +511,46 @@ export function ViewProductModal (props) {
                     <ViewTransactions
                         inventory = {selectedInventory}
                         closeModal = {closeModal}
-                        product = {props.product}
+                        product = {productDetails}
                     />
                 )
+            case 'edit-supplier':
+                return(
+                    <EditProductSupplier
+                        fieldName = {modalData.data.fieldName}
+                        product = {productDetails}
+                        fieldValue = {modalData.data.fieldValue}
+                        index = {modalData.index}
+                        closeModal = {closeModal}
+                    />
+                )
+            default:
+                return(
+                    null
+                )
         }
-
     }
+
+    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+        <Badge
+            variant='warning' 
+            size='sm' 
+            as='button'
+            href=""
+            ref={ref}
+            onClick={(e) => {
+            e.preventDefault();
+            onClick(e);
+            }}
+        >
+            {children}&#x25bc;
+        </Badge>
+    ));
+
     return(
         <>
             <Modal.Header style={{display:'flex', justifyContent:'center'}}>
-            <Modal.Title>{props.product.name_english.toUpperCase()} - Detailed View</Modal.Title>
+            <Modal.Title>{productDetails.name_english.toUpperCase()} - Detailed View</Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 <Container fluid>
@@ -473,51 +559,79 @@ export function ViewProductModal (props) {
                             <ListGroup>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse0')}>Edit▼</Badge> <b>Name English:</b><span style={{float: 'right'}}>{props.product.name_english}</span>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse0')}>Edit▼</Badge>&nbsp;<b>Name English:</b><span style={{float: 'right'}}>{productDetails.name_english}</span>
                                     </div>
                                     <div id='collapse0' style={collapseStyle}>
-                                        <InputGroup>
-                                            <FormControl
-                                            placeholder={props.product.name_english}
-                                            aria-label="English Name"
-                                            />
-                                            <InputGroup.Append>
-                                                <Button variant="success">✓</Button>
-                                                <Button variant="danger">✗</Button>
-                                            </InputGroup.Append>
-                                        </InputGroup>
+                                        <EditProductDetail 
+                                            field = 'name_english'
+                                            label = 'English Name'
+                                            placeholder = {productDetails.name_english}
+                                            id = {productDetails.id}
+                                            divId = 'collapse0'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse1')}>Edit▼</Badge> <b>Name Chinese:</b><span style={{float: 'right'}}>{props.product.name_chinese}</span>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse1')}>Edit▼</Badge>&nbsp;<b>Name Chinese:</b><span style={{float: 'right'}}>{productDetails.name_chinese}</span>
                                     </div>
                                     <div id='collapse1' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'name_chinese'
+                                            label = 'Chinese Name'
+                                            placeholder = {productDetails.name_chinese}
+                                            id = {productDetails.id}
+                                            divId = 'collapse1'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse2')}>Edit▼</Badge> <b>Category:</b><span style={{float: 'right'}}>{props.product.category}</span>
-                                    </div>
-                                    <div id='collapse2' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <span style={{float: 'left'}}>
+                                        <EditProductDetail
+                                            field = 'category'
+                                            label = 'Categry'
+                                            placeholder = {productDetails.category}
+                                            id = {productDetails.id}
+                                            //divId = 'collapse1'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        /></span>&nbsp;<b>Category:</b>
+                                        <span style={{float: 'right'}}>{productDetails.category.toUpperCase()}</span>
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse3')}>Edit▼</Badge> <b>Holding:</b><span style={{float: 'right'}}>{props.product.holding}</span>
-                                    </div>
-                                    <div id='collapse3' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                    <span style={{float: 'left'}}>
+                                        <EditProductDetail
+                                            field = 'holding'
+                                            label = 'Holding'
+                                            placeholder = {productDetails.holding}
+                                            id = {productDetails.id}
+                                            //divId = 'collapse1'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        /></span>&nbsp;<b>Holding:</b><span style={{float: 'right'}}>{productDetails.holding.toUpperCase()}</span>
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse4')}>Edit▼</Badge> <b>UPC:</b><span style={{float: 'right'}}>{props.product.upc}</span>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse4')}>Edit▼</Badge>&nbsp;<b>UPC:</b><span style={{float: 'right'}}>{productDetails.upc}</span>
                                     </div>
                                     <div id='collapse4' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'upc'
+                                            label = 'UPC'
+                                            placeholder = {productDetails.upc}
+                                            id = {productDetails.id}
+                                            divId = 'collapse4'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                             </ListGroup>
@@ -526,42 +640,71 @@ export function ViewProductModal (props) {
                             <ListGroup>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse5')}>Edit▼</Badge> <b>Location:</b><span style={{float: 'right'}}>{props.product.location}</span>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse5')}>Edit▼</Badge>&nbsp;<b>Location:</b><span style={{float: 'right'}}>{productDetails.location}</span>
                                     </div>
                                     <div id='collapse5' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'location'
+                                            label = 'Location'
+                                            placeholder = {productDetails.location}
+                                            id = {productDetails.id}
+                                            divId = 'collapse5'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse6')}>Edit▼</Badge> <b>Weight:</b><span style={{float: 'right'}}>{props.product.weight} {props.product.measurement_system}</span>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse6')}>Edit▼</Badge>&nbsp;<b>Weight:</b><span style={{float: 'right'}}>{productDetails.weight} {productDetails.measurement_system}</span>
                                     </div>
                                     <div id='collapse6' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'weight'
+                                            label = 'Weight'
+                                            placeholder = {productDetails.weight}
+                                            id = {productDetails.id}
+                                            divId = 'collapse6'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse7')}>Edit▼</Badge> <b>Supplier 1:</b><span style={{float: 'right'}}>{props.product.supplier_primary_id}</span>
-                                    </div>
-                                    <div id='collapse7' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => editSupplier('edit-supplier','lg','supplier_primary_id',productDetails.supplier_name, props.index)}>Edit▼</Badge>&nbsp;<b>Supplier 1:</b><span style={{float: 'right'}}>{productDetails.supplier_primary_id}</span>
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse8')}>Edit▼</Badge> <b>Supplier 2:</b><span style={{float: 'right'}}>{props.product.supplier_secondary_id}</span>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse8')}>Edit▼</Badge>&nbsp;<b>Supplier 2:</b><span style={{float: 'right'}}>{productDetails.supplier_secondary_id}</span>
                                     </div>
                                     <div id='collapse8' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'supplier_secondary_id'
+                                            label = 'Supplier'
+                                            placeholder = {productDetails.supplier_secondary_id}
+                                            id = {productDetails.id}
+                                            divId = 'collapse8'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                                 <ListGroup.Item>
                                     <div style={{margin: '2px'}}>
-                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse9')}>Edit▼</Badge> <b>Supplier 3:</b><span style={{float: 'right'}}>{props.product.supplier_tertiary_id}</span>
+                                    <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse9')}>Edit▼</Badge>&nbsp;<b>Supplier 3:</b><span style={{float: 'right'}}>{productDetails.supplier_tertiary_id}</span>
                                     </div>
                                     <div id='collapse9' style={collapseStyle}>
-                                        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                                        <EditProductDetail 
+                                            field = 'supplier_tertiary_id'
+                                            label = 'Supplier'
+                                            placeholder = {productDetails.supplier_tertiary_id}
+                                            id = {productDetails.id}
+                                            divId = 'collapse9'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
                                     </div>
                                 </ListGroup.Item>
                             </ListGroup>
@@ -570,7 +713,22 @@ export function ViewProductModal (props) {
                     <Row>
                         <Col>
                             <ListGroup>
-                                <ListGroup.Item><b>Description:</b> {props.product.description}</ListGroup.Item>
+                                <ListGroup.Item>
+                                    <div style={{margin: '2px'}}>
+                                        <Badge variant='warning' size='sm' as='button' onClick={() => handleCollapse('collapse10')}>Edit▼</Badge>&nbsp;<b>Description:</b> {productDetails.description}
+                                    </div>    
+                                    <div id='collapse10' style={collapseStyle}>
+                                        <EditProductDetail 
+                                            field = 'description'
+                                            label = 'Description'
+                                            placeholder = {productDetails.description}
+                                            id = {productDetails.id}
+                                            divId = 'collapse10'
+                                            collapse = {handleCollapse}
+                                            index = {props.index}
+                                        />
+                                    </div>
+                                </ListGroup.Item>
                             </ListGroup>
                         </Col>
                     </Row>
@@ -584,7 +742,7 @@ export function ViewProductModal (props) {
                                 <ProductInventory 
                                     product = {props.product}
                                     productInventory = {props.productInventory}
-                                    switchModalFunction = {switchModalFunction}
+                                    switchModalFunction = {ViewTransactions}
                                     tableHeight = '200px'
                                     style={{marginTop: '5px'}}
                                 />
@@ -604,6 +762,7 @@ export function ViewProductModal (props) {
                 show={showModal}
                 onHide={closeModal}
                 backdrop="static"
+                centered={modalData.modalCentered?true:false}
                 size={modalData.modalSize}
                 keyboard={false}>
                     {handleProductFunctions()}
@@ -611,6 +770,155 @@ export function ViewProductModal (props) {
                 :
                 null
             }
+        </>
+    )
+}
+
+export function EditProductDetail (props){
+    const inventoryContext = useContext(InventoryContext)
+    const [inputValue, setInputValue] = useState(props.placeholder)
+    const [loading, setLoading] = useState(false)
+    const [show, setShow] = useState(false);
+
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+
+    const inputHandler = value => {
+        setInputValue(value)
+    }
+
+    const updateProductField = (value) => {
+        let fieldValue;
+        if(value){
+            fieldValue = value
+        }else{
+            fieldValue = inputValue
+        }
+        console.log('update')
+        setLoading(true)
+        console.log('[Submit Input]: '+fieldValue)
+        Api.updateProduct({
+            id: props.id,
+            update: {[props.field]: fieldValue}
+        }).then(result => {
+            setTimeout(function (){
+                let updatedProducts = [...inventoryContext.products]
+                updatedProducts.splice(props.index,1,result.data[0])
+                inventoryContext.storeProducts(updatedProducts)
+                setLoading(false)
+                if(props.divId){
+                    props.collapse(props.divId)
+                }
+            },3000)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
+
+    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
+        <Badge
+            disabled={loading?true:false}
+            variant='warning' 
+            size='sm' 
+            as='button'
+            href=""
+            ref={ref}
+            onClick={(e) => {
+            e.preventDefault();
+            onClick(e);
+            }}
+        >
+            {loading?
+                <Spinner animation="border" role="status" size='sm'>
+                    <span className="sr-only">Loading...</span>
+                </Spinner>
+            :
+                <>{children}&#x25bc;</>
+            }
+        </Badge>
+    ));
+
+    const switchFieldUpdate = () =>{
+        switch(props.field){
+            case 'name_chinese':
+            case 'name_english':
+            case 'weight':
+            case 'location':
+            case 'upc':
+            case 'description':
+                return(
+                    <InputGroup>
+                        <FormControl
+                        value={inputValue}
+                        aria-label={props.label}
+                        onChange={(event) => inputHandler(event.target.value)}
+                        />
+                        <InputGroup.Append>
+                            <Button variant="success" onClick={() => updateProductField()}>
+                                {loading?
+                                <Spinner animation="border" role="status" size='sm'>
+                                    <span className="sr-only">Loading...</span>
+                                </Spinner>
+                                :
+                                <>✓</>
+                                }
+                            </Button>
+                            <Button variant="danger" disabled={loading?true:false} onClick={() => props.collapse(props.divId)}>✗</Button>
+                        </InputGroup.Append>
+                    </InputGroup>
+                )
+            case 'category':
+                return(
+                <Dropdown>
+                    <Dropdown.Toggle as={CustomToggle} >Edit</Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {inventoryContext.categories.map((category, index) => {
+                            return(
+                            <Dropdown.Item
+                                key={category+''+index}
+                                eventKey={category+''+index}
+                                onClick={() =>{
+                                    updateProductField(category)
+                                }}
+                            >
+                                {category.toUpperCase()}
+                            </Dropdown.Item>
+                            )
+                        })}
+                    </Dropdown.Menu>
+                </Dropdown>
+                )
+            case 'holding':
+                return(
+                <Dropdown>
+                    <Dropdown.Toggle as={CustomToggle} >Edit</Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        {['refrigeration','frozen','dry'].map((holding, index) => {
+                            return(
+                            <Dropdown.Item
+                                key={holding+''+index}
+                                eventKey={holding+''+index}
+                                onClick={() =>{
+                                    updateProductField(holding)
+                                }}
+                            >
+                                {holding.toUpperCase()}
+                            </Dropdown.Item>
+                            )
+                        })}
+                    </Dropdown.Menu>
+                </Dropdown>
+                )
+            default:
+                return(
+                    null
+                )
+        }
+    }
+
+    return(
+        <>
+            {switchFieldUpdate()}
         </>
     )
 }
