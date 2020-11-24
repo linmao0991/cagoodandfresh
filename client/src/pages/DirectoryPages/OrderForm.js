@@ -265,11 +265,11 @@ class OrderForm extends Component{
                 return(
                     <Container 
                         fluid
-                        style={{
-                            fontSize: "14px",
-                            overflowY: "auto",
-                            height:"500px"
-                        }}
+                        // style={{
+                        //     fontSize: "14px",
+                        //     overflowY: "auto",
+                        //     height:"500px"
+                        // }}
                     >
                         <ProductListing 
                             allProductData = {this.context.productData}

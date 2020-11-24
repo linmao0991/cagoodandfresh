@@ -117,14 +117,6 @@ function ProductListing (props){
                 hover
                 variant="dark"
             >
-                {/* <colgroup>
-                    <col style={{width: "10%"}}/>
-                    <col style={{width: "5%"}}/>
-                    <col style={{width: "35%"}}/>
-                    <col style={{width: "30%"}}/>
-                    <col style={{width: "10%"}}/>
-                    <col style={{width: "10%"}}/>
-                </colgroup> */}
                 <thead style={listingStyle.thead}>
                     <tr style={listingStyle.tr}>
                         <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}>{props.categorySelection}</td>

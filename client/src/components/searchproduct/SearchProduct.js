@@ -72,12 +72,10 @@ class SearchProduct extends Component{
             <br/>
             <Row>
                 {this.state.renderResults? 
-                    <Container fluid>
                         <ProductListing 
                             allProductData = {this.context.productData}
                             categorySelection = {this.context.categorySelection.toUpperCase()}
                         />
-                    </Container>
                 : null}
             </Row>
             </>
