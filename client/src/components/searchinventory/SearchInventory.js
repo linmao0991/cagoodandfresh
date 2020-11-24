@@ -2,7 +2,7 @@ import React, {useContext, useState, useRef}from 'react';
 import {Button, Container, Row, Col, InputGroup, FormControl, DropdownButton, Dropdown, Spinner} from "react-bootstrap";
 import InventoryContext from '../../context/InventoryContext';
 import Api from '../../utils/Api'
-import InventoryList from './SubComponent/InventoryList';
+import InventoryList from './subcomponent/InventoryList';
 
 function SearchInventory (){
     const inventoryContext = useContext(InventoryContext)

@@ -384,35 +384,35 @@ router.get("/user_data", (req, res) => {
         }
       ).then( result => {
         db.sequelize.query(
-          `SELECT	cagoodandfresh.products.id,
-                  cagoodandfresh.products.upc,
-                  cagoodandfresh.products.location,
-                  cagoodandfresh.products.category,
-                  cagoodandfresh.products.holding,
-                  cagoodandfresh.products.image,
-                  cagoodandfresh.products.measurement_system,
-                  cagoodandfresh.products.name_chinese,
-                  cagoodandfresh.products.name_english,
-                  cagoodandfresh.products.supplier_primary_id,
-                  cagoodandfresh.products.supplier_secondary_id,
-                  cagoodandfresh.products.supplier_tertiary_id,
-                  cagoodandfresh.products.weight,
-                  cagoodandfresh.products.description,
+          `SELECT	products.id,
+                  products.upc,
+                  products.location,
+                  products.category,
+                  products.holding,
+                  products.image,
+                  products.measurement_system,
+                  products.name_chinese,
+                  products.name_english,
+                  products.supplier_primary_id,
+                  products.supplier_secondary_id,
+                  products.supplier_tertiary_id,
+                  products.weight,
+                  products.description,
                   IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-          FROM cagoodandfresh.products
+          FROM products
           LEFT JOIN (
             SELECT product_code,
                    SUM(quantity) AS total_quantity
-            FROM cagoodandfresh.inventory_transaction
+            FROM inventory_transaction
             GROUP BY product_code
-          ) transaction ON transaction.product_code = cagoodandfresh.products.id
+          ) transaction ON transaction.product_code = products.id
           LEFT JOIN (
             SELECT product_code,
                    SUM(invoice_quantity) as total_quantity
-            FROM cagoodandfresh.inventory
+            FROM inventory
             GROUP BY product_code
-          ) inventory ON inventory.product_code = cagoodandfresh.products.id
-          WHERE cagoodandfresh.products.id = ${req.body.id}`,{type: db.sequelize.QueryTypes.SELECT}
+          ) inventory ON inventory.product_code = products.id
+          WHERE products.id = ${req.body.id}`,{type: db.sequelize.QueryTypes.SELECT}
         ).then( result => {
           res.json(result)
         })
@@ -433,35 +433,35 @@ router.get("/user_data", (req, res) => {
 
     if (checkPermission(req.user, permission_req)){
       db.sequelize.query(
-        `SELECT	cagoodandfresh.products.id,
-                cagoodandfresh.products.upc,
-                cagoodandfresh.products.location,
-                cagoodandfresh.products.category,
-                cagoodandfresh.products.holding,
-                cagoodandfresh.products.image,
-                cagoodandfresh.products.measurement_system,
-                cagoodandfresh.products.name_chinese,
-                cagoodandfresh.products.name_english,
-                cagoodandfresh.products.supplier_primary_id,
-                cagoodandfresh.products.supplier_secondary_id,
-                cagoodandfresh.products.supplier_tertiary_id,
-                cagoodandfresh.products.weight,
-                cagoodandfresh.products.description,
+        `SELECT	products.id,
+                products.upc,
+                products.location,
+                products.category,
+                products.holding,
+                products.image,
+                products.measurement_system,
+                products.name_chinese,
+                products.name_english,
+                products.supplier_primary_id,
+                products.supplier_secondary_id,
+                products.supplier_tertiary_id,
+                products.weight,
+                products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM cagoodandfresh.products
+        FROM products
         LEFT JOIN (
           SELECT product_code,
                  SUM(quantity) AS total_quantity
-          FROM cagoodandfresh.inventory_transaction
+          FROM inventory_transaction
           GROUP BY product_code
-        ) transaction ON transaction.product_code = cagoodandfresh.products.id
+        ) transaction ON transaction.product_code = products.id
         LEFT JOIN (
           SELECT product_code,
                  SUM(invoice_quantity) as total_quantity
-          FROM cagoodandfresh.inventory
+          FROM inventory
           GROUP BY product_code
-        ) inventory ON inventory.product_code = cagoodandfresh.products.id
-        GROUP BY cagoodandfresh.products.id
+        ) inventory ON inventory.product_code = products.id
+        GROUP BY products.id
         ORDER BY holding DESC;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( data => {
         res.json(data)
@@ -489,36 +489,36 @@ router.get("/user_data", (req, res) => {
       //-Where product table column category = category string sent by client
       //-Group results by product id
       db.sequelize.query(
-        `SELECT	cagoodandfresh.products.id,
-                cagoodandfresh.products.upc,
-                cagoodandfresh.products.location,
-                cagoodandfresh.products.category,
-                cagoodandfresh.products.holding,
-                cagoodandfresh.products.image,
-                cagoodandfresh.products.measurement_system,
-                cagoodandfresh.products.name_chinese,
-                cagoodandfresh.products.name_english,
-                cagoodandfresh.products.supplier_primary_id,
-                cagoodandfresh.products.supplier_secondary_id,
-                cagoodandfresh.products.supplier_tertiary_id,
-                cagoodandfresh.products.weight,
-                cagoodandfresh.products.description,
+        `SELECT	products.id,
+                products.upc,
+                products.location,
+                products.category,
+                products.holding,
+                products.image,
+                products.measurement_system,
+                products.name_chinese,
+                products.name_english,
+                products.supplier_primary_id,
+                products.supplier_secondary_id,
+                products.supplier_tertiary_id,
+                products.weight,
+                products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM cagoodandfresh.products
+        FROM products
         LEFT JOIN (
           SELECT product_code,
                  SUM(quantity) AS total_quantity
-          FROM cagoodandfresh.inventory_transaction
+          FROM inventory_transaction
           GROUP BY product_code
-        ) transaction ON transaction.product_code = cagoodandfresh.products.id
+        ) transaction ON transaction.product_code = products.id
         LEFT JOIN (
           SELECT product_code,
                  SUM(invoice_quantity) as total_quantity
-          FROM cagoodandfresh.inventory
+          FROM inventory
           GROUP BY product_code
-        ) inventory ON inventory.product_code = cagoodandfresh.products.id
-        WHERE cagoodandfresh.products.${[req.body.searchType]} = '${req.body.searchData}'
-        GROUP BY cagoodandfresh.products.id
+        ) inventory ON inventory.product_code = products.id
+        WHERE products.${req.body.searchType} = '${req.body.searchData}'
+        GROUP BY products.id
         ORDER BY holding DESC;`
         ,{type: db.sequelize.QueryTypes.SELECT}
       ).then(data => {
@@ -539,38 +539,38 @@ router.get("/user_data", (req, res) => {
     let permission_req = 1;
     if(checkPermission(req.user, permission_req)){
       db.sequelize.query(
-        `SELECT	cagoodandfresh.products.id,
-                cagoodandfresh.products.upc,
-                cagoodandfresh.products.location,
-                cagoodandfresh.products.category,
-                cagoodandfresh.products.holding,
-                cagoodandfresh.products.image,
-                cagoodandfresh.products.measurement_system,
-                cagoodandfresh.products.name_chinese,
-                cagoodandfresh.products.name_english,
-                cagoodandfresh.products.supplier_primary_id,
-                cagoodandfresh.products.supplier_secondary_id,
-                cagoodandfresh.products.supplier_tertiary_id,
-                cagoodandfresh.products.weight,
-                cagoodandfresh.products.description,
+        `SELECT	products.id,
+                products.upc,
+                products.location,
+                products.category,
+                products.holding,
+                products.image,
+                products.measurement_system,
+                products.name_chinese,
+                products.name_english,
+                products.supplier_primary_id,
+                products.supplier_secondary_id,
+                products.supplier_tertiary_id,
+                products.weight,
+                products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM cagoodandfresh.products
+        FROM products
         LEFT JOIN (
           SELECT product_code,
                  SUM(quantity) AS total_quantity
-          FROM cagoodandfresh.inventory_transaction
+          FROM inventory_transaction
           GROUP BY product_code
-        ) transaction ON transaction.product_code = cagoodandfresh.products.id
+        ) transaction ON transaction.product_code = products.id
         LEFT JOIN (
           SELECT product_code,
                  SUM(invoice_quantity) as total_quantity
-          FROM cagoodandfresh.inventory
+          FROM inventory
           GROUP BY product_code
-        ) inventory ON inventory.product_code = cagoodandfresh.products.id
-        WHERE cagoodandfresh.products.id LIKE '%${req.body.searchInput}&'
-        OR cagoodandfresh.products.name_english LIKE '%${req.body.searchInput}%'
-        OR cagoodandfresh.products.name_chinese LIKE '%${req.body.searchInput}%'
-        GROUP BY cagoodandfresh.products.id;`,{type: db.sequelize.QueryTypes.SELECT}
+        ) inventory ON inventory.product_code = products.id
+        WHERE products.id LIKE '%${req.body.searchInput}&'
+        OR products.name_english LIKE '%${req.body.searchInput}%'
+        OR products.name_chinese LIKE '%${req.body.searchInput}%'
+        GROUP BY products.id;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( result => {
         res.json(result)
       }).catch( err => {

@@ -5,7 +5,8 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + "/../config/config.json")[env];
+//const config = require(__dirname + "/../config/config.json")[env];
+const config = require(__dirname + "/../config/config.js")[env];
 const db = {};
 
 if (process.env.NODE_ENV === "production") {
@@ -58,7 +59,7 @@ db.accounts_receivable_invoices.hasMany(db.collections, { sourceKey: 'invoice_nu
 db.accounts_receivable_invoices.hasMany(db.inventory_transaction, { sourceKey: 'invoice_number', foreignKey: 'ar_invoice_number'});
 
 //inventory has many inventory_transactions
-db.inventory.hasMany(db.inventory_transaction, {foreignKey: 'inventory_id'})
+db.inventory.hasMany(db.inventory_transaction, {sourceKey: 'id', foreignKey: 'inventory_id'})
 
 //suppliers has many accounts_payable_invoices
 db.suppliers.hasMany(db.accounts_payable_invoices, {foreignKey: 'supplier_id'});

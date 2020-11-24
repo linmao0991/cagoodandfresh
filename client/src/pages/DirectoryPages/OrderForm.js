@@ -125,7 +125,7 @@ class OrderForm extends Component{
             if( this.context.cartTotalSales > this.context.paymentInfo.paymentAmount && this.context.paymentInfo.paymentAmount > 0){
                 return "Partial"
             }
-            if( this.context.cartTotalSales = this.context.paymentInfo.paymentAmount ){
+            if( this.context.cartTotalSales === this.context.paymentInfo.paymentAmount ){
                 return "Paid"
             }
             return "Unpaid"
@@ -265,11 +265,11 @@ class OrderForm extends Component{
                 return(
                     <Container 
                         fluid
-                        style={
-                            {fontSize: "14px"},
-                            {overflowY: "auto"},
-                            {height:"500px"}
-                        }
+                        style={{
+                            fontSize: "14px",
+                            overflowY: "auto",
+                            height:"500px"
+                        }}
                     >
                         <ProductListing 
                             allProductData = {this.context.productData}

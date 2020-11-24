@@ -1,5 +1,5 @@
 import React from "react";
-import {Row, Col, Button, Table} from "react-bootstrap";
+import {Button, Table} from "react-bootstrap";
 
 function CustomerDisplay(props){
 

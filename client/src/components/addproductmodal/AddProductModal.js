@@ -15,7 +15,7 @@ function AddProductModal (props) {
         return initialCountState;
     }
 
-    const [show, toggleShow] = useState(props.show);
+    //const [show, toggleShow] = useState(props.show);
     const [count, setCount] = useState(setInitialCount());
     const [totalCount, setTotalCount] = useState(undefined)
     const [totalSale, setTotalSale] = useState(undefined)
@@ -43,6 +43,8 @@ function AddProductModal (props) {
                 //If the quantity is > 0 return this new cartItem
                 if(item.quantity>0){
                     return cartItem
+                }else{
+                    return null
                 }
             //Filter through the new array returned by map and remove indexes that contain null.
             }).filter(cartItem =>{
@@ -82,7 +84,7 @@ function AddProductModal (props) {
         // Store the updated cart to OrderContext
         orderContext.storeCart(cartData)
         // Calls the toggleShow function in the parent component ProductListing to hide the modal
-        props.toggleShow(!show)
+        props.toggleShow(!props.show)
     }
 
     //Sets the item count by manual input and calculates...
@@ -137,7 +139,7 @@ function AddProductModal (props) {
         <>
         <Modal
             size="lg"
-            show={show}
+            show={props.show}
             onHide={props.toggleShow}
             backdrop="static"
             keyboard={false}
@@ -224,7 +226,7 @@ function AddProductModal (props) {
                         <Col>Total Sales: ${totalSale}</Col>
                         <Col>
                             <Button size="sm" variant="success" style={{float: 'left'}} onClick={(event)=>addProductToCart(event)}>Add To Cart</Button>{''}
-                            <Button size="sm" variant="danger" style={{float: 'right'}} onClick={()=>props.toggleShow(!show)}>Cancel</Button>
+                            <Button size="sm" variant="danger" style={{float: 'right'}} onClick={()=>props.toggleShow(!props.show)}>Cancel</Button>
                         </Col>
                     </Row>
                 </Container>

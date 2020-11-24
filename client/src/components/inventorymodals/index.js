@@ -37,6 +37,8 @@ export function ViewInventoryModal(props){
                         product = {props.product}
                     />
                 )
+            default:
+                return(null)
         }
     }
 
@@ -466,7 +468,7 @@ export function ViewProductModal (props) {
         transition: 'max-height 0.2s ease-out'
     }
 
-    const ViewTransactions = (modalType, modalSize, inventory) => {
+    const viewTransactions = (modalType, modalSize, inventory) => {
         setInventory(inventory)
         setModalData({modalType: modalType, modalSize: modalSize})
         setShowModal(true)
@@ -497,7 +499,7 @@ export function ViewProductModal (props) {
 
     const handleCollapse = elId => {
         let elem = document.getElementById(elId)
-        if(elem.style.maxHeight != '0px'){
+        if(elem.style.maxHeight !== '0px'){
             elem.style.maxHeight = '0px'
         }else{
             elem.style.maxHeight = elem.scrollHeight+'px'
@@ -530,22 +532,6 @@ export function ViewProductModal (props) {
                 )
         }
     }
-
-    const CustomToggle = React.forwardRef(({ children, onClick }, ref) => (
-        <Badge
-            variant='warning' 
-            size='sm' 
-            as='button'
-            href=""
-            ref={ref}
-            onClick={(e) => {
-            e.preventDefault();
-            onClick(e);
-            }}
-        >
-            {children}&#x25bc;
-        </Badge>
-    ));
 
     return(
         <>
@@ -742,7 +728,7 @@ export function ViewProductModal (props) {
                                 <ProductInventory 
                                     product = {props.product}
                                     productInventory = {props.productInventory}
-                                    switchModalFunction = {ViewTransactions}
+                                    switchModalFunction = {viewTransactions}
                                     tableHeight = '200px'
                                     style={{marginTop: '5px'}}
                                 />
@@ -778,10 +764,10 @@ export function EditProductDetail (props){
     const inventoryContext = useContext(InventoryContext)
     const [inputValue, setInputValue] = useState(props.placeholder)
     const [loading, setLoading] = useState(false)
-    const [show, setShow] = useState(false);
+    //const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    //const handleClose = () => setShow(false);
+    //const handleShow = () => setShow(true);
 
     const inputHandler = value => {
         setInputValue(value)
@@ -801,15 +787,13 @@ export function EditProductDetail (props){
             id: props.id,
             update: {[props.field]: fieldValue}
         }).then(result => {
-            setTimeout(function (){
-                let updatedProducts = [...inventoryContext.products]
-                updatedProducts.splice(props.index,1,result.data[0])
-                inventoryContext.storeProducts(updatedProducts)
-                setLoading(false)
-                if(props.divId){
-                    props.collapse(props.divId)
-                }
-            },3000)
+            let updatedProducts = [...inventoryContext.products]
+            updatedProducts.splice(props.index,1,result.data[0])
+            inventoryContext.storeProducts(updatedProducts)
+            setLoading(false)
+            if(props.divId){
+                props.collapse(props.divId)
+            }
         }).catch(err => {
             console.log(err)
         })

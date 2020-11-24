@@ -1,6 +1,6 @@
-import React, {useState, useContext, Component} from "react";
+import React, {Component} from "react";
 import DirectoryContext from "../../context/DirectoryContext"
-import {Modal, Button, Container, Row, Col} from "react-bootstrap";
+import {Button, Container, Row, Col} from "react-bootstrap";
 
 class AccountsRec extends Component{
     static contextType = DirectoryContext;

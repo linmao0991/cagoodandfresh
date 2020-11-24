@@ -26,6 +26,10 @@ module.exports = function ( sequelize, DataTypes){
         transaction_type: {
             type: DataTypes.STRING
         },
+        measurement_system: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
         weight: {
             type: DataTypes.INTEGER,
             allowNull: true,

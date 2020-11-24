@@ -145,7 +145,7 @@ function ProductListing (props){
                                 >{
                                     product.inventory_count - orderContext.cartData.reduce(
                                         (accumulator, currentValue) => {
-                                            if(currentValue.product_code == product.id){
+                                            if(currentValue.product_code === product.id){
                                                 return accumulator + currentValue.quantity
                                             }else{
                                                 return accumulator;
