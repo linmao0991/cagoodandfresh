@@ -97,7 +97,14 @@ function InventoryList (props){
             allInventory: true,
         }).then( results => {
             inventoryContext.storeInventory(results.data)
-            setDisplayType(modal)
+            Api.getProductSuppliers({
+                supplier_ids: [product.supplier_primary_id,product.supplier_secondary_id,product.supplier_tertiary_id]
+            }).then( result => {
+                inventoryContext.storeProductSuppliers(result.data)
+                setDisplayType(modal)
+            }).catch( err => {
+                console.log(err)
+            })
         }).catch( err =>{
             console.log(err)
         })

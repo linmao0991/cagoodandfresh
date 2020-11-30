@@ -83,7 +83,7 @@ function SearchInventory (){
                             ref={searchInputRef}
                         />
                         <InputGroup.Append>
-                        <Button variant="outline-info" onClick={searchProductByInput}>Search</Button>
+                        <Button variant="info" onClick={searchProductByInput}>Search</Button>
                         </InputGroup.Append>
                     </InputGroup>
                 </Col>

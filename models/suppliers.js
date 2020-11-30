@@ -58,6 +58,10 @@ module.exports = function ( sequelize, DataTypes){
         },
         account_number: {
             type: DataTypes.STRING
+        },
+        products: {
+            type: DataTypes.STRING(2000),
+            allowNUll: true,
         }
     },{
     //Stops sequelize auto-pluralization and keeps table name as model name.

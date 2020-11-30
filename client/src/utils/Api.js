@@ -1,7 +1,6 @@
 import axios from "axios";
 
-export default {
-
+const Api = {
     //Log in
     logIn: userData => {
         console.log("[Logging In]")
@@ -56,12 +55,30 @@ export default {
         return axios.post("/api/get_inventory_by_product_code", productCode)
     },
 
+    //Get all suppliers
+    getAllSuppliers: () => {
+        console.log('[Get All Suppliers]')
+        return axios.get('/api/get_all_suppliers')
+    },
+
+    getSuppliersByInput: (data) => {
+        console.log(`[Get Suppliers by Input: ${data.searchString}]`)
+        return axios.post('/api/get_suppliers_by_input', data)
+    },
+
+    //Get product suppliers
+    getProductSuppliers: (data) => {
+        console.log('[Get Product Suppliers]')
+        return axios.post('/api/get_product_suppliers', data)
+    },
+
     //Update inventory record
     updateInventory: (data) => {
         console.log("[Update Inventory Record]")
         return axios.post('/api/update_inventory', data)
     },
 
+    //Update product record
     updateProduct: data => {
         console.log("[Update Product Record]")
         return axios.post('/api/update_product', data)  
@@ -85,18 +102,23 @@ export default {
         return axios.get("/api/download_csv/"+csvName)
     },
 
+    //Filter out current customers from yelp search results
     filterSearchResults: (data) => {
         console.log("[Filter Search Results]")
         return axios.post("/api/filter_restaurant_search", data)
     },
 
+    //Search inventory by input
     searchInventoryByInput: (input) => {
         console.log("[Filter Search Results]")
         return axios.post("/api/search_inventory_by_input", input)
     },
 
+    //Submit order
     submitOrder: (orderData) => {
         console.log('[Submit Order]')
         return axios.post('/api/submit_order', orderData)
     }
 }
+
+export default Api

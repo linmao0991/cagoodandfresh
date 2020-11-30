@@ -1,4 +1,3 @@
-// Requiring our models and passport as we've configured it
 require('dotenv').config();
 var path = require("path")
 var db = require("../../models");
@@ -10,12 +9,12 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
 
-var bcrypt = require("bcryptjs");
-const e = require('express');
-const cli = require('cli');
-const { sequelize } = require('../../models');
-const { error } = require('cli');
-const saltRounds = 10;
+// var bcrypt = require("bcryptjs");
+// const e = require('express');
+// const cli = require('cli');
+// const { sequelize } = require('../../models');
+// const { error } = require('cli');
+// const saltRounds = 10;
 
 
 //Function to check user permission level agianst required level for function.
@@ -448,21 +447,21 @@ router.get("/user_data", (req, res) => {
                 products.weight,
                 products.description,
                 IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM products
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(quantity) AS total_quantity
-          FROM inventory_transaction
-          GROUP BY product_code
-        ) transaction ON transaction.product_code = products.id
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(invoice_quantity) as total_quantity
-          FROM inventory
-          GROUP BY product_code
-        ) inventory ON inventory.product_code = products.id
-        GROUP BY products.id
-        ORDER BY holding DESC;`,{type: db.sequelize.QueryTypes.SELECT}
+            FROM products
+            LEFT JOIN (
+              SELECT product_code,
+                SUM(quantity) AS total_quantity
+              FROM inventory_transaction
+              GROUP BY product_code
+            ) transaction ON transaction.product_code = products.id
+            LEFT JOIN (
+              SELECT product_code,
+                SUM(invoice_quantity) as total_quantity
+              FROM inventory
+              GROUP BY product_code
+            ) inventory ON inventory.product_code = products.id
+            GROUP BY products.id
+            ORDER BY category DESC;`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( data => {
         res.json(data)
       }).catch( err => {
@@ -584,11 +583,87 @@ router.get("/user_data", (req, res) => {
     }
   })
 
-  router.post('/get_product_suppliers', (req, res) => {
-    let permission_req = 1
+  //Get All suppliers
+  router.get('/get_all_suppliers', (req, res) => {
+    let permission_req = 2
+    if(checkPermission(req.user, permission_req)){
+      db.suppliers.findAll({
+      }).then( result => {
+        res.json(result)
+      })
+    }else{
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
+    }
+  })
+
+  //Get suppliers by search string input
+  router.post('/get_suppliers_by_input', (req, res) => {
+    let permission_req = 2
 
     if(checkPermission(req.user, permission_req)){
+      let stringArray = req.body.searchString.split(/,| /)
+      let searchArray = [];
+      stringArray.map(string => {
+        ['name_english','name_chinese','products','id'].forEach(field => {
+          if(field === 'id'){
+            searchArray.push({
+              [field]: string
+            })
+          }else{
+          searchArray.push({
+            [field]:{
+              [Op.substring]: string
+            }
+          })
+          }
+        })
+      })
+      console.log(searchArray)
 
+      db.suppliers.findAll({
+        where: {
+          [Op.or]: searchArray
+        }
+      }).then( result => {
+        res.json(result)
+      })
+    }else{
+      console.log("User Unauthorized")
+      console.log("User: "+req.user.id)
+      res.status(401).json({ error: "User Unauthorized"});
+    }
+  })
+
+  //Get product suppliers
+  router.post('/get_product_suppliers', (req, res) => {
+    let permission_req = 1
+    if(checkPermission(req.user, permission_req)){
+      let searchArray = []
+      req.body.supplier_ids.forEach(element => {
+        if(element != null){
+          let x = {id: element}
+          searchArray.push(x)
+        }
+      });
+
+      db.suppliers.findAll({
+        where: {
+          [Op.or]:searchArray
+        }
+      }).then(result => {
+        let suppliers = result
+        if(result.length < 3){
+          let x = (3 - result.length)
+          for( let i = 0; i < x; i++){
+            suppliers.push(null)
+          }
+        }
+        res.json(suppliers)
+      }).catch(err => {
+        res.json(err)
+      })
     }else{
       console.log("User Unauthorized")
       console.log("User: "+req.user.id)
