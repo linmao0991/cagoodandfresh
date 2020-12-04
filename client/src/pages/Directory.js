@@ -24,6 +24,7 @@ class Directory extends Component{
         invProductsData: undefined,
         invInventoryData: undefined,
         invProductSuppliers: undefined,
+        invSelectedProduct: undefined,
         cartTotalSales: 0.00,
         paymentInfo: {
             paymentAmount: 0,
@@ -97,6 +98,10 @@ class Directory extends Component{
         this.setState({invProductSuppliers: data})
     }
 
+    invContextSelectedProductStore = data => {
+        this.setState({invSelectedProduct: data})
+    }
+
     directoryDisplay = () =>{
         switch (this.context.currentDir) {
             case "Accounts Payable":
@@ -119,6 +124,7 @@ class Directory extends Component{
                             storeProducts: this.invContextProductStore,
                             storeInventory: this.invContextInventoryStore,
                             storeProductSuppliers: this.invContextProductSupplierStore,
+                            storeSelectedProduct: this.invContextSelectedProductStore,
                         }}
                     >
                         <Inventory/>

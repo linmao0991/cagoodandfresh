@@ -138,7 +138,7 @@ function PopOverComponent (props){
         backgroundColor: "#404040",
         color: "white",
         boarderStyle: 'solid',
-        borderColor: 'gray'
+        borderColor: 'gray',
     }
 
     const inventoryContext = useContext(InventoryContext)

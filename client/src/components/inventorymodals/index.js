@@ -80,7 +80,6 @@ export function ViewProductModal (props) {
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState({modalType: undefined, modalSize: 'xl',  modalStyle: null})
     const [selectedInventory, setInventory] = useState(null)
-    console.log(inventoryContext.productSuppliers)
     let productDetails = inventoryContext.products[props.index]
 
     const collapseStyle = {
@@ -98,7 +97,6 @@ export function ViewProductModal (props) {
     }
 
     const editSupplier = (modalType, modalSize, supplierIndex, supplier, index) => {
-        console.log([modalType, modalSize, supplierIndex, supplier, index])
         setModalData(undefined)
         setModalData({
             modalStyle: {borderStyle: 'solid', borderColor: 'white'},
@@ -109,11 +107,10 @@ export function ViewProductModal (props) {
                 supplierTier: supplierIndex,
                 //index of product in products array located at InventoryContext
                 //--Needed for updating context
-                index: index,
+                productIndex: index,
                 supplierData: supplier
             }
         })
-        console.log(modalData)
         setShowModal(true)
 
     }
@@ -132,7 +129,6 @@ export function ViewProductModal (props) {
     }
 
     const handleProductFunctions = () => {
-        console.log(modalData)
         switch (modalData.modalType){
             case 'view-transactions':
                 return(
@@ -146,8 +142,9 @@ export function ViewProductModal (props) {
                 return(
                     <EditProductSupplier
                         modalStyle = {modalData.modalStyle}
-                        supplier_tier = {modalData.data.supplierTier}
+                        supplierIndex = {modalData.data.supplierTier}
                         product = {productDetails}
+                        productIndex = {props.index}
                         supplierData = {modalData.data.supplierData}
                         index = {modalData.data.index}
                         closeModal = {closeModal}
@@ -284,15 +281,16 @@ export function ViewProductModal (props) {
                                     </div>
                                 </ListGroup.Item>
                                 {inventoryContext.productSuppliers.map( (supplier, supplierIndex) => {
+                                    let label=['Primary Supplier','Secondary Supplier','Tertiary Supplier'];
                                     return(
-                                        <ListGroup.Item key={supplierIndex}>
+                                        <ListGroup.Item key={supplierIndex} className={label[supplierIndex].replace(/\s/g, '-')}>
                                             <div style={{margin: '2px'}}>
                                                 <Badge 
                                                     variant='warning'
                                                     size='sm' as='button' 
                                                     onClick={() => editSupplier('edit-supplier','xl',supplierIndex,supplier, props.index)}
                                                 >Edit<b>+</b>
-                                                </Badge>&nbsp;<b>Supplier 1:</b><span style={{float: 'right'}}>{supplier? supplier.name_english: 'None'}</span>
+                                                </Badge>&nbsp;<b>{label[supplierIndex]}:</b><span style={{float: 'right'}}>{supplier? supplier.name_english: 'None'}</span>
                                             </div>
                                         </ListGroup.Item>
                                     )

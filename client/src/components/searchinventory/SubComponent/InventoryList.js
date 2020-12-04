@@ -100,6 +100,7 @@ function InventoryList (props){
             Api.getProductSuppliers({
                 supplier_ids: [product.supplier_primary_id,product.supplier_secondary_id,product.supplier_tertiary_id]
             }).then( result => {
+                inventoryContext.storeSelectedProduct(product)
                 inventoryContext.storeProductSuppliers(result.data)
                 setDisplayType(modal)
             }).catch( err => {

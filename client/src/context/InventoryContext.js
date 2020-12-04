@@ -6,9 +6,11 @@ const inventoryContext = React.createContext({
     products: undefined,
     inventory: undefined,
     productSuppliers: undefined,
+    selectedProduct: undefined,
     storeProducts: () => {},
     storeInventory: () => {},
-    storeProductSuppliers: () => {}
+    storeProductSuppliers: () => {},
+    storeSelectedProduct: () => {}
 })
 
 export default inventoryContext

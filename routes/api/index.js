@@ -221,7 +221,6 @@ router.get("/logout", function (req, res) {
   res.json({ message: "Logging out" });
 });
 
-
 //Create employee
 router.post("/create_employee", (req, res) => {
     console.log("===================================")
@@ -639,20 +638,27 @@ router.get("/user_data", (req, res) => {
   //Get product suppliers
   router.post('/get_product_suppliers', (req, res) => {
     let permission_req = 1
-    if(checkPermission(req.user, permission_req)){
-      let searchArray = []
-      req.body.supplier_ids.forEach(element => {
-        if(element != null){
-          let x = {id: element}
-          searchArray.push(x)
-        }
-      });
 
-      db.suppliers.findAll({
-        where: {
-          [Op.or]:searchArray
-        }
-      }).then(result => {
+    const supplierSearch = (supplierId) => {
+      return new Promise((resolve, reject) => {
+        db.suppliers.findOne({
+          where:{
+            id: supplierId
+          }
+        }).then( response => {
+          resolve(response)
+        }).catch(err => {
+          reject(err)
+        })
+      })
+    }
+
+    if(checkPermission(req.user, permission_req)){
+      let searchArray = req.body.supplier_ids.map( supplierId => {
+        return supplierSearch(supplierId)
+      })
+
+      Promise.all(searchArray).then(result => {
         let suppliers = result
         if(result.length < 3){
           let x = (3 - result.length)
@@ -661,7 +667,8 @@ router.get("/user_data", (req, res) => {
           }
         }
         res.json(suppliers)
-      }).catch(err => {
+      }).catch( err => {
+        console.log(err)
         res.json(err)
       })
     }else{
