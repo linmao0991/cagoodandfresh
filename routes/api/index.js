@@ -5,7 +5,6 @@ var passport = require("../../config/passport");
 var router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
 
@@ -31,7 +30,7 @@ router.post("/new_customer_search_yelp", (req, res) => {
   console.log("===================================")
   console.log("[Search for Restaurants]")
   console.log("===================================")
-  let permission_req = 1;
+  const permission_req = 1;
   if(checkPermission(req.user, permission_req)){
     //Declare our restaurants result array
     let restaurants = []
@@ -226,7 +225,7 @@ router.post("/create_employee", (req, res) => {
     console.log("===================================")
     console.log("[Create Employee]")
     console.log("===================================")
-    let permission_req = 3;
+    const permission_req = 3;
     if (checkPermission(req.user, permission_req)) {
       db.employees.create({
         email: req.body.email,
@@ -277,314 +276,331 @@ router.get("/user_data", (req, res) => {
     }
   });
 
-  //Find customer 
-  router.post("/find_customer", (req, res) => {
-    let permission_req = 1;
-    //Check for user permission level
-    if (checkPermission(req.user, permission_req)) {
-      let searchArray =[];
-      //Convert search parameters object to array
-      for (const property in req.body){
-        //Checks search input for null or empty string and skips if null or empty
-        if(req.body[property] !== "" && req.body[property] !== undefined){
-          //Add current search parameter object to array
-          searchArray.push({
-            [property]: {
-              [Op.or]: {
-                //Find data that starts with search property input
-                [Op.startsWith]: req.body[property],
-                //Find data that contains search property input
-                [Op.like]: "%"+req.body[property]+"%"}
-              }
-            })
-          }
+//Find customer 
+router.post("/find_customer", (req, res) => {
+  const permission_req = 1;
+  //Check for user permission level
+  if (checkPermission(req.user, permission_req)) {
+    let searchArray =[];
+    //Convert search parameters object to array
+    for (const property in req.body){
+      //Checks search input for null or empty string and skips if null or empty
+      if(req.body[property] !== "" && req.body[property] !== undefined){
+        //Add current search parameter object to array
+        searchArray.push({
+          [property]: {
+            [Op.or]: {
+              //Find data that starts with search property input
+              [Op.startsWith]: req.body[property],
+              //Find data that contains search property input
+              [Op.like]: "%"+req.body[property]+"%"}
+            }
+          })
         }
+      }
 
-      //Search database with searchArray
-      db.customers.findAll({
+    //Search database with searchArray
+    db.customers.findAll({
+      where: {
+        [Op.and]: searchArray
+      }
+    }).then( (dbCustomer) => {
+      res.json(dbCustomer)
+    }).catch((err) => {
+      console.log(err)
+      res.status(404).json({ error: err.errors[0].message });
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+});
+
+//Get Product Categories
+router.get("/get_product_categories", (req, res) =>{
+  const permission_req = 1;
+  //Check Permission Level
+  if (checkPermission(req.user, permission_req)){
+    //Find category
+    db.products.findAll({
+      group: ["category"]
+    }).then(data => {
+      let categories = [];
+      //Create array with only a list of categories
+      for (const index in data){
+        categories.push(data[index].dataValues.category)
+      }
+      res.json(categories)
+    }).catch((err) => {
+      console.log(err.errors[0].message)
+      res.status(404).json({ error: err.errors[0].message });
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+});
+
+//Update Inventory record
+router.post("/update_inventory", (req, res) => {
+  const permission_req = 2;
+
+  //Update inventory data sent from client contains field name and field value.
+  //--This reduces the amount of code, instead of a switch, if, or multiple APIs for updating inventory fields  
+  if(checkPermission(req.user, permission_req)){
+    db.inventory.update(
+      //updates structure is [fieldName]: fieldValue
+      req.body.updates,
+      {
         where: {
-          [Op.and]: searchArray
+          id: req.body.id
         }
-      }).then( (dbCustomer) => {
-        res.json(dbCustomer)
-      }).catch((err) => {
-        console.log(err)
-        res.status(404).json({ error: err.errors[0].message });
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  });
+      }
+    ).then( result => {
+      res.json(result)
+    }).catch(err => {
+      console.log(err)
+      res.status(404).json({ error: err});
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
 
-  //Get Product Categories
-  router.get("/get_product_categories", (req, res) =>{
-    let permission_req = 1;
-    //Check Permission Level
-    if (checkPermission(req.user, permission_req)){
-      //Find category
-      db.products.findAll({
-        group: ["category"]
-      }).then(data => {
-        let categories = [];
-        //Create array with only a list of categories
-        for (const index in data){
-          categories.push(data[index].dataValues.category)
+//Update product
+router.post('/update_product', (req, res) => {
+  const permission_req = 2;
+
+  //Update product information sent from client contains field name and field value.
+  //--This reduces the amount of code, instead of a switch, if, or multiple APIs for updating product information
+  if(checkPermission(req.user, permission_req)){
+    db.products.update(
+      //data from server is in the format [field]: fieldValue
+      req.body.update,
+      {
+        where: {
+          id: req.body.id
         }
-        res.json(categories)
-      }).catch((err) => {
-        console.log(err.errors[0].message)
-        res.status(404).json({ error: err.errors[0].message });
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  });
-
-  //Update Inventory record
-  router.post("/update_inventory", (req, res) => {
-    let permission_req = 2;
-
-    if(checkPermission(req.user, permission_req)){
-      db.inventory.update(
-        req.body.updates,
-        {
-          where: {
-            id: req.body.id
-          }
-        }
+      }
+    ).then( result => {
+      //Raw SQL query that finds all products, left join transactions and inventory, 
+      // --sums up the relevant quantities for both tables then calculates current quantity
+      // --as inventory_count
+      db.sequelize.query(
+        `SELECT	products.id,
+                products.upc,
+                products.location,
+                products.category,
+                products.holding,
+                products.image,
+                products.measurement_system,
+                products.name_chinese,
+                products.name_english,
+                products.supplier_primary_id,
+                products.supplier_secondary_id,
+                products.supplier_tertiary_id,
+                products.weight,
+                products.description,
+                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+        FROM products
+        LEFT JOIN (
+          SELECT product_code,
+                  SUM(quantity) AS total_quantity
+          FROM inventory_transaction
+          GROUP BY product_code
+        ) transaction ON transaction.product_code = products.id
+        LEFT JOIN (
+          SELECT product_code,
+                  SUM(invoice_quantity) as total_quantity
+          FROM inventory
+          GROUP BY product_code
+        ) inventory ON inventory.product_code = products.id
+        WHERE products.id = ${req.body.id}`,{type: db.sequelize.QueryTypes.SELECT}
       ).then( result => {
         res.json(result)
-      }).catch(err => {
-        console.log(err)
-        res.status(404).json({ error: err});
       })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  })
+    }).catch(err => {
+      console.log(err)
+      res.status(404).json({ error: err});
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
 
-  router.post('/update_product', (req, res) => {
-    let permission_req = 2;
+//Get all products
+router.get("/get_all_products", (req, res) => {
+  const permission_req = 1;
 
-    if(checkPermission(req.user, permission_req)){
-      db.products.update(
-        req.body.update,
-        {
-          where: {
-            id: req.body.id
-          }
-        }
-      ).then( result => {
-        db.sequelize.query(
-          `SELECT	products.id,
-                  products.upc,
-                  products.location,
-                  products.category,
-                  products.holding,
-                  products.image,
-                  products.measurement_system,
-                  products.name_chinese,
-                  products.name_english,
-                  products.supplier_primary_id,
-                  products.supplier_secondary_id,
-                  products.supplier_tertiary_id,
-                  products.weight,
-                  products.description,
-                  IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+  // Raw SQL query that finds all products, left join transactions and inventory, 
+  // --sums up the relevant quantities for both tables then calculates current quantity
+  // --as inventory_count
+  if (checkPermission(req.user, permission_req)){
+    db.sequelize.query(
+      `SELECT	products.id,
+              products.upc,
+              products.location,
+              products.category,
+              products.holding,
+              products.image,
+              products.measurement_system,
+              products.name_chinese,
+              products.name_english,
+              products.supplier_primary_id,
+              products.supplier_secondary_id,
+              products.supplier_tertiary_id,
+              products.weight,
+              products.description,
+              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
           FROM products
           LEFT JOIN (
             SELECT product_code,
-                   SUM(quantity) AS total_quantity
+              SUM(quantity) AS total_quantity
             FROM inventory_transaction
             GROUP BY product_code
           ) transaction ON transaction.product_code = products.id
           LEFT JOIN (
             SELECT product_code,
-                   SUM(invoice_quantity) as total_quantity
+              SUM(invoice_quantity) as total_quantity
             FROM inventory
             GROUP BY product_code
           ) inventory ON inventory.product_code = products.id
-          WHERE products.id = ${req.body.id}`,{type: db.sequelize.QueryTypes.SELECT}
-        ).then( result => {
-          res.json(result)
-        })
-      }).catch(err => {
-        console.log(err)
-        res.status(404).json({ error: err});
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  })
+          GROUP BY products.id
+          ORDER BY category DESC;`,{type: db.sequelize.QueryTypes.SELECT}
+    ).then( data => {
+      res.json(data)
+    }).catch( err => {
+      console.log(err)
+      res.status(404).json({ error: err});
+    })
 
-  //Get all products
-  router.get("/get_all_products", (req, res) => {
-    let permission_req = 1;
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
 
-    if (checkPermission(req.user, permission_req)){
-      db.sequelize.query(
-        `SELECT	products.id,
-                products.upc,
-                products.location,
-                products.category,
-                products.holding,
-                products.image,
-                products.measurement_system,
-                products.name_chinese,
-                products.name_english,
-                products.supplier_primary_id,
-                products.supplier_secondary_id,
-                products.supplier_tertiary_id,
-                products.weight,
-                products.description,
-                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-            FROM products
-            LEFT JOIN (
-              SELECT product_code,
+//Get all products by category
+router.post("/get_products_by_category", (req, res) =>{
+  const permission_req = 1;
+  if (checkPermission(req.user, permission_req)){
+
+    //Raw sql query
+    //-Select product table columns
+    //-Sum inventory table at current_quantity columns by product code
+    //-Left join tables
+    //-Where product table column category = category string sent by client
+    //-Group results by product id
+    db.sequelize.query(
+      `SELECT	products.id,
+              products.upc,
+              products.location,
+              products.category,
+              products.holding,
+              products.image,
+              products.measurement_system,
+              products.name_chinese,
+              products.name_english,
+              products.supplier_primary_id,
+              products.supplier_secondary_id,
+              products.supplier_tertiary_id,
+              products.weight,
+              products.description,
+              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+      FROM products
+      LEFT JOIN (
+        SELECT product_code,
                 SUM(quantity) AS total_quantity
-              FROM inventory_transaction
-              GROUP BY product_code
-            ) transaction ON transaction.product_code = products.id
-            LEFT JOIN (
-              SELECT product_code,
+        FROM inventory_transaction
+        GROUP BY product_code
+      ) transaction ON transaction.product_code = products.id
+      LEFT JOIN (
+        SELECT product_code,
                 SUM(invoice_quantity) as total_quantity
-              FROM inventory
-              GROUP BY product_code
-            ) inventory ON inventory.product_code = products.id
-            GROUP BY products.id
-            ORDER BY category DESC;`,{type: db.sequelize.QueryTypes.SELECT}
-      ).then( data => {
-        res.json(data)
-      }).catch( err => {
-        console.log(err)
-        res.status(404).json({ error: err});
-      })
+        FROM inventory
+        GROUP BY product_code
+      ) inventory ON inventory.product_code = products.id
+      WHERE products.${req.body.searchType} = '${req.body.searchData}'
+      GROUP BY products.id
+      ORDER BY holding DESC;`
+      ,{type: db.sequelize.QueryTypes.SELECT}
+    ).then(data => {
+      res.json(data)
+    }).catch((err) => {
+      console.log(err)
+      res.status(404).json({ error: err});
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+});
 
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  })
+//Search inventory by search input
+router.post("/search_inventory_by_input", (req, res) => {
+  const permission_req = 1;
 
-  //Get all products by category
-  router.post("/get_products_by_category", (req, res) =>{
-    let permission_req = 1;
-    if (checkPermission(req.user, permission_req)){
+  // Raw SQL query that finds all products by the search input, left join transactions and inventory, 
+  // --sums up the relevant quantities for both tables then calculates current quantity
+  // --as inventory_count
+  if(checkPermission(req.user, permission_req)){
+    db.sequelize.query(
+      `SELECT	products.id,
+              products.upc,
+              products.location,
+              products.category,
+              products.holding,
+              products.image,
+              products.measurement_system,
+              products.name_chinese,
+              products.name_english,
+              products.supplier_primary_id,
+              products.supplier_secondary_id,
+              products.supplier_tertiary_id,
+              products.weight,
+              products.description,
+              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+      FROM products
+      LEFT JOIN (
+        SELECT product_code,
+                SUM(quantity) AS total_quantity
+        FROM inventory_transaction
+        GROUP BY product_code
+      ) transaction ON transaction.product_code = products.id
+      LEFT JOIN (
+        SELECT product_code,
+                SUM(invoice_quantity) as total_quantity
+        FROM inventory
+        GROUP BY product_code
+      ) inventory ON inventory.product_code = products.id
+      WHERE products.id LIKE '%${req.body.searchInput}&'
+      OR products.name_english LIKE '%${req.body.searchInput}%'
+      OR products.name_chinese LIKE '%${req.body.searchInput}%'
+      GROUP BY products.id;`,{type: db.sequelize.QueryTypes.SELECT}
+    ).then( result => {
+      res.json(result)
+    }).catch( err => {
+      console.log(err)
+      res.status(404).json({ error: err});
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
 
-      //Raw sql query
-      //-Select product table columns
-      //-Sum inventory table at current_quantity columns by product code
-      //-Left join tables
-      //-Where product table column category = category string sent by client
-      //-Group results by product id
-      db.sequelize.query(
-        `SELECT	products.id,
-                products.upc,
-                products.location,
-                products.category,
-                products.holding,
-                products.image,
-                products.measurement_system,
-                products.name_chinese,
-                products.name_english,
-                products.supplier_primary_id,
-                products.supplier_secondary_id,
-                products.supplier_tertiary_id,
-                products.weight,
-                products.description,
-                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM products
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(quantity) AS total_quantity
-          FROM inventory_transaction
-          GROUP BY product_code
-        ) transaction ON transaction.product_code = products.id
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(invoice_quantity) as total_quantity
-          FROM inventory
-          GROUP BY product_code
-        ) inventory ON inventory.product_code = products.id
-        WHERE products.${req.body.searchType} = '${req.body.searchData}'
-        GROUP BY products.id
-        ORDER BY holding DESC;`
-        ,{type: db.sequelize.QueryTypes.SELECT}
-      ).then(data => {
-        res.json(data)
-      }).catch((err) => {
-        console.log(err)
-        res.status(404).json({ error: err});
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  });
-
-  //Search inventory by search input
-  router.post("/search_inventory_by_input", (req, res) => {
-    let permission_req = 1;
-    if(checkPermission(req.user, permission_req)){
-      db.sequelize.query(
-        `SELECT	products.id,
-                products.upc,
-                products.location,
-                products.category,
-                products.holding,
-                products.image,
-                products.measurement_system,
-                products.name_chinese,
-                products.name_english,
-                products.supplier_primary_id,
-                products.supplier_secondary_id,
-                products.supplier_tertiary_id,
-                products.weight,
-                products.description,
-                IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-        FROM products
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(quantity) AS total_quantity
-          FROM inventory_transaction
-          GROUP BY product_code
-        ) transaction ON transaction.product_code = products.id
-        LEFT JOIN (
-          SELECT product_code,
-                 SUM(invoice_quantity) as total_quantity
-          FROM inventory
-          GROUP BY product_code
-        ) inventory ON inventory.product_code = products.id
-        WHERE products.id LIKE '%${req.body.searchInput}&'
-        OR products.name_english LIKE '%${req.body.searchInput}%'
-        OR products.name_chinese LIKE '%${req.body.searchInput}%'
-        GROUP BY products.id;`,{type: db.sequelize.QueryTypes.SELECT}
-      ).then( result => {
-        res.json(result)
-      }).catch( err => {
-        console.log(err)
-        res.status(404).json({ error: err});
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  })
-
-  //Get All suppliers
-  router.get('/get_all_suppliers', (req, res) => {
-    let permission_req = 2
+//Get All suppliers
+router.get('/get_all_suppliers', (req, res) => {
+    const permission_req = 2
     if(checkPermission(req.user, permission_req)){
       db.suppliers.findAll({
       }).then( result => {
@@ -597,48 +613,52 @@ router.get("/user_data", (req, res) => {
     }
   })
 
-  //Get suppliers by search string input
-  router.post('/get_suppliers_by_input', (req, res) => {
-    let permission_req = 2
+//Get suppliers by search string input
+router.post('/get_suppliers_by_input', (req, res) => {
+  const permission_req = 2
 
-    if(checkPermission(req.user, permission_req)){
-      let stringArray = req.body.searchString.split(/,| /)
-      let searchArray = [];
-      stringArray.map(string => {
+  if(checkPermission(req.user, permission_req)){
+    //Takes in the search string converts to array spliting at spaces
+    let stringArray = req.body.searchString.split(/,| /)
+
+    //Map through stringArray and create new array to search every listed field for the array of strings
+    //--The array structure is for sequelize query
+    let searchArray = []
+    stringArray.map(string => {
         ['name_english','name_chinese','products','id'].forEach(field => {
           if(field === 'id'){
             searchArray.push({
               [field]: string
             })
           }else{
-          searchArray.push({
-            [field]:{
-              [Op.substring]: string
-            }
-          })
+            searchArray.push({
+              [field]:{
+                [Op.substring]: string
+              }
+            })
           }
         })
       })
-      console.log(searchArray)
+    //Find all records using our searchArray
+    db.suppliers.findAll({
+      where: {
+        [Op.or]: searchArray
+      }
+    }).then( result => {
+      res.json(result)
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
 
-      db.suppliers.findAll({
-        where: {
-          [Op.or]: searchArray
-        }
-      }).then( result => {
-        res.json(result)
-      })
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
-    }
-  })
+//Get product suppliers
+router.post('/get_product_suppliers', (req, res) => {
+    const permission_req = 1
 
-  //Get product suppliers
-  router.post('/get_product_suppliers', (req, res) => {
-    let permission_req = 1
-
+    //Promse function to get suppliers from DB
     const supplierSearch = (supplierId) => {
       return new Promise((resolve, reject) => {
         db.suppliers.findOne({
@@ -654,13 +674,21 @@ router.get("/user_data", (req, res) => {
     }
 
     if(checkPermission(req.user, permission_req)){
+
+      //Array to store supplierSearch promise function for each supplier ID
+      //--Had to do it this way because sequelize eager loading keeps ordering results by ascending ID
+      //--We need to keep suppliers in order because they are stored in tiers
       let searchArray = req.body.supplier_ids.map( supplierId => {
         return supplierSearch(supplierId)
       })
 
+      //Promise all for the searchArray
       Promise.all(searchArray).then(result => {
         let suppliers = result
+        //Checks for less than 3 suppliers
         if(result.length < 3){
+          //Loop to make sure suppliers array length is 3 because database stores 3 suppliers in tiers
+          //--and user must be able to see if some tiers are empty
           let x = (3 - result.length)
           for( let i = 0; i < x; i++){
             suppliers.push(null)
@@ -678,10 +706,9 @@ router.get("/user_data", (req, res) => {
     }
   })
 
-  //Get inventory by product code (product id)
-  router.post("/get_inventory_by_product_code",(req, res) => {
-    let permission_req = 1
-    //console.log(req.body.productCode)
+//Get inventory by product code (product id)
+router.post("/get_inventory_by_product_code",(req, res) => {
+    const permission_req = 1
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
         where: {
@@ -693,7 +720,6 @@ router.get("/user_data", (req, res) => {
         }
       }).then( results =>{
         let newResults = results.reduce((accumulator, currentValue) => {
-          //console.log(currentValue)
           //Set current quantity to invoice_quantity
           let currentQuantity = currentValue.invoice_quantity
           //-Sum of all the quantities in inventory transactions array in current index if array length is larger than 0
@@ -726,9 +752,9 @@ router.get("/user_data", (req, res) => {
     }
   });
 
-  //Order Submission
-  router.post('/submit_order', (req,res)=>{
-    let permission_req = 1
+//Order Submission
+router.post('/submit_order', (req,res)=>{
+    const permission_req = 1
 
     //Promise to create transaction record in inventory_transaction table
     const inventoryTransaction = (invoiceNumber, data) => {
@@ -781,7 +807,6 @@ router.get("/user_data", (req, res) => {
           employee_id: req.user.id,
           ar_invoice_number: invoice.invoice_number, 
         }).then( dbCollection => {
-          //console.log(dbCollection)
           reslove(dbCollection)
         }).catch(err => {
           reject(err)

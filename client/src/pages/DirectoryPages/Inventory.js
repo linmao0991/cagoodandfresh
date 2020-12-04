@@ -25,9 +25,9 @@ class Inventory extends Component{
             <Container fluid>
                 <Row>
                     <Col>
-                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Search Inventory'})}>Search Inventory</Button>{' '}
-                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Add Product'})}>Add New Product</Button>{' '}
-                        <Button variant='secondary' onClick={()=> this.setState({displayType: 'Add Inventory'})}>Add Inventory</Button>{' '}
+                        <Button variant='info' onClick={()=> this.setState({displayType: 'Search Inventory'})}>Search Inventory</Button>{' '}
+                        <Button variant='info' onClick={()=> this.setState({displayType: 'Add Product'})}>Add New Product</Button>{' '}
+                        <Button variant='info' onClick={()=> this.setState({displayType: 'Add Inventory'})}>Add Inventory</Button>{' '}
                     </Col>
                     <Col>
                     </Col>
