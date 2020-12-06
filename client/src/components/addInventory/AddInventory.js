@@ -75,7 +75,6 @@ const AddInventory = () => {
     }
 
     const modalSwitchFunc = () => {
-        console.log(`Show ${modalData.function}, ${showModal}`)
         switch (modalData.function){
             case 'view-transactions':
                 return(
@@ -153,10 +152,8 @@ const AddInventory = () => {
                     <InventorySearch
                         toggleLoading = {() => setResultDisplay('loading')}
                         toggleLoaded = {() => setResultDisplay('display-result')}
-                    />
-                    {inventoryContext.products? 
-                        searchResultComponentSwitch()
-                    :null}
+                    /> 
+                    {searchResultComponentSwitch()}
                 </Col>
                 <Col>
                     <Row className= 'justify-content-md-center' style={{borderBottom: '1px solid white', paddingBottom: '15px'}}>

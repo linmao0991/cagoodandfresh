@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import {Container} from 'react-bootstrap';
 import Login from "../pages/Login";
 import LoginContext from "../context/LoginContext";
 import DirectoryContext from "../context/DirectoryContext";
@@ -24,8 +25,8 @@ class App extends Component {
     this.setState({
       isLoggedin: false,
       permissionLevel: null,
-      currentDir: 'main',
-      previousDir: 'main'
+      currentDir: '',
+      previousDir: ''
     })
     Api.logOut().then(() => {
 

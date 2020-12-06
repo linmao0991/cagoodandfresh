@@ -140,7 +140,6 @@ class OrderForm extends Component{
             paymentStatus: paymentStatus(),
             transaction_type: "sale"
         }
-        console.log(orderData)
         //Toggles the submit order modal to show a loading animation
         this.messageModalHandler('submit-order')
         //API call to submit order

@@ -48,7 +48,6 @@ function ProductListing (props){
                     return updatedInventory
                 }
             })
-            console.log(initialInventory)
             return initialInventory
         // }else{
         //     //Returns inventory from database unedited

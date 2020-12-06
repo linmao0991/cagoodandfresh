@@ -12,7 +12,6 @@ function CategorySelection (props){
             searchType: 'category',
             searchData: props.category.trim()
         }).then( products => {
-            console.log(products.data)
             orderContext.storeCategorySelection(props.category, products.data,"selection-product")
         }).catch(err => {
             console.log("something went wrong")

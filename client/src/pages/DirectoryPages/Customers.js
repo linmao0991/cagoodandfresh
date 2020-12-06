@@ -45,7 +45,6 @@ class Customers extends Component{
                 location: this.state.location,
                 limit: "50",
         }).then(data => {
-            console.log(data.data);
             this.setState({
                 findRestaurantResults: data.data,
                 display: "SearchYelp",
@@ -100,9 +99,7 @@ class Customers extends Component{
                     btnFilterResults: false,
                     exportingPending: false
                 })
-                console.log(file)
                 //window.location.href = (file)
-                console.log(this.state.exportName+'.csv')
                 download(file.data, this.state.exportName+'.csv')
             })
             //Figure a way to download the csv file sent from the server

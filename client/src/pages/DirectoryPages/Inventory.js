@@ -41,9 +41,6 @@ const Inventory = ()=>{
                     <Button variant={displayType === 'Add-Inventory'?'warning':'info'} onClick={()=> selectInventoryFunc('Add-Inventory')}>Add Inventory</Button>&nbsp;
                     <Button variant={displayType === 'Add-Product'?'warning':'info'} onClick={()=> selectInventoryFunc('Add-Product')}>Add New Product</Button>&nbsp;
                 </Col>
-                <Col>
-                </Col>
-                <Col></Col>
             </Row>
             <br />
             <Row>

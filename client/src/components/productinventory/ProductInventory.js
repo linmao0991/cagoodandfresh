@@ -152,7 +152,6 @@ function PopOverComponent(props) {
     const handleSetNewValue = event => {
         event.preventDefault()
         setNewValue(event.target.value)
-        console.log(event.target.value)
     }
 
     const submitNewValue = () => {

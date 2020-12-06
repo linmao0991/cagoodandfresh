@@ -33,7 +33,6 @@ class SearchProduct extends Component {
                 })
             })
         }
-        console.log(this.state.searchInput)
     }
 
     render() {

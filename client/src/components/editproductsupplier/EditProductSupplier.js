@@ -27,14 +27,12 @@ const EditProductSupplier = (props) =>{
     const [supplierLoading, setSupplierLoading] = useState(false)
     const [updating, setUpdating] = useState(false)
     let supplier = inventoryContext.productSuppliers[props.supplierIndex]
-    console.log(props.supplierIndex)
 
     const searchSupplierByInput = () => {
         setSupplierLoading(true)
         API.getSuppliersByInput({
             searchString: searchInputRef.current.value.trim()
         }).then( result => {
-            console.log(result.data)
             setContentData(result.data)
             setSupplierLoading(false)
         }).catch(err => {
@@ -45,7 +43,6 @@ const EditProductSupplier = (props) =>{
     const searchAllSuppliers = () => {
         setSupplierLoading(true)
         API.getAllSuppliers().then( result => {
-            console.log(result)
             setContentData(result.data)
             setSupplierLoading(false)
         }).catch(err => {
@@ -56,7 +53,6 @@ const EditProductSupplier = (props) =>{
     const updateProductField = (fieldValue) => {
         setUpdating(true)
         setContentType('updating-supplier')
-        console.log(`[Submit ${supplierFieldName[props.supplierIndex]}]: ${fieldValue}`)
         API.updateProduct({
             id: props.product.id,
             update: {[supplierFieldName[props.supplierIndex]]: fieldValue}

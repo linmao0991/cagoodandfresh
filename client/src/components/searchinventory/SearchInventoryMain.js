@@ -30,7 +30,6 @@ function SearchInventory (props){
         setSearchTitle('All Products')
         Api.getAllProducts({
         }).then( products => {
-            console.log(products)
             inventoryContext.storeProducts(products.data)
             setShowDisplay(true)
         }).catch(err => {
@@ -92,9 +91,8 @@ function SearchInventory (props){
                     <h4>{searchTitle? searchTitle: null}</h4>
                 </Col>
             </Row>
-            <br/>
             <Row className="justify-content-md-center">
-                {showDisplay && inventoryContext.products?
+                {showDisplay?
                     InventoryDisplaySwitch()
                     :
                     null

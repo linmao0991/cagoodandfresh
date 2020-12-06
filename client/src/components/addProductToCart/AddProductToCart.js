@@ -23,7 +23,6 @@ function AddProductToCart (props) {
     //Function to add selected product into the cart then stores updated cart to OrderContext
     const addProductToCart = (event) => {
         event.preventDefault()
-        console.log(count)
         //Create new object with combined product data and inventory data
         let newCartItems = 
             count.map(item => {
@@ -93,8 +92,6 @@ function AddProductToCart (props) {
         event.preventDefault()
         let newState = [...count]
         newState[index].quantity = Number(event.target.value)
-        console.log(newState[index].quantity)
-        console.log(typeof newState[index].quantity)
         calculateTotals(newState)
         setCount(newState)
     }

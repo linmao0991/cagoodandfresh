@@ -23,9 +23,7 @@ const EditProductDetail = (props) =>{
         }else{
             fieldValue = inputValue
         }
-        console.log('update')
         setLoading(true)
-        console.log('[Submit Input]: '+fieldValue)
         Api.updateProduct({
             id: props.id,
             update: {[props.field]: fieldValue}

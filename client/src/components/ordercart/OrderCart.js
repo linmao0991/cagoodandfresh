@@ -16,7 +16,6 @@ function OrderCart (props) {
             paymentInfo.paymentAmount = 0
             paymentInfo.checkNumber = null
         }
-        console.log(paymentInfo)
         orderContext.storePaymentInfo(paymentInfo)
     }
 

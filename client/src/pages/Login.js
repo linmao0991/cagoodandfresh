@@ -43,7 +43,6 @@ function Login(){
             loginContext.login(response);
           }).catch( err => {
             console.log("[Login Failed]")
-            console.log(err);
             console.log(err.response.data)
             if(err.response.data === 'Unauthorized'){
                 setloginFailed('Email or Password is incorrect')

@@ -163,9 +163,8 @@ class Directory extends Component{
     render(){
         return(
             <Container fluid>
-                <br />
                 <Row>
-                    <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold'}}>
+                    <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold', padding: '0 0 0 0'}}>
                     <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
                         <Navbar.Brand href='' style={{width: '25%'}}>{this.context.currentDir}</Navbar.Brand>
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
