@@ -2,7 +2,7 @@ import React, {useContext, useState} from "react";
 import {Modal, Container, Row, Col, Button, Table, InputGroup, FormControl} from "react-bootstrap";
 import OrderContext from "../../context/OrderContext";
 
-function AddProductModal (props) {
+function AddProductToCart (props) {
     const orderContext = useContext(OrderContext);
 
     //Function to set the intial count of the inventory with default values and inventory data from conetext
@@ -237,4 +237,4 @@ function AddProductModal (props) {
 
 }
 
-export default AddProductModal;
+export default AddProductToCart;

@@ -1,6 +1,5 @@
 import React from 'react'
 import {Table, Badge, Spinner, OverlayTrigger, Col, Button, Row, Popover, Container} from 'react-bootstrap'
-import './supplierlist.css'
 
 const SupplierList = (props) => {
     const listingStyle = {

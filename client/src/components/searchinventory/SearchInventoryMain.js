@@ -1,12 +1,12 @@
-import React, {useContext, useState, useRef}from 'react';
-import {Button, Container, Row, Col, InputGroup, FormControl, DropdownButton, Dropdown, Spinner} from "react-bootstrap";
+import React, {useContext, useState}from 'react';
+import {Button, Container, Row, Col, DropdownButton, Dropdown, Spinner} from "react-bootstrap";
 import InventoryContext from '../../context/InventoryContext';
 import Api from '../../utils/Api'
 import InventoryList from './subcomponent/InventoryList';
+import InventorySearch from '../inventorySearch/InventorySearch';
 
-function SearchInventory (){
+function SearchInventory (props){
     const inventoryContext = useContext(InventoryContext)
-    const searchInputRef = useRef(null)
     const [searchTitle, setSearchTitle] = useState(undefined)
     const [showDisplay, setShowDisplay] = useState(false)
 
@@ -22,18 +22,6 @@ function SearchInventory (){
             setShowDisplay(true)
         }).catch(err => {
             console.log("something went wrong")
-        })
-    }
-
-    const searchProductByInput = () => {
-        setShowDisplay('loading')
-        setSearchTitle(searchInputRef.current.value.trim())
-        //This API should be changed to searchProductByInput
-        Api.searchInventoryByInput({
-            searchInput: searchInputRef.current.value.trim()
-        }).then(products => {
-            inventoryContext.storeProducts(products.data)
-            setShowDisplay(true)
         })
     }
 
@@ -77,19 +65,15 @@ function SearchInventory (){
         <Container fluid>
             <Row>
                 <Col>
-                    <InputGroup className="mb-3">
-                        <FormControl
-                            placeholder="Product Name or ID"
-                            ref={searchInputRef}
-                        />
-                        <InputGroup.Append>
-                        <Button variant="info" onClick={searchProductByInput}>Search</Button>
-                        </InputGroup.Append>
-                    </InputGroup>
+                    <InventorySearch
+                        toggleLoading = {() => setShowDisplay('loading')}
+                        toggleLoaded = {() => setShowDisplay(true)}
+                        returnInput = {setSearchTitle}
+                    />
                 </Col>
                 <Col>
-                    <Button style={{display: 'inline-block'}} variant='secondary' onClick={() => getAllProducts()}>All Products</Button>{' '}
-                    <DropdownButton style={{display: 'inline-block'}} variant='secondary' id="dropdown-item-button" title="Category">
+                    <Button style={{display: 'inline-block'}} variant='warning' onClick={() => getAllProducts()}>All Products</Button>&nbsp;
+                    <DropdownButton style={{display: 'inline-block'}} variant='warning' id="dropdown-item-button" title="Category">
                         {inventoryContext.categories.map((category, index) => {
                             return(
                                 <Dropdown.Item 
@@ -100,9 +84,7 @@ function SearchInventory (){
                                 </Dropdown.Item>
                             )
                         })}
-                    </DropdownButton>{' '}
-                </Col>
-                <Col>
+                    </DropdownButton>
                 </Col>
             </Row>
             <Row>
@@ -112,7 +94,7 @@ function SearchInventory (){
             </Row>
             <br/>
             <Row className="justify-content-md-center">
-                {showDisplay?
+                {showDisplay && inventoryContext.products?
                     InventoryDisplaySwitch()
                     :
                     null

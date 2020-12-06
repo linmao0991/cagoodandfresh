@@ -1,7 +1,7 @@
 import React, {useState, useContext} from "react";
 import {Table, Button} from "react-bootstrap";
 import Api from "../../utils/Api";
-import AddProductModal from "../addproductmodal/AddProductModal";
+import AddProductModal from "../addProductToCart/AddProductToCart";
 import OrderContext from '../../context/OrderContext';
 
 function ProductListing (props){

@@ -47,7 +47,7 @@ export function ViewInventoryModal(props){
                 <Container fluid>
                     <ProductInventory 
                         product = {props.product}
-                        productInventory = {props.productInventory}
+                        //productInventory = {props.productInventory}
                         switchModalFunction = {switchModalFunction}
                         tableHeight = '500px'
                     />

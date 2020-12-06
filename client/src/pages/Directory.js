@@ -121,6 +121,7 @@ class Directory extends Component{
                             products: this.state.invProductsData,
                             inventory: this.state.invInventoryData,
                             productSuppliers: this.state.invProductSuppliers,
+                            selectedProduct: this.state.invSelectedProduct,
                             storeProducts: this.invContextProductStore,
                             storeInventory: this.invContextInventoryStore,
                             storeProductSuppliers: this.invContextProductSupplierStore,
@@ -183,14 +184,14 @@ class Directory extends Component{
                                     {login.permissionLevel >=2?
                                         <>
                                         <Nav.Link onClick={() => this.context.switchDir("Inventory")}>Inventory</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("Accounts Receivable")}>Accounts Receivable</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("Accounts Payable")}>Accounts Payable</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Accounts Receivable")}>Accounts Receivable</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Accounts Payable")}>Accounts Payable</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
                                     <>
-                                        <Nav.Link onClick={() => this.context.switchDir("Admin Tools")}>Admin Tools</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Admin Tools")}>Admin Tools</Nav.Link>{" "}
                                     </>
                                     :
                                     null}
