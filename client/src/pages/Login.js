@@ -7,8 +7,11 @@ function Login(){
     const collapseStyle = {
         width: '100%',
         maxHeight: '0px', 
-        overflow: 'hidden', 
-        transition: 'max-height 0.4s ease-out'
+        overflow: 'hidden',
+        opacity: '0',
+        //transition: 'max-height 0.4s ease-out', 
+        transitionProperty: 'max-height, opacity',
+        transitionDuration: '1s'
     }
 
     const loginContext = useContext(LoginContext);
@@ -23,6 +26,7 @@ function Login(){
         //     elem.style.maxHeight = '0px'
         // }else{
             elem.style.maxHeight = elem.scrollHeight+'px'
+            elem.style.opacity = '1'
         
     }
 

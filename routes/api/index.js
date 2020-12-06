@@ -198,10 +198,24 @@ router.get("/download_csv/:id", (req,res)=>{
   res.download(filePath)
 })
 
-//Log in
-router.post("/login", passport.authenticate("local"), (req, res) => {
+// //Log in
+// router.post("/login", passport.authenticate("local"), (req, res) => {
+//     console.log("===================================")
+//     console.log("[User Log In]")
+//     console.log("===================================")
+//     console.log(err)
+//     res.json({
+//       id: req.user.id,
+//       first_name: req.user.first_name,
+//       last_name: req.user.last_name,
+//       permission_level: req.user.permission_level,
+//     });
+//   });
+
+//Log in 2.0
+router.post("/login", passport.authenticate("local"),(req, res) => {
     console.log("===================================")
-    console.log("[User Log In]")
+    console.log("[Authentication Successful]")
     console.log("===================================")
     res.json({
       id: req.user.id,
@@ -209,7 +223,7 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
       last_name: req.user.last_name,
       permission_level: req.user.permission_level,
     });
-  });
+});
 
 //Log Out
 router.get("/logout", function (req, res) {
@@ -258,7 +272,7 @@ router.get("/user_data", (req, res) => {
     if (!req.user) {
       // The user is not logged in, send back an empty object
       //res.json({ response: "User Not Logged In" });
-      res.status(401).send("Not Logged In")
+      res.status(401).send("Please Log In")
     } else {
       // Otherwise perform API call to find users updated information then send information back to client
       db.employees.findOne({
