@@ -1,0 +1,10 @@
+
+.invoice-detail-column{
+    padding-left: 30px;
+    /* max-width: 376px; */
+}
+
+.invoice-detail-column .input-group-prepend span{
+    width: 140px;
+    font-weight: bold;
+}

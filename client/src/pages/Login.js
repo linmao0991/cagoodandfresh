@@ -18,7 +18,7 @@ function Login(){
     const [email, emailNameInput] = useState('');
     const [password, passwordInput] = useState('');
     const [loggingIn, setLoggingIn] = useState(false)
-    const [loginFailed, setloginFailed] = useState(false)
+    const [loginFailed, setloginFailed] = useState({type: null, mess: null})
 
     const handleCollapse = elId => {
         let elem = document.getElementById(elId)
@@ -26,33 +26,84 @@ function Login(){
         //     elem.style.maxHeight = '0px'
         // }else{
             elem.style.maxHeight = elem.scrollHeight+'px'
-            elem.style.opacity = '1'
-        
+            elem.style.opacity = '1'       
     }
 
-    const logUserIn = event => {
-        event.preventDefault();
-        //API Call to log in using userName & password
+    const checkInputs = () => {
+        let inputValues = ["password","email"]
+        let checkInputValues = [];
+        inputValues.forEach(inputValue => {
+            if(document.getElementById(inputValue).value === undefined
+            || document.getElementById(inputValue).value === null
+            || document.getElementById(inputValue).value === ''){
+                document.getElementById(inputValue).style.borderColor = 'red';
+                document.getElementById(inputValue).style.borderStyle = 'solid';
+                document.getElementById(inputValue).style.borderWidth = '2px';
+                checkInputValues.push(false)
+            }else{
+                document.getElementById(inputValue).style.removeProperty('border-color')
+                document.getElementById(inputValue).style.removeProperty('border-style')
+                document.getElementById(inputValue).style.removeProperty('border-width')
+            }
+        })
+        return checkInputValues.every(value => {return value? true: false})
+    }
+
+    const signUp = () => {
         setLoggingIn(true)
-        Api.logIn({
-            email: email,
-            password: password
-          }).then(response => {
-            emailNameInput(null)
-            passwordInput(null)
-            loginContext.login(response);
-          }).catch( err => {
-            console.log("[Login Failed]")
-            console.log(err.response.data)
-            if(err.response.data === 'Unauthorized'){
-                setloginFailed('Email or Password is incorrect')
-            }
-            if(err.response.data === 'Bad Request'){
-                setloginFailed('Email or Password fields are empty')
-            }
+        console.log(checkInputs())
+        if(checkInputs()){
+            Api.createrUser({
+                email: email,
+                password: password
+            }).then( response => {
+                emailNameInput(null)
+                passwordInput(null)
+                loginContext.login(response);
+            }).catch( err => {
+                console.log(err.response.data.error)
+                console.log("[Sign Up Failed]")
+                setloginFailed({type: 'Sign Up Failed', mess: err.response.data.error})
+                handleCollapse('failed-login')
+                setLoggingIn(false)
+            })
+        }else{
+            console.log("[Sign Up Failed]")
+            setloginFailed({type:'Sign Up Failed', mess: 'Email or Password empty'})
             handleCollapse('failed-login')
-            setLoggingIn(false)
-          })
+            setLoggingIn(false) 
+        }
+    }
+
+    const logUserIn = () => {
+        setLoggingIn(true)
+        console.log(checkInputs())
+        if(checkInputs()){
+            Api.logIn({
+                email: email,
+                password: password
+            }).then(response => {
+                emailNameInput(null)
+                passwordInput(null)
+                loginContext.login(response);
+            }).catch( err => {
+                console.log("[Login Failed]")
+                console.log(err.response.data)
+                if(err.response.data === 'Unauthorized'){
+                    setloginFailed({type: 'Login Failed', mess: 'Email or Password is incorrect'})
+                }
+                if(err.response.data === 'Bad Request'){
+                    setloginFailed({type: 'Login Failed', mess:'Email or Password fields are empty'})
+                }
+                handleCollapse('failed-login')
+                setLoggingIn(false)
+            })
+        }else{
+            console.log("[Login Failed]")
+            setloginFailed({type: 'Login Failed', mess:'Email or Password fields are empty'})
+            handleCollapse('failed-login')
+            setLoggingIn(false) 
+        }
     };
 
     return(
@@ -63,22 +114,21 @@ function Login(){
                 </Col>
             </Row>
             <Row className='justify-content-md-center'>
-                <Col md={5}>
-                    <div 
-                        style={{
-                            backgroundColor: '#2c2c2c',
-                            borderRadius: '15px',
-                            padding: '30px',
-                        }}
-                    >
+                <Col md={5} 
+                    style={{
+                    backgroundColor: '#2c2c2c',
+                    borderRadius: '15px',
+                    padding: '30px',
+                    }}>
                         <div id={'failed-login'} style={collapseStyle}>
                             <Alert key={'failed-login'} variant='danger'>
-                                <p style={{margin: '0px', textAlign: 'center'}}>Login Failed!</p>
-                                <p style={{margin: '0px', textAlign: 'center'}}>{loginFailed}</p>
+                                <p style={{margin: '0px', textAlign: 'center'}}>{loginFailed.type}</p>
+                                <p style={{margin: '0px', textAlign: 'center'}}>Error: {loginFailed.mess}</p>
                             </Alert>
                         </div>
                         <label>Email</label>
                         <input
+                            id = 'email'
                             disabled = {loggingIn?true:false}
                             style={loggingIn?{backgroundColor: 'grey', borderColor: 'grey'}:null}
                             value = {email}
@@ -90,6 +140,7 @@ function Login(){
                         <br />
                         <label>Password</label>
                         <input
+                            id='password'
                             disabled = {loggingIn?true:false}
                             style={loggingIn?{backgroundColor: 'grey', borderColor: 'grey'}:null}
                             value = {password}
@@ -99,25 +150,41 @@ function Login(){
                             className="form-control validate"
                         />
                         <br />
-                        <Button
-                            disabled = {loggingIn?true:false}
-                            variant= {loggingIn?'secondary':'info'} 
-                            onClick= {event => logUserIn(event)}
-                            style={{width: '33%'}}
-                        >
-                            {loggingIn?
-                            <Spinner animation="border" role="status" size='sm'>
-                                <span className="sr-only">Loading...</span>
-                            </Spinner>
-                             :
-                             'Log In'
-                            }
-                        </Button>
-                        {/* <br />
-                        <Button onClick={event => userCreate(event)}>Create User</Button>
-                        <br />
-                        <Button onClick={event => getUserData(event)}>Get User Data</Button> */}
-                    </div>
+                        <Row>
+                            <Col >
+                                <Button
+                                    disabled = {loggingIn?true:false}
+                                    variant= {loggingIn?'secondary':'info'} 
+                                    onClick= {event => logUserIn(event)}
+                                    style={{ width: '75%'}}
+                                >
+                                    {loggingIn?
+                                    <Spinner animation="border" role="status" size='sm'>
+                                        <span className="sr-only">Loading...</span>
+                                    </Spinner>
+                                    :
+                                    'Log In'
+                                    }
+                                </Button>
+                            </Col>
+                            <Col>
+                                <Button
+                                    disabled = {loggingIn?true:false}
+                                    variant= {loggingIn?'secondary':'info'} 
+                                    onClick= {event => signUp(event)}
+                                    style={{float: 'right', width: '75%'}}
+                                >
+                                    {loggingIn?
+                                    <Spinner animation="border" role="status" size='sm'>
+                                        <span className="sr-only">Loading...</span>
+                                    </Spinner>
+                                    :
+                                    'Sign Up'
+                                    }
+                                </Button>
+                            </Col>
+                        </Row>
+                    {/* </div> */}
                 </Col>
             </Row>
         </Container>

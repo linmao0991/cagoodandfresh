@@ -4,9 +4,9 @@ import InventorySearch from '../inventorySearch/InventorySearch';
 import InventoryContext from '../../context/InventoryContext';
 import ProductInventory from '../productinventory/ProductInventory'
 import ViewTransactions from '../viewtransactions/ViewTransactions'
-import AddInventoryRecord from '../addInventoryRecord/AddInventoryRecord'
+import AddInventoryItem from '../addInventoryItem/AddInventoryItem'
 import API from '../../utils/Api'
-import './addInventory.css'
+import './addInventoryOld.css'
 
 const AddInventory = () => { 
     const inventoryContext = useContext(InventoryContext);
@@ -86,7 +86,7 @@ const AddInventory = () => {
                 )
             case 'add-inventory-record':
                 return(
-                    <AddInventoryRecord
+                    <AddInventoryItem
                         suppliers = {inventoryContext.productSuppliers}
                         closeModal ={toggleModal}
                         product = {inventoryContext.selectedProduct}

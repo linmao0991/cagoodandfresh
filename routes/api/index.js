@@ -1,20 +1,12 @@
 require('dotenv').config();
-var path = require("path")
-var db = require("../../models");
-var passport = require("../../config/passport");
-var router = require("express").Router();
+let path = require("path")
+let db = require("../../models");
+let passport = require("../../config/passport");
+let router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const yelp = require('yelp-fusion');
 const client = yelp.client(process.env.YELP_KEY);
-
-// var bcrypt = require("bcryptjs");
-// const e = require('express');
-// const cli = require('cli');
-// const { sequelize } = require('../../models');
-// const { error } = require('cli');
-// const saltRounds = 10;
-
 
 //Function to check user permission level agianst required level for function.
 checkPermission = (user, permission_req) =>{
@@ -198,20 +190,6 @@ router.get("/download_csv/:id", (req,res)=>{
   res.download(filePath)
 })
 
-// //Log in
-// router.post("/login", passport.authenticate("local"), (req, res) => {
-//     console.log("===================================")
-//     console.log("[User Log In]")
-//     console.log("===================================")
-//     console.log(err)
-//     res.json({
-//       id: req.user.id,
-//       first_name: req.user.first_name,
-//       last_name: req.user.last_name,
-//       permission_level: req.user.permission_level,
-//     });
-//   });
-
 //Log in 2.0
 router.post("/login", passport.authenticate("local"),(req, res) => {
     console.log("===================================")
@@ -236,31 +214,36 @@ router.get("/logout", function (req, res) {
 
 //Create employee
 router.post("/create_employee", (req, res) => {
+    let disabled = true;
     console.log("===================================")
     console.log("[Create Employee]")
     console.log("===================================")
-    const permission_req = 3;
-    if (checkPermission(req.user, permission_req)) {
+    const permission_req = 0;
+    if(disabled){
+      res.status(503).json({ error: 'Sign up currently unavaliable' });
+    }else{
       db.employees.create({
         email: req.body.email,
         password: req.body.password,
+        permission_level: req.body.permission_level? req.body.permission_level: 1 ,
         })
           .then((dbUser) => {
-          req.login(dbUser, (err) => {
-              if (err) {
-              console.log(err);
-              }
-          })
-          res.json(dbUser);
+            req.login(dbUser, (err) => {
+                if (err) {
+                console.log(err);
+                }
+                res.json({
+                  id: dbUser.id,
+                  first_name: dbUser.first_name,
+                  last_name: dbUser.last_name,
+                  permission_level: dbUser.permission_level,
+                });
+            })
           })
           .catch((err) => {
           console.log(err.errors[0].message)
           res.status(401).json({ error: err.errors[0].message });
         });
-    }else{
-      console.log("User Unauthorized")
-      console.log("User: "+req.user.id)
-      res.status(401).json({ error: "User Unauthorized"});
     }
 });
 

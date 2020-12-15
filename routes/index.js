@@ -1,7 +1,7 @@
 // Requiring path to so we can use relative routes to our HTML files
-var path = require("path");
-var router = require("express").Router();
-var apiRoutes = require("./api");
+let path = require("path");
+let router = require("express").Router();
+let apiRoutes = require("./api");
 
 router.use("/api", apiRoutes);
 

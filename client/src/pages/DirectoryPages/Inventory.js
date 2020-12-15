@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Container, Row, Col} from "react-bootstrap";
 import SearchInventory from '../../components/searchinventory/SearchInventoryMain';
-import AddInventory from '../../components/addInventory/AddInventory';
+import AddInventoryInvoice from '../../components/addInventoryInvoice/AddInventoryInvoice';
 //import InventoryContext from '../../context/InventoryContext'
 
 const Inventory = ()=>{
@@ -24,7 +24,7 @@ const Inventory = ()=>{
                 )
             case 'Add-Inventory':
                 return(
-                    <AddInventory />
+                    <AddInventoryInvoice />
                 )
             default:
                 return(

@@ -14,6 +14,7 @@ import Api from "../utils/Api"
 
 class Directory extends Component{
     state = {
+        navExpanded: false,
         orderCustomerData: undefined,
         productCate: undefined,
         categoryData: undefined,
@@ -30,7 +31,20 @@ class Directory extends Component{
             paymentAmount: 0,
             paymentType: "Pay Type",
             checkNumber: null,
-        }
+        },
+        invNewInvoiceDetails: {
+            invoice_number: undefined,
+            purchase_order_number: null,
+            invoice_date: undefined,
+            due_date: null,
+            receive_date: undefined,
+            account_number: null,
+            invoice_total: undefined,
+            payment_status: undefined,
+            supplier_id: undefined,
+            paid_amount: 0
+        },
+        invNewInvoiceItems: []
     }
     static contextType = DirectoryContext;
 
@@ -102,6 +116,14 @@ class Directory extends Component{
         this.setState({invSelectedProduct: data})
     }
 
+    invContextStoreNewInvoiceDetails = (data) => {
+        this.setState({invNewInvoiceDetails: data})
+    }
+
+    invContextStoreNewInvoiceItems = (data) => {
+        this.setState({invNewInvoiceItems: data})
+    }
+
     directoryDisplay = () =>{
         switch (this.context.currentDir) {
             case "Accounts Payable":
@@ -122,10 +144,14 @@ class Directory extends Component{
                             inventory: this.state.invInventoryData,
                             productSuppliers: this.state.invProductSuppliers,
                             selectedProduct: this.state.invSelectedProduct,
+                            newInvoiceDetails: this.state.invNewInvoiceDetails,
+                            newInvoiceItems: this.state.newInvoiceItems,
                             storeProducts: this.invContextProductStore,
                             storeInventory: this.invContextInventoryStore,
                             storeProductSuppliers: this.invContextProductSupplierStore,
                             storeSelectedProduct: this.invContextSelectedProductStore,
+                            storeNewInvoiceDetails: this.invContextStoreNewInvoiceDetails,
+                            storeNewInvoiceItems: this.invContextStoreNewInvoiceItems,
                         }}
                     >
                         <Inventory/>
@@ -160,12 +186,20 @@ class Directory extends Component{
         }
     }
 
+    setNavExpanded(expanded) {
+        this.setState({ navExpanded: expanded });
+      }
+    
+      closeNav() {
+        this.setState({ navExpanded: false });
+      }
+
     render(){
         return(
             <Container fluid>
                 <Row>
                     <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold', padding: '0 0 0 0'}}>
-                    <Navbar collapseOnSelect expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
+                    <Navbar onToggle={() => this.setNavExpanded(!this.state.navExpanded)} expanded={this.state.navExpanded} expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
                         <Navbar.Brand href='' style={{width: '25%'}}>{this.context.currentDir}</Navbar.Brand>
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                         <Navbar.Collapse id="responsive-navbar-nav">
@@ -175,22 +209,22 @@ class Directory extends Component{
                                 <>
                                     {login.permissionLevel >= 1?
                                         <>
-                                        <Nav.Link onClick={() => this.context.switchDir("Order Form")}>Order Form</Nav.Link>{" "}
-                                        <Nav.Link onClick={() => this.context.switchDir("Customers")}>Customers</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => {this.context.switchDir("Order Form");this.closeNav()}}>Order Form</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => {this.context.switchDir("Customers");this.closeNav()}}>Customers</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Nav.Link onClick={() => this.context.switchDir("Inventory")}>Inventory</Nav.Link>{" "}
-                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Accounts Receivable")}>Accounts Receivable</Nav.Link>{" "}
-                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Accounts Payable")}>Accounts Payable</Nav.Link>{" "}
+                                        <Nav.Link onClick={() => {this.context.switchDir("Inventory");this.closeNav()}}>Inventory</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => {this.context.switchDir("Accounts Receivable");this.closeNav()}}>Accounts Receivable</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => {this.context.switchDir("Accounts Payable");this.closeNav()}}>Accounts Payable</Nav.Link>{" "}
                                         </>
                                     :
                                     null}
                                     {login.permissionLevel >=3?
                                     <>
-                                        <Nav.Link disabled={true} onClick={() => this.context.switchDir("Admin Tools")}>Admin Tools</Nav.Link>{" "}
+                                        <Nav.Link disabled={true} onClick={() => {this.context.switchDir("Admin Tools");this.closeNav()}}>Admin Tools</Nav.Link>{" "}
                                     </>
                                     :
                                     null}
