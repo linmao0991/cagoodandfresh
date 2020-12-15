@@ -3,7 +3,7 @@ import LoginContext from "../context/LoginContext";
 import Api from "../utils/Api";
 import {Button, Container, Row, Col,Spinner, Alert} from "react-bootstrap";
 
-function Login(){
+const Login = () =>{
     const collapseStyle = {
         width: '100%',
         maxHeight: '0px', 

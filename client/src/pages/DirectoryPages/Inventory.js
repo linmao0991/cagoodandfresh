@@ -4,7 +4,7 @@ import SearchInventory from '../../components/searchinventory/SearchInventoryMai
 import AddInventoryInvoice from '../../components/addInventoryInvoice/AddInventoryInvoice';
 //import InventoryContext from '../../context/InventoryContext'
 
-const Inventory = ()=>{
+const Inventory = () =>{
     //const inventoryContext = useContext(InventoryContext)
     const [displayType, setDisplayType] = useState(null)
 
