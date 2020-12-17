@@ -38,6 +38,7 @@ const inventoryContext = React.createContext({
             sale_price: undefined,
             supplier_id: undefined,
             supplier_name: undefined,
+            lot: undefined,
         },
     ],
     storeProducts: () => {},

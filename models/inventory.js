@@ -36,6 +36,9 @@ module.exports = function ( sequelize, DataTypes){
         },
         supplier_name: {
             type: DataTypes.STRING
+        },
+        lot: {
+            type: DataTypes.STRING
         }
     },{
         freezeTableName: true

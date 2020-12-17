@@ -33,16 +33,18 @@ class Directory extends Component{
             checkNumber: null,
         },
         invNewInvoiceDetails: {
-            invoice_number: undefined,
-            purchase_order_number: null,
-            invoice_date: undefined,
-            due_date: null,
-            receive_date: undefined,
-            account_number: null,
-            invoice_total: undefined,
-            payment_status: undefined,
-            supplier_id: undefined,
-            paid_amount: 0
+            invoice_number: '',
+            purchase_order_number: '',
+            invoice_date: '',
+            due_date: '',
+            receive_date: '',
+            account_number: '',
+            invoice_total: 0,
+            payment_status: '',
+            supplier_id: '',
+            supplier_name: '',
+            paid_amount: 0,
+            lot: '',
         },
         invNewInvoiceItems: []
     }
@@ -121,7 +123,8 @@ class Directory extends Component{
     }
 
     invContextStoreNewInvoiceItems = (data) => {
-        this.setState({invNewInvoiceItems: data})
+        let newItemList = this.state.invNewInvoiceItems.concat(data)
+        this.setState({invNewInvoiceItems: newItemList})
     }
 
     directoryDisplay = () =>{
@@ -145,7 +148,7 @@ class Directory extends Component{
                             productSuppliers: this.state.invProductSuppliers,
                             selectedProduct: this.state.invSelectedProduct,
                             newInvoiceDetails: this.state.invNewInvoiceDetails,
-                            newInvoiceItems: this.state.newInvoiceItems,
+                            newInvoiceItems: this.state.invNewInvoiceItems,
                             storeProducts: this.invContextProductStore,
                             storeInventory: this.invContextInventoryStore,
                             storeProductSuppliers: this.invContextProductSupplierStore,

@@ -146,6 +146,7 @@ class OrderForm extends Component{
         Api.submitOrder({
             orderData
         }).then(response => {
+            console.log("[Completed Order - Data]")
             console.log(response)
             //Toogles the submit button to active
             this.setState({

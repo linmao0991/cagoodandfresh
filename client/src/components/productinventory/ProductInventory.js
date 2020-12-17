@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Table, Badge, Popover, Container, Row, Col, Button, Spinner, OverlayTrigger } from 'react-bootstrap';
+import { Table, Badge, Popover, Button, Spinner, OverlayTrigger } from 'react-bootstrap';
 import Api from '../../utils/Api';
 import InventoryContext from '../../context/InventoryContext';
 import './productInventory.css'
@@ -37,37 +37,41 @@ function ProductInventory(props) {
             display: 'block',
             textAlign: 'left'
         },
-        //Date
-        col_1_width: {
-            width: '10%'
-        },
         //Quantity
+        col_1_width: {
+            width: '8%'
+        },
+        //Sale Price
         col_2_width: {
             width: '13%'
         },
-        //Sale Price
+        //Cost
         col_3_width: {
             width: '13%'
         },
-        //Cost
+        //Transactions
         col_4_width: {
             width: '10%'
         },
-        //Invoice Number
+        //Date Received
         col_5_width: {
-            width: '15%'
+            width: '12%'
         },
-        //Total Sale
+        //Initial Quantity
         col_6_width: {
-            width: '10%'
+            width: '8%'
         },
-        //Total Cost
+        //Supplier
         col_7_width: {
-            width: '15%'
+            width: '12%'
         },
-        //Gross
+        //Invoice Number
         col_8_width: {
             width: '14%'
+        },
+        //Lot Number
+        col_9_width: {
+            width: '10%'
         }
     }
 
@@ -88,6 +92,7 @@ function ProductInventory(props) {
                     <th style={{ ...listingStyle.col_6_width, ...listingStyle.tdth }}>Initial Qt</th>
                     <th style={{ ...listingStyle.col_7_width, ...listingStyle.tdth }}>Supplier</th>
                     <th style={{ ...listingStyle.col_8_width, ...listingStyle.tdth }}>Invoice #</th>
+                    <th style={{ ...listingStyle.col_9_width, ...listingStyle.tdth }}>Lot#</th>
                 </tr>
             </thead>
             <tbody style={listingStyle.tbody}>
@@ -126,6 +131,7 @@ function ProductInventory(props) {
                             <td style={{ ...listingStyle.col_6_width, ...listingStyle.tdth }}>{inventory.invoice_quantity}</td>
                             <td style={{ ...listingStyle.col_7_width, ...listingStyle.tdth }}>{inventory.supplier_name}</td>
                             <td style={{ ...listingStyle.col_8_width, ...listingStyle.tdth }}>{inventory.ap_invoice_number}</td>
+                            <td style={{ ...listingStyle.col_9_width, ...listingStyle.tdth }}>{inventory.lot}</td>
                         </tr>
                     )
                 })}

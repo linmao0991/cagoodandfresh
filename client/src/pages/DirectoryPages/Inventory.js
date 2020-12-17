@@ -10,10 +10,6 @@ const Inventory = () =>{
 
     const selectInventoryFunc = (func) => {
         setDisplayType(func)
-        // inventoryContext.storeProducts(undefined)
-        // inventoryContext.storeInventory(undefined)
-        // inventoryContext.storeProductSuppliers(undefined)
-        // inventoryContext.storeSelectedProduct(undefined)
     }
 
     const switchDisplay = () => {

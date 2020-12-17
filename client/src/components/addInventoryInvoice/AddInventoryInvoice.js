@@ -1,38 +1,73 @@
-import React,{useState, useContext, useRef, useEffect} from 'react';
-import {Container, Row, Col, Button, Spinner, Modal, InputGroup, FormControl, Dropdown, DropdownButton} from 'react-bootstrap';
-import AddInventoryItem from '../addInventoryItem/AddInventoryItem';
+import React,{useState, useContext, Suspense, useEffect} from 'react';
+import {Container, Row, Col, Button, Spinner, Modal, InputGroup, FormControl, Badge, Accordion, Card} from 'react-bootstrap';
 import InventoryContext from '../../context/InventoryContext';
 import API from '../../utils/Api'
 import './addInventoryInvoice.css'
+const AddInventoryItem = React.lazy(() => import('../addInventoryItem/AddInventoryItem'));
+const SupplierList = React.lazy(() => import('../supplierlist/SupplierList'))
 
 //Creating new inventory operation order
 //--Create accounts_payable_invoices record
 //--Create new inventory record for each item using accounts_payable_invoices.id
 
 const AddInventoryInvoice = () => {
-    const inputRef = useRef(null)
+    //Store context
     const inventoryContext = useContext(InventoryContext);
+    //Setting States
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState(null)
-    // const [screenWidth, setScreenWidth] =useState(null)
-    // const [screenHeight, setScreenHeight] = useState(null)
-    // const [itemListPos, setitemListPos] =useState(null)
-    const [itemListStyle, setitemListStyle] = useState(null)
     const [addItemLoading, setAddItemLoading] = useState(false)
 
     const modalSwitchFunction = () => {
         switch (modalData.type){
             case 'add-new-item':
                 return(
-                    <AddInventoryItem
-                        closeModal = {() => setShowModal(false)}
-                    />
+                    <Suspense fallback={
+                        loadingSpinner
+                    }>
+                        <AddInventoryItem
+                            addInvoiceItem = {addInvoiceItem}
+                            closeModal = {() => setShowModal(false)}
+                        />
+                    </Suspense>
+                )
+            case 'search-supplier':
+                return(
+                    <>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Search Suppliers</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Container>
+                            <Suspense fallback={loadingSpinner}>
+                                <SupplierList 
+                                    updateSupplier = {selectSupplier}
+                                />
+                            </Suspense>
+                        </Container>
+                    </Modal.Body>
+                    <Modal.Footer>
+                    </Modal.Footer>
+                    </>
                 )
             default:
                 return(
                     null
                 )
         }
+    }
+
+    const addInvoiceItem = item => {
+        inventoryContext.storeNewInvoiceItems(item)
+    }
+
+    const selectSupplier = supplier => {
+        let newInvoiceDetails = {...inventoryContext.newInvoiceDetails}
+        newInvoiceDetails.supplier_id = supplier.id
+        newInvoiceDetails.supplier_name = supplier.name
+        inventoryContext.storeNewInvoiceDetails(newInvoiceDetails)
+        // document.getElementById('supplier-name').value = supplier.name
+        setShowModal(false)
     }
 
     const checkInvDetails = () => {
@@ -76,45 +111,24 @@ const AddInventoryInvoice = () => {
 
     const handleInputchange = e => {
         let newInvoiceDetails = {...inventoryContext.newInvoiceDetails}
-        console.log(e.target.value)
         let fieldName = e.target.id.replace(/-/g,'_')
         newInvoiceDetails[fieldName] = e.target.value
         inventoryContext.storeNewInvoiceDetails(newInvoiceDetails)
-        console.log(inventoryContext.newInvoiceDetails)
     }
 
-    // useEffect(() => {
-    //     const heightHandler = (size) => {
-    //         setScreenHeight(size)
-    //     }
-
-    //     const widthHandler = (size) =>{
-    //         setScreenWidth(size)
-    //     }
-
-    //     window.addEventListener('resize',() => {
-    //         if(window.innerHeight !== screenHeight){
-    //             heightHandler(window.innerHeight)
-    //         }
-    //         if(window.innerWidth !== screenHeight){
-    //             widthHandler(window.innerHeight)
-    //         }
-    //     })
-    // })
-
-    // useEffect(()=>{
-    //     const handleItemListPos = (innerHeight) => {
-    //         let itemListPos = document.querySelector('.invoice-item-list').getBoundingClientRect()
-    //         let elHeight = innerHeight - itemListPos.y
-    //         console.log(elHeight)
-    //         setitemListStyle({height: `${elHeight-20}px`, backgroundColor: 'black'})
-    //     }
-
-    //     window.addEventListener('resize',() => {
-    //         handleItemListPos(window.innerHeight)
-    //     });
-    // },[])
-
+    useEffect(()=> {
+        console.log("[Set invoice Total]")
+        if(inventoryContext.newInvoiceItems.length > 0){
+            console.log("[Passed array length condition]")
+            console.log(inventoryContext.newInvoiceItems)
+            let newInvoiceDetails = {...inventoryContext.newInvoiceDetails}
+            newInvoiceDetails.invoice_total = inventoryContext.newInvoiceItems.reduce((accumulator, currentValue) => {
+                return accumulator+(+currentValue.cost*+currentValue.invoice_quantity)
+            }, 0)
+            console.log(`[New Total: ${newInvoiceDetails.invoice_total}]`)
+            inventoryContext.storeNewInvoiceDetails(newInvoiceDetails)
+        }
+    }, [inventoryContext.newInvoiceItems])
     return(
         <>
         <Container fluid>
@@ -126,6 +140,7 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Invoice Number</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
+                            value={inventoryContext.newInvoiceDetails.invoice_number}
                             placeholder="Invoice Number"
                             aria-label="Invoice Number"
                             aria-describedby="invoice-number"
@@ -140,6 +155,7 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>PO Number</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
+                            value={inventoryContext.newInvoiceDetails.purchase_order_number}
                             id="purchase-order-number"
                             placeholder="PO Number"
                             aria-label="PO Number"
@@ -150,27 +166,33 @@ const AddInventoryInvoice = () => {
                     </Row>
                     <Row>
                         <InputGroup className="mb-3">
-                            <InputGroup.Prepend
-                                id='supplier-input-group-dropdown'
-                            >
-                                {/* <InputGroup.Text>Supplier</InputGroup.Text> */}
-                                <DropdownButton
-                                as={InputGroup.Prepend}
-                                variant="secondary"
-                                title="Supplier"
-                                id="input-group-dropdown"
-                                >
-                                    <Dropdown.Item href="#">Separated link</Dropdown.Item>
-                                </DropdownButton>
+                            <InputGroup.Prepend>
+                                <Button 
+                                    variant='warning' 
+                                    style={{width: '140px', fontWeight: 'bold', textAlign: 'left'}}
+                                    onClick={() => handleModelSwitch('search-supplier','xl')}
+                                    >Search</Button>
                             </InputGroup.Prepend>
                             <FormControl
+                            style={{backgroundColor:'#4d4b4b', color: 'white'}}
+                            disabled
+                            value={inventoryContext.newInvoiceDetails.supplier_name}
                             id="supplier-name"
-                            placeholder="Supplier"
+                            placeholder="Select a Supplier"
                             aria-label="Supplier"
                             aria-describedby="supplier-name"
-                            onChange={(e) => handleInputchange(e)}
                             >
                             </FormControl>
+                            <InputGroup.Append>
+                                <InputGroup.Text 
+                                    style={{
+                                        backgroundColor:inventoryContext.newInvoiceDetails.supplier_name?'yellowgreen':"Red", 
+                                        fontWeight: 'bold',
+                                        color: 'white'}}
+                                >
+                                   {inventoryContext.newInvoiceDetails.supplier_name?'✓':'X'}
+                                </InputGroup.Text>
+                            </InputGroup.Append>
                         </InputGroup>   
                     </Row>
                     <Row>
@@ -181,11 +203,11 @@ const AddInventoryInvoice = () => {
                             <FormControl
                             style={{backgroundColor:'lightgrey'}}
                             disabled
+                            value={`$${inventoryContext.newInvoiceDetails.invoice_total.toFixed(2)}`}
                             id="invoice-total"
                             placeholder="$0.00"
                             aria-label="Invoice Total"
                             aria-describedby="invoice-total"
-                            type='number'
                             onChange={(e) => handleInputchange(e)}
                             />
                         </InputGroup>   
@@ -199,6 +221,7 @@ const AddInventoryInvoice = () => {
                             </InputGroup.Prepend>
                             <FormControl
                             id="receive-date"
+                            value={inventoryContext.newInvoiceDetails.receive_date}
                             placeholder="MM/DD/YYYY"
                             aria-label="Receive Date"
                             aria-describedby="receive-date"
@@ -214,6 +237,7 @@ const AddInventoryInvoice = () => {
                             </InputGroup.Prepend>
                             <FormControl
                             id="due-date"
+                            value={inventoryContext.newInvoiceDetails.due_date}
                             placeholder="MM/DD/YYYY"
                             aria-label="Due Date"
                             aria-describedby="due-date"
@@ -228,7 +252,8 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Paid Amount</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            placeholder="0.00"
+                            value={inventoryContext.newInvoiceDetails.paid_amount}
+                            placeholder="$0.00"
                             aria-label="Paid Amount"
                             aria-describedby="paid-amount"
                             type='number'
@@ -246,13 +271,71 @@ const AddInventoryInvoice = () => {
             </Row>
             <hr />
             <Row>
-                <Col className='invoice-item-list' style={itemListStyle}>
+                <Col className='invoice-item-list'>
+                    <Row>
+                        <Col>
+                            <div className="invoice-item-titles-container">
+                                <div className="invoice-item-container-titles" style={{width: '30%'}}>Name English</div>
+                                <div className="invoice-item-container-titles" style={{width: '30%'}}>Name Chinese</div>
+                                <div className="invoice-item-container-titles" style={{width: '10%'}}>Quantity</div>
+                                <div className="invoice-item-container-titles" style={{width: '10%'}}>Cost</div>
+                                <div className="invoice-item-container-titles" style={{width: '10%'}}>Lot#</div>
+                            </div>
+                        </Col>
+                    </Row>
                     {inventoryContext.newInvoiceItems?
                         inventoryContext.newInvoiceItems.map((item, index) => {
                             return(
-                                <div key={index}>{item.name_english}</div>
+                                <>
+                                    <Row key={index}>
+                                        <Col>
+                                            <div className="invoice-item-container">
+                                                <div style={{display:"inline-block", width: '30%', padding: '2px 2px 2px 5px'}}>{item.name_english}</div>
+                                                <div style={{display:"inline-block", width: '30%', padding: '2px 2px 2px 5px'}}>{item.name_chinese}</div>
+                                                <div style={{display:"inline-block", width: '10%', padding: '2px 2px 2px 5px', textAlign: "center"}}>{item.invoice_quantity}</div>
+                                                <div style={{display:"inline-block", width: '10%', padding: '2px 2px 2px 5px', textAlign: "center"}}>${(+item.cost).toFixed(2)}</div>
+                                                <div style={{display:"inline-block", width: '10%', padding: '2px 2px 2px 5px', textAlign: "center"}}>{item.lot}</div>
+                                                <div style={{display:"inline-block", padding: '2px 2px 2px 5px'}}><Badge variant='danger' as='button' size-='sm'>Remove</Badge></div>
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </>
                             )
                         })
+                    :
+                    <Row className='justify-content-md-center'>
+                        <Col style={{textAlign: 'center'}}>No Items</Col>
+                    </Row>
+                    }
+                </Col>
+                <Col className='invoice-item-list-mobile'>
+                    {inventoryContext.newInvoiceItems?
+                        <Accordion style={{width: '100%'}}>
+                            {inventoryContext.newInvoiceItems.map((item, index) => {
+                                return(
+                                    <Card key={index}
+                                    style={{backgroundColor: '#333333', borderColor: 'black', color: 'white'}}>
+                                        <Accordion.Toggle 
+                                        as={Card.Header} 
+                                        eventKey={`${index}`} 
+                                        style={{backgroundColor: '#d39e00', color: 'black'}}>
+                                            {item.name_english}
+                                        </Accordion.Toggle>
+                                        <Accordion.Collapse eventKey={`${index}`}>
+                                            <Card.Body>
+                                                <Row><Col>Name Chinese:</Col><Col>{item.name_chinese}</Col></Row>
+                                                <Row><Col>Quantity:</Col><Col>{item.invoice_quantity}</Col></Row>
+                                                <Row><Col>Cost:</Col><Col>${(+item.cost).toFixed(2)}</Col></Row>
+                                                <Row><Col>Lot#:</Col><Col>{item.lot}</Col></Row>
+                                                <hr style={{margin: "5px 0px 5px 0px", padding: "0px"}}/>
+                                                <Row><Col><Badge variant='danger' as='button' size-='sm'>Remove</Badge></Col></Row>
+                                            </Card.Body>
+                                        </Accordion.Collapse>
+                                    </Card>
+                                )
+                            })}
+                        </Accordion>
+                        
                     :
                     <Row className='justify-content-md-center'>
                         <Col style={{textAlign: 'center'}}>No Items</Col>

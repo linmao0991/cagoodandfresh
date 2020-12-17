@@ -1,4 +1,4 @@
-import React, {useContext, useState, useRef, useEffect} from 'react';
+import React, {useContext, useState, useEffect} from 'react';
 import { Modal, Button, Container, Row, Col , Spinner, InputGroup, FormControl} from 'react-bootstrap';
 import API from '../../utils/Api';
 import InventoryContext from '../../context/InventoryContext'
@@ -6,32 +6,55 @@ import InventorySearch from '../../components/inventorySearch/InventorySearch'
 import './addInventoryItem.css'
 
 const AddInventoryRecord = (props) => {
-    const itemTemplate = {
-        product_code: undefined,
-        name_english: undefined,
-        name_chinese: undefined,
-        upc: undefined,
-        invoice_quantity: undefined,
-        purchase_order_number: undefined,
-        //ap_invoice_number is the same as newInvoiceDetails.invoice_number
-        ap_invoice_number: undefined,
-        receive_date: undefined,
-        cost: undefined,
-        sale_price: undefined,
-        supplier_id: undefined,
-        supplier_name: undefined,
-    }
 
     const inventoryContext = useContext(InventoryContext)
     const [resultDisplay, setResultDisplay] = useState(null)
     const [productDisplay,setProductDisplay] = useState()
     const [activeProduct, setActiveProduct] = useState(null)
-    const [itemDetail, setItemDetail] = useState(itemTemplate)
+    const [itemDetail, setItemDetail] = useState(null)
+    const [addingItem, setAddingItem] = useState(false)
+
+    const validateItemDetails = () => {
+        setAddingItem(true)
+        console.log('Validate Item Details')
+        let inputValues = ["invoice-quantity","sale-price","cost"]
+        let checkInputValues = [];
+        inputValues.forEach(inputValue => {
+            if(document.getElementById(inputValue).value === undefined
+            || document.getElementById(inputValue).value === null
+            || document.getElementById(inputValue).value === ''){
+                document.getElementById(inputValue).style.borderColor = 'red';
+                document.getElementById(inputValue).style.borderStyle = 'solid';
+                document.getElementById(inputValue).style.borderWidth = '2px';
+                checkInputValues.push(false)
+            }else{
+                document.getElementById(inputValue).style.removeProperty('border-color')
+                document.getElementById(inputValue).style.removeProperty('border-style')
+                document.getElementById(inputValue).style.removeProperty('border-width')
+            }
+        })
+        if(checkInputValues.every(value => {return value? true: false})){
+            props.addInvoiceItem(itemDetail)
+            setItemDetail({
+                ...itemDetail,
+                product_code: undefined,
+                name_english: undefined,
+                name_chinese: undefined,
+                upc: undefined,
+                invoice_quantity: undefined,
+                cost: undefined,
+                sale_price: undefined 
+            })
+            inventoryContext.storeSelectedProduct(undefined)
+            setAddingItem(false)
+        }else{
+            setAddingItem(false)
+        }
+    }
 
     const handleSelectedProduct = (product, productIndex) => {
         setActiveProduct(productIndex)
         setProductDisplay('loading')
-        console.log(product)
         inventoryContext.storeSelectedProduct(product)
         API.getInventoryByProductID({
             productCode: product.id,
@@ -65,40 +88,16 @@ const AddInventoryRecord = (props) => {
     }
 
     const handleInputchange = e => {
-        console.log(e.target.value)
         let fieldName = e.target.id.replace(/-/g,'_')
         setItemDetail({...itemDetail, [fieldName]: e.target.value})
-        console.log(itemDetail)
     }
 
-    // {
-    //     //Same as product.id
-    //     product_code: undefined,
-    //     name_english: undefined,
-    //     name_chinese: undefined,
-    //     upc: undefined,
-    //     invoice_quantity: undefined,
-    //     purchase_order_number: undefined,
-    //     //ap_invoice_number is the same as newInvoiceDetails.invoice_number
-    //     ap_invoice_number: undefined,
-    //     receive_date: undefined,
-    //     cost: undefined,
-    //     sale_price: undefined,
-    //     supplier_id: undefined,
-    //     supplier_name: undefined,
-    // },
-
-    useEffect(() => {
-        setItemDetail({
-        //Same as product.id
-        purchase_order_number: inventoryContext.newInvoiceDetails.purchase_order_number,
-        //ap_invoice_number is the same as newInvoiceDetails.invoice_number
-        ap_invoice_number: inventoryContext.newInvoiceDetails.invoice_number,
-        receive_date: inventoryContext.newInvoiceDetails.receive_date,
-        supplier_id: inventoryContext.newInvoiceDetails.supplier_id,
-        supplier_name: inventoryContext.newInvoiceDetails.supplier_name, 
-        })
-    }, [])
+    const loadingSpinner = (size, style) => {
+        return(
+            <Spinner animation="border" role="status" size={size} style={style? style :{left: '45%', top: '50%', margin: '0px', position: 'absolute'}}>
+                <span className="sr-only">Loading...</span>
+            </Spinner>)
+        }
 
     const productDisplaySwitch = () => {
         switch (productDisplay){
@@ -195,8 +194,8 @@ const AddInventoryRecord = (props) => {
                                     style={{backgroundColor:'#4d4b4b'}}
                                     disabled
                                     placeholder={
-                                        itemDetail.supplier_name?
-                                        itemDetail.supplier_name:
+                                        inventoryContext.newInvoiceDetails.supplier_name?
+                                        inventoryContext.newInvoiceDetails.supplier_name:
                                         "None"}
                                     aria-label="Supplier"
                                     aria-describedby="inventory-item-supplier"
@@ -220,7 +219,20 @@ const AddInventoryRecord = (props) => {
                                     />
                                 </InputGroup> 
                             </Col>
-                            <Col>
+                            <Col className="mb-2">
+                                <InputGroup className="mb-2">
+                                    <InputGroup.Prepend>
+                                        <InputGroup.Text>Lot Number</InputGroup.Text>
+                                    </InputGroup.Prepend>
+                                    <FormControl
+                                    placeholder="0"
+                                    aria-label="Lot Number"
+                                    type="text"
+                                    aria-describedby="lot-number"
+                                    id="lot"
+                                    onChange={(e) => handleInputchange(e)}
+                                    />
+                                </InputGroup>
                             </Col>
                         </Row>
                     </>
@@ -228,9 +240,7 @@ const AddInventoryRecord = (props) => {
             case 'loading':
                 return(
                     <Row className="justify-content-md-center">
-                        <Spinner animation="border" role="status" size='lg' style={{left: '45%', top: '50%', margin: '0px', position: 'absolute'}}>
-                            <span className="sr-only">Loading...</span>
-                        </Spinner>
+                        {loadingSpinner('lg')}
                     </Row>
                 )
             default:
@@ -244,9 +254,7 @@ const AddInventoryRecord = (props) => {
         switch (resultDisplay){
             case 'loading':
                 return(
-                    <Spinner animation="border" role="status" size='lg' style={{left: '45%', top: '50%', margin: '0px', position: 'absolute'}}>
-                        <span className="sr-only">Loading...</span>
-                    </Spinner>
+                    loadingSpinner('lg')
                 )
             case 'display-result':
                 return(
@@ -273,13 +281,40 @@ const AddInventoryRecord = (props) => {
         }
     }
 
+    useEffect(() => {
+        console.log(['Set default item details'])
+        let defaultDetails = {
+            //Same as product.id
+            purchase_order_number: inventoryContext.newInvoiceDetails.purchase_order_number,
+            //ap_invoice_number is the same as newInvoiceDetails.invoice_number
+            ap_invoice_number: inventoryContext.newInvoiceDetails.invoice_number,
+            receive_date: inventoryContext.newInvoiceDetails.receive_date,
+            supplier_id: inventoryContext.newInvoiceDetails.supplier_id,
+            supplier_name: inventoryContext.newInvoiceDetails.supplier_name,
+            product_code: undefined,
+            name_english: undefined,
+            name_chinese: undefined,
+            upc: undefined,
+            invoice_quantity: undefined,
+            cost: undefined,
+            sale_price: undefined
+        }
+        setItemDetail({...defaultDetails})
+    }, [
+        //ap_invoice_number is the same as newInvoiceDetails.invoice_number
+        inventoryContext.newInvoiceDetails.invoice_number,
+        inventoryContext.newInvoiceDetails.receive_date,
+        inventoryContext.newInvoiceDetails.supplier_id,
+        inventoryContext.newInvoiceDetails.supplier_name,
+        inventoryContext.newInvoiceDetails.purchase_order_number,
+    ])
+
     return (
         <>
             <Modal.Header closeButton>
                 <Modal.Title>Add Item To Invoice</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            </Modal.Body>
                 <Container fluid style={{marginBottom: '10px'}}>
                     <Row xs={1} md={1} lg={2}>
                         <Col md={6} lg={4}>
@@ -298,19 +333,27 @@ const AddInventoryRecord = (props) => {
                         </Col>
                     </Row>
                 </Container>
+            </Modal.Body>
             <Modal.Footer>
-                <Row>
-                    <Col>
-                        <Button variant="secondary" onClick={props.closeModal}>
-                            Close
-                        </Button>
-                    </Col>
-                    <Col>
-                        <Button variant="warning" onClick={props.closeModal}>
-                            Add
-                        </Button>
-                    </Col>
-                </Row>
+                <Container fluid>
+                    <Row>
+                        <Col>
+                            <Button 
+                            variant="secondary" 
+                            onClick={props.closeModal}
+                            disabled ={addingItem? true: false}
+                            style={{width: '50%', float: "left"}}
+                            >
+                                Close
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Button variant="warning" onClick={validateItemDetails} style={{width: '50%', float: "right"}}>
+                                {addingItem? loadingSpinner('sm', {margin: 'auto'}): 'Add Item'}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Container>
             </Modal.Footer>
         </>
     )

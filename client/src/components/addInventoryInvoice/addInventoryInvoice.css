@@ -1,10 +1,50 @@
 
 .invoice-detail-column{
-    padding-left: 30px;
+    padding: 0px 30px 0px 30px;
     /* max-width: 376px; */
 }
 
 .invoice-detail-column .input-group-prepend span{
     width: 140px;
     font-weight: bold;
+}
+
+#supplier-name::-webkit-input-placeholder{
+    color: white;
+}
+
+.invoice-item-container {
+    padding: 10px 0 10px 0;
+    border-bottom: 2px solid grey;
+}
+
+.invoice-item-titles-container{
+    padding: 10px 0 10px 0;
+}
+
+.invoice-item-container-titles {
+    text-align: center;
+    display: inline-block;
+    border: 2px solid grey
+}
+
+.invoice-item-container:hover {
+    /* border-style: none;
+    border-width: 1px; */
+    border-color: white;
+    background-color:#5f5f5f;
+}
+
+.invoice-item-list-mobile {
+    display: none;
+}
+
+@media only screen and (max-width: 768px) {
+    .invoice-item-list {
+        display: none;
+    }
+
+    .invoice-item-list-mobile {
+        display: flex;
+    }
 }

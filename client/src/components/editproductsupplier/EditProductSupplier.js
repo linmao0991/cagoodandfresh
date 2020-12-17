@@ -1,5 +1,5 @@
-import React, {useState, useRef, useContext} from 'react';
-import {Row, Col, Modal, Button, Container, InputGroup, FormControl, Spinner, Badge} from 'react-bootstrap';
+import React, {useState, useContext} from 'react';
+import {Row, Col, Modal, Button, Container, Spinner, Badge} from 'react-bootstrap';
 import API from '../../utils/Api'
 import SupplierList from '../../components/supplierlist/SupplierList'
 import InventoryContext from '../../context/InventoryContext'
@@ -21,41 +21,41 @@ const EditProductSupplier = (props) =>{
     const modalStyle = {backgroundColor: '#595959'}
 
     const inventoryContext = useContext(InventoryContext)
-    const searchInputRef = useRef(null)
+    // const searchInputRef = useRef(null)
     const [contentData, setContentData] = useState(null)
     const [contentType, setContentType] = useState('supplier-display')
-    const [supplierLoading, setSupplierLoading] = useState(false)
+    //const [supplierLoading, setSupplierLoading] = useState(false)
     const [updating, setUpdating] = useState(false)
     let supplier = inventoryContext.productSuppliers[props.supplierIndex]
 
-    const searchSupplierByInput = () => {
-        setSupplierLoading(true)
-        API.getSuppliersByInput({
-            searchString: searchInputRef.current.value.trim()
-        }).then( result => {
-            setContentData(result.data)
-            setSupplierLoading(false)
-        }).catch(err => {
-            console.log(err)
-        })
-    }
+    // const searchSupplierByInput = () => {
+    //     setSupplierLoading(true)
+    //     API.getSuppliersByInput({
+    //         searchString: searchInputRef.current.value.trim()
+    //     }).then( result => {
+    //         setContentData(result.data)
+    //         setSupplierLoading(false)
+    //     }).catch(err => {
+    //         console.log(err)
+    //     })
+    // }
 
-    const searchAllSuppliers = () => {
-        setSupplierLoading(true)
-        API.getAllSuppliers().then( result => {
-            setContentData(result.data)
-            setSupplierLoading(false)
-        }).catch(err => {
-            console.log(err)
-        })
-    }
+    // const searchAllSuppliers = () => {
+    //     setSupplierLoading(true)
+    //     API.getAllSuppliers().then( result => {
+    //         setContentData(result.data)
+    //         setSupplierLoading(false)
+    //     }).catch(err => {
+    //         console.log(err)
+    //     })
+    // }
 
-    const updateProductField = (fieldValue) => {
+    const updateProductField = (supplier) => {
         setUpdating(true)
         setContentType('updating-supplier')
         API.updateProduct({
             id: props.product.id,
-            update: {[supplierFieldName[props.supplierIndex]]: fieldValue}
+            update: {[supplierFieldName[props.supplierIndex]]: supplier.id}
         }).then(result => {
             let updatedProduct = result.data[0]
             let updatedProducts = [...inventoryContext.products]
@@ -158,32 +158,9 @@ const EditProductSupplier = (props) =>{
                 )
             case 'search-suppliers':
                 return(
-                    <>
-                    <Row noGutters={true}>
-                        <Col>
-                            <InputGroup style={{padding: '4px'}}>
-                                <FormControl
-                                    placeholder="Supplier Name, Product Categories, or ID"
-                                    ref={searchInputRef}
-                                />
-                                <InputGroup.Append>
-                                    <Button variant="info" onClick={searchSupplierByInput}>Search</Button>
-                                </InputGroup.Append>
-                                <InputGroup.Append>
-                                    <Button variant="info" onClick={searchAllSuppliers}>All Suppliers</Button>
-                                </InputGroup.Append>
-                            </InputGroup>
-                        </Col>
-                    </Row>
-                    <Row>
-                        <SupplierList 
-                            supplierData = {contentData}
-                            loading = {supplierLoading}
-                            updating = {updating}
-                            updateSupplier = {updateProductField}
-                        />
-                    </Row>
-                    </>
+                    <SupplierList 
+                        updateSupplier = {updateProductField}
+                    />
                 )
             default:
                 return(
