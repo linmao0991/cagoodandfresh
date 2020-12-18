@@ -123,8 +123,7 @@ class Directory extends Component{
     }
 
     invContextStoreNewInvoiceItems = (data) => {
-        let newItemList = this.state.invNewInvoiceItems.concat(data)
-        this.setState({invNewInvoiceItems: newItemList})
+        this.setState({invNewInvoiceItems: data})
     }
 
     directoryDisplay = () =>{
