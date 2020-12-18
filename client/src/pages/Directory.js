@@ -11,6 +11,7 @@ import OrderForm from "./DirectoryPages/OrderForm";
 import OrderContext from "../context/OrderContext";
 import InventoryContext from '../context/InventoryContext';
 import Api from "../utils/Api"
+import './directory.css'
 
 class Directory extends Component{
     state = {
@@ -214,11 +215,11 @@ class Directory extends Component{
             <Container fluid>
                 <Row>
                     <Col md='auto' style={{width: '100%', display: 'flex', justifyContent: 'center', fontWeight: 'bold', padding: '0 0 0 0'}}>
-                    <Navbar onToggle={() => this.setNavExpanded(!this.state.navExpanded)} expanded={this.state.navExpanded} expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
-                        <Navbar.Brand href='' style={{width: '25%'}}>{this.context.currentDir}</Navbar.Brand>
+                    <Navbar onToggle={() => this.setNavExpanded(!this.state.navExpanded)} fixed="top" expanded={this.state.navExpanded} expand="lg" bg="dark" variant="dark" style={{width: '100%'}}>
+                        <Navbar.Brand href=''>{this.context.currentDir}</Navbar.Brand>
                         <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                         <Navbar.Collapse id="responsive-navbar-nav">
-                            <Nav className="mr-auto">
+                            <Nav style={{margin: 'auto'}}>
                             <LoginContext.Consumer>
                             {login => (
                                 <>
@@ -232,7 +233,7 @@ class Directory extends Component{
                                     {login.permissionLevel >=2?
                                         <>
                                         {/* <Nav.Link onClick={() => {this.context.switchDir("Inventory");this.closeNav()}}>Inventory</Nav.Link>{" "} */}
-                                        <NavDropdown title="Inventory" id="basic-nav-dropdown">
+                                        <NavDropdown title="Inventory" id="basic-nav-dropdown" variant='dark'>
                                             <NavDropdown.Item 
                                                 href=""
                                                 onClick={() => this.switchToInventory("Search-Inventory")}
@@ -274,8 +275,7 @@ class Directory extends Component{
                     </Navbar>
                     </Col>
                 </Row>
-                <br />
-                <Row>
+                <Row style={{marginTop: "75px"}}>
                     <Col>
                         {this.directoryDisplay()}
                     </Col>

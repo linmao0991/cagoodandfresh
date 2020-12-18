@@ -1,0 +1,9 @@
+.dropdown-menu {
+    background-color: #343a40;
+    border: none;
+    border-radius: 0;
+}
+
+.dropdown-item {
+    color: white;
+}
