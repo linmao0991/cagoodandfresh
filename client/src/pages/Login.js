@@ -57,8 +57,8 @@ const Login = () =>{
                 email: email,
                 password: password
             }).then( response => {
-                emailNameInput(null)
-                passwordInput(null)
+                emailNameInput('')
+                passwordInput('')
                 loginContext.login(response);
             }).catch( err => {
                 console.log(err.response.data.error)
@@ -75,6 +75,14 @@ const Login = () =>{
         }
     }
 
+    const handlePasswordInput = input => {
+        passwordInput(input)
+    }
+
+    const handleEmailInput = input => {
+        emailNameInput(input)
+    }
+
     const logUserIn = () => {
         setLoggingIn(true)
         console.log(checkInputs())
@@ -83,8 +91,8 @@ const Login = () =>{
                 email: email,
                 password: password
             }).then(response => {
-                emailNameInput(null)
-                passwordInput(null)
+                emailNameInput('')
+                passwordInput('')
                 loginContext.login(response);
             }).catch( err => {
                 console.log("[Login Failed]")
@@ -134,7 +142,7 @@ const Login = () =>{
                             value = {email}
                             type = "email"
                             autoComplete= "email"
-                            onChange = {event => emailNameInput(event.target.value)}
+                            onChange = {event => handleEmailInput(event.target.value)}
                             className="form-control validate"
                         />
                         <br />
@@ -146,7 +154,7 @@ const Login = () =>{
                             value = {password}
                             type = "password"
                             autoComplete= "current-password"
-                            onChange = {event => passwordInput(event.target.value)}
+                            onChange = {event => handlePasswordInput(event.target.value)}
                             className="form-control validate"
                         />
                         <br />
