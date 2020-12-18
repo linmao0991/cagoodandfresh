@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Container, Row, Col, Navbar, Nav} from "react-bootstrap";
+import {Container, Row, Col, Navbar, Nav, NavDropdown} from "react-bootstrap";
 import LoginContext from "../context/LoginContext";
 import DirectoryContext from "../context/DirectoryContext";
 import AccountsPay from "./DirectoryPages/AccountsPay";
@@ -46,7 +46,8 @@ class Directory extends Component{
             paid_amount: 0,
             lot: '',
         },
-        invNewInvoiceItems: []
+        invNewInvoiceItems: [],
+        invSubDirectory: undefined,
     }
     static contextType = DirectoryContext;
 
@@ -126,6 +127,10 @@ class Directory extends Component{
         this.setState({invNewInvoiceItems: data})
     }
 
+    invContextStoreSubDir = (data) => {
+        this.setState({invSubDirectory: data})
+    }
+
     directoryDisplay = () =>{
         switch (this.context.currentDir) {
             case "Accounts Payable":
@@ -140,6 +145,7 @@ class Directory extends Component{
                 return (
                     <InventoryContext.Provider
                         value = {{
+                            subdirectory: this.state.invSubDirectory,
                             categories: this.state.productCate,
                             permission_level: this.props.permission_level,
                             products: this.state.invProductsData,
@@ -154,6 +160,7 @@ class Directory extends Component{
                             storeSelectedProduct: this.invContextSelectedProductStore,
                             storeNewInvoiceDetails: this.invContextStoreNewInvoiceDetails,
                             storeNewInvoiceItems: this.invContextStoreNewInvoiceItems,
+                            storeSubDirectory: this.invContextStoreSubDir,
                         }}
                     >
                         <Inventory/>
@@ -190,11 +197,17 @@ class Directory extends Component{
 
     setNavExpanded(expanded) {
         this.setState({ navExpanded: expanded });
-      }
+    }
     
-      closeNav() {
+    closeNav() {
         this.setState({ navExpanded: false });
-      }
+    }
+
+    switchToInventory = (subDirectory) => {
+        this.invContextStoreSubDir(subDirectory)
+        this.context.switchDir("Inventory")
+        this.closeNav()
+    }
 
     render(){
         return(
@@ -218,7 +231,27 @@ class Directory extends Component{
                                     null}
                                     {login.permissionLevel >=2?
                                         <>
-                                        <Nav.Link onClick={() => {this.context.switchDir("Inventory");this.closeNav()}}>Inventory</Nav.Link>{" "}
+                                        {/* <Nav.Link onClick={() => {this.context.switchDir("Inventory");this.closeNav()}}>Inventory</Nav.Link>{" "} */}
+                                        <NavDropdown title="Inventory" id="basic-nav-dropdown">
+                                            <NavDropdown.Item 
+                                                href=""
+                                                onClick={() => this.switchToInventory("Search-Inventory")}
+                                            >
+                                                Search
+                                            </NavDropdown.Item>
+                                            <NavDropdown.Item 
+                                                href=""
+                                                onClick={() => this.switchToInventory("Add-Inventory")}
+                                            >
+                                                 Add Inventory
+                                            </NavDropdown.Item>
+                                            <NavDropdown.Item 
+                                                href=""
+                                                disabled
+                                            >
+                                                Add Product
+                                            </NavDropdown.Item>
+                                        </NavDropdown>
                                         <Nav.Link disabled={true} onClick={() => {this.context.switchDir("Accounts Receivable");this.closeNav()}}>Accounts Receivable</Nav.Link>{" "}
                                         <Nav.Link disabled={true} onClick={() => {this.context.switchDir("Accounts Payable");this.closeNav()}}>Accounts Payable</Nav.Link>{" "}
                                         </>

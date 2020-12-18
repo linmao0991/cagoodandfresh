@@ -1,6 +1,7 @@
 import React from "react";
 
 const inventoryContext = React.createContext({
+    subdirectory: undefined,
     categories: undefined,
     permission_level: undefined,
     products: undefined,
@@ -47,6 +48,7 @@ const inventoryContext = React.createContext({
     storeSelectedProduct: () => {},
     storeNewInvoiceDetails: () => {},
     storeNewInvoiceItems: () => {},
+    storeSubDirectory: () => {}
 })
 
 export default inventoryContext
