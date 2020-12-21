@@ -10,11 +10,11 @@ function OrderCart (props) {
     const handlePaymentInfo = (objectKey, objectValue) => {
         let paymentInfo = {...orderContext.paymentInfo, [objectKey]: objectValue}
         if(objectValue === "Cash"){
-            paymentInfo.checkNumber = null
+            paymentInfo.checkNumber = false
         }
         if(objectValue === "Account"){
             paymentInfo.paymentAmount = 0
-            paymentInfo.checkNumber = null
+            paymentInfo.checkNumber = false
         }
         orderContext.storePaymentInfo(paymentInfo)
     }

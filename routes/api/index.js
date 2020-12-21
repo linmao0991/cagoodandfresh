@@ -6,8 +6,10 @@ let router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const yelp = require('yelp-fusion');
+const { resolve } = require('path');
 const client = yelp.client(process.env.YELP_KEY);
 
+//Global Functions
 //Function to check user permission level agianst required level for function.
 checkPermission = (user, permission_req) =>{
   if(user.permission_level >= permission_req){
@@ -16,6 +18,104 @@ checkPermission = (user, permission_req) =>{
     return false
   }
 }
+
+recordCashLedger = data => {
+  return new Promise((resolve, reject) => {
+    console.log("[Record Cash Tranaction]")
+    let { 
+      accountTable,
+      accountTableId,
+      credit = 0,
+      debit = 0,
+      check = false,
+      cash = false, 
+      checkNumber = null,
+      note = null,
+      referenceNumber,
+      referenceId,
+      exmmployee_id
+    } = data
+    db.cash.create({
+      account: accountTable,
+      account_id: accountTableId,
+      credit: credit,
+      debit: debit,
+      check: check,
+      cash: cash,
+      check_number: checkNumber,
+      note: note,
+      employee_id: exmmployee_id,
+      reference: referenceNumber,
+      reference_id: referenceId 
+    }).then( dbCash => {
+      console.log("[Cash Tranaction Recorded]")
+      console.log(dbCash)
+      resolve(dbCash)
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+recordAccountsReceiveable = (data) => {
+  return new Promise((resolve, reject) => {
+    console.log("[Record AR]")
+    let {
+      credit = 0,
+      debit = 0,
+      note = null,
+      invoice_number,
+      invoice_id,
+      exmmployee_id
+    } = data
+
+    db.accounts_receivable.create({
+      credit: credit,
+      debit: debit,
+      note: note,
+      //Reference to accounts_receivable_invoice
+      reference: invoice_number,
+      reference_id: invoice_id,
+      employee_id: exmmployee_id,
+    }).then( result => {
+      console.log("[AR Recorded]")
+      resolve(result)
+    }).catch( err => {
+      reject(err)
+    })
+  })
+}
+
+recordSalesRevenue = (data) => {
+  return new Promise((resolve, reject) => {
+    console.log("[Record Sales Revenue]")
+    let {
+      customer_account_number,
+      credit = 0,
+      debit = 0,
+      note = null,
+      ar_invoice_id,
+      ar_invoice_number,
+      exmmployee_id
+    } = data
+    db.sales_revenue.create({
+      customer_account_number: customer_account_number,
+      credit: credit,
+      debit: debit,
+      note: note,
+      ar_invoice_number: ar_invoice_number,
+      ar_invoice_id: ar_invoice_id,
+      employee_id: exmmployee_id
+    }).then( dbSalesRevenue => {
+      console.log("[Sales Transaction Recorded]")
+      resolve(dbSalesRevenue)
+    }).catch( err => {
+      reject(err)
+    })
+  })
+}
+
+//End Global Functions
 
 //Search yelp for potential new customers
 router.post("/new_customer_search_yelp", (req, res) => {
@@ -340,6 +440,48 @@ router.get("/get_product_categories", (req, res) =>{
   }
 });
 
+//Add ap invoice and inventory records
+router.post("/add_ap_invoice", (req,res) => {
+  const recordInventory = (inventory) => {
+    return new Promise((resolve, reject) => {
+      db.inventory.create({
+        inventory
+      }).then(response => {
+        resolve(response)
+      }).catch( err => {
+        resolve({
+          error: err,
+          info: {
+            status: 'FAILED',
+            inventory: inventory
+          }})
+      })
+    })
+  }
+
+  let permission_level = 3
+  if(checkPermission(req.user, permission_level)){
+    db.accounts_payable_invoices.create(
+      req.invoiceDetails).then( response => {
+        let recordInvArray = req.inventoryDetials.map(invenotry => {
+          return recordInventory({...inventory, ap_invoice_id: response.data.id})
+        })
+       Promise.all(recordInvArray).then( result => {
+         res.json({
+           accounts_payable_invoice: response,
+           inventory_items: result
+         })
+       })
+    }).catch( err => {
+      res.json(err)
+    })
+  }else{
+    console.log("User Unauthorized")
+    console.log("User: "+req.user.id)
+    res.status(401).json({ error: "User Unauthorized"});
+  }
+})
+
 //Update Inventory record
 router.post("/update_inventory", (req, res) => {
   const permission_req = 2;
@@ -454,18 +596,20 @@ router.get("/get_all_products", (req, res) => {
               products.supplier_tertiary_id,
               products.weight,
               products.description,
-              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
+              IFNULL(inventory.total_quantity - IFNULL(transaction.total_quantity,0),0) AS inventory_count
           FROM products
           LEFT JOIN (
             SELECT product_code,
-              SUM(quantity) AS total_quantity
+                    IFNULL(SUM(quantity),0) as total_quantity
             FROM inventory_transaction
+            WHERE quantity IS NOT NULL
             GROUP BY product_code
           ) transaction ON transaction.product_code = products.id
           LEFT JOIN (
             SELECT product_code,
-              SUM(invoice_quantity) as total_quantity
+                    IFNULL(SUM(invoice_quantity),0) as total_quantity
             FROM inventory
+            WHERE invoice_quantity IS NOT NULL
             GROUP BY product_code
           ) inventory ON inventory.product_code = products.id
           GROUP BY products.id
@@ -510,23 +654,25 @@ router.post("/get_products_by_category", (req, res) =>{
               products.supplier_tertiary_id,
               products.weight,
               products.description,
-              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-      FROM products
-      LEFT JOIN (
-        SELECT product_code,
-                SUM(quantity) AS total_quantity
-        FROM inventory_transaction
-        GROUP BY product_code
-      ) transaction ON transaction.product_code = products.id
-      LEFT JOIN (
-        SELECT product_code,
-                SUM(invoice_quantity) as total_quantity
-        FROM inventory
-        GROUP BY product_code
-      ) inventory ON inventory.product_code = products.id
-      WHERE products.${req.body.searchType} = '${req.body.searchData}'
-      GROUP BY products.id
-      ORDER BY holding DESC;`
+          IFNULL(inventory.total_quantity - IFNULL(transaction.total_quantity,0),0) AS inventory_count
+          FROM products
+          LEFT JOIN (
+            SELECT product_code,
+                    IFNULL(SUM(quantity),0) as total_quantity
+            FROM inventory_transaction
+            WHERE quantity IS NOT NULL
+            GROUP BY product_code
+          ) transaction ON transaction.product_code = products.id
+          LEFT JOIN (
+            SELECT product_code,
+                    IFNULL(SUM(invoice_quantity),0) as total_quantity
+            FROM inventory
+            WHERE invoice_quantity IS NOT NULL
+            GROUP BY product_code
+          ) inventory ON inventory.product_code = products.id
+          WHERE products.${req.body.searchType} = '${req.body.searchData}'
+          GROUP BY products.id
+          ORDER BY holding DESC;`
       ,{type: db.sequelize.QueryTypes.SELECT}
     ).then(data => {
       res.json(data)
@@ -564,20 +710,20 @@ router.post("/search_inventory_by_input", (req, res) => {
               products.supplier_tertiary_id,
               products.weight,
               products.description,
-              IFNULL(inventory.total_quantity - transaction.total_quantity,0) AS inventory_count
-      FROM products
-      LEFT JOIN (
-        SELECT product_code,
-                SUM(quantity) AS total_quantity
-        FROM inventory_transaction
-        GROUP BY product_code
-      ) transaction ON transaction.product_code = products.id
-      LEFT JOIN (
-        SELECT product_code,
-                SUM(invoice_quantity) as total_quantity
-        FROM inventory
-        GROUP BY product_code
-      ) inventory ON inventory.product_code = products.id
+              IFNULL(inventory.total_quantity - IFNULL(transaction.total_quantity,0),0) AS inventory_count
+        FROM products
+        LEFT JOIN (
+          SELECT product_code,
+                  SUM(quantity) as total_quantity
+          FROM inventory_transaction
+          GROUP BY product_code
+        ) transaction ON transaction.product_code = products.id
+        LEFT JOIN (
+          SELECT product_code,
+                  SUM(invoice_quantity) as total_quantity
+          FROM inventory
+          GROUP BY product_code
+        ) inventory ON inventory.product_code = products.id
       WHERE products.id LIKE '%${req.body.searchInput}&'
       OR products.name_english LIKE '%${req.body.searchInput}%'
       OR products.name_chinese LIKE '%${req.body.searchInput}%'
@@ -705,6 +851,7 @@ router.post('/get_product_suppliers', (req, res) => {
 
 //Get inventory by product code (product id)
 router.post("/get_inventory_by_product_code",(req, res) => {
+    console.log(req.body.productCode)
     const permission_req = 1
     if(checkPermission(req.user, permission_req)){
       db.inventory.findAll({
@@ -716,6 +863,7 @@ router.post("/get_inventory_by_product_code",(req, res) => {
           as: 'inventory_transactions',
         }
       }).then( results =>{
+        console.log(results)
         let newResults = results.reduce((accumulator, currentValue) => {
           //Set current quantity to invoice_quantity
           let currentQuantity = currentValue.invoice_quantity
@@ -733,9 +881,9 @@ router.post("/get_inventory_by_product_code",(req, res) => {
           if( currentQuantity > 0 || req.body.allInventory === true){
             accumulator.push(newInventory)
           }
-
           return accumulator
         },[])
+        console.log(newResults)
         //Send new inventory with current quantities to client
         res.json(newResults);
       }).catch( err => {
@@ -754,10 +902,11 @@ router.post('/submit_order', (req,res)=>{
     const permission_req = 1
 
     //Promise to create transaction record in inventory_transaction table
-    const inventoryTransaction = (invoiceNumber, data) => {
+    const inventoryTransaction = (invoice, data) => {
       return new Promise((reslove, reject) => {
         db.inventory_transaction.create({
-          ar_invoice_number: invoiceNumber,
+          ar_invoice_id: invoice.id,
+          ar_invoice_number: invoice.invoice_number,
           inventory_id: data.inventory_id,
           product_code: data.product_code,
           product_name_english: data.name_english,
@@ -778,89 +927,109 @@ router.post('/submit_order', (req,res)=>{
       })
     }
 
-    //Promise to record payment in collections table
-    const recordPayment = async (invoice) => {
-      return new Promise((reslove, reject) => {
-        //Checks for payment type of check by looking for check number, then settng checkBoolean based on if check number is true or false
-        let checkBoolean = () => {
-          return (req.body.orderData.paymentInfo.checkNumber? true: false)
-        }
-        //Calcualtes change from payment and total sales sets to change.
-        let change = () => {
-          return( (req.body.orderData.paymentInfo.paymentAmount >= req.body.orderData.cartTotalSale)?
-            req.body.orderData.paymentInfo.paymentAmount - req.body.orderData.cartTotalSale:0)
-        }
-        //Create transaction record
-        db.collections.create({
-          date: req.body.orderData.orderDate,
-          collection_amount: req.body.orderData.paymentInfo.paymentAmount,
+    //Function to get invoice and all assoicated tables.
+    const getCompletedOrder = (invoice) => {
+      return new Promise((resolve,reject) => {
+        console.log("[Completing Order]")
+        db.accounts_receivable_invoices.findOne({
+          where: {
+            invoice_number: invoice.invoice_number
+          },
+          include:[
+            {model: db.inventory_transaction},
+            {model: db.cash}
+          ]
+        }).then( dbInvoice => {
+          db.cash.findAll({
+            where: {
+              [Op.and]: [
+                {reference_id: dbInvoice.invoice.id},
+                {reference: 'accounts_receivable_invoices'}
+              ]
+            }
+          }).then(dbCash => {
+            console.log("[Order Completed]")
+            resolve(dbCash)
+            //res.json(result)
+          })
+        }).catch( err => {
+          reject(err)
+          //res.status(404).json({ error: err});
+        })
+      })
+    }
+
+    const createArInvoice = () => {
+      return new Promise((resolve,reject) => {
+        console.log("[Create AR Invoice]")
+        db.accounts_receivable_invoices.create({
+          customer_account_number: req.body.orderData.customerData.customer_account_number,
+          order_date: req.body.orderData.orderDate,
+          //delivery_date: req.body,
+          //pickup_date: req.body,
           invoice_total: req.body.orderData.cartTotalSale,
-          check: (req.body.orderData.paymentInfo.paymentType === "Check"? true: false),
-          cash: (req.body.orderData.paymentInfo.paymentType === "Cash"? true: false),
-          check_number: req.body.orderData.paymentInfo.checkNumber,
-          check_memo: null,
-          change: change(),
-          note: null,
           employee_id: req.user.id,
-          ar_invoice_number: invoice.invoice_number, 
-        }).then( dbCollection => {
-          reslove(dbCollection)
-        }).catch(err => {
+          payment_status: req.body.orderData.paymentStatus
+        }).then( dbInvoice => {
+          console.log("[AR Invoice Created]")
+          resolve(dbInvoice)
+        }).catch( err => {
           reject(err)
         })
       })
-    }
+    } 
 
-    //Function to get invoice and all assoicated tables.
-    const getCompletedOrder = (invoice) => {
-      db.accounts_receivable_invoices.findOne({
-        where: {
-          invoice_number: invoice.invoice_number
-        },
-        include:[
-          {model: db.inventory_transaction},
-          {model: db.collections}
-        ]
-      }).then( result => {
-        res.json(result)
-      }).catch( err => {
-        console.log(err)
-        res.status(404).json({ error: err});
+  const submitOrder = async () => {
+    //Create array of promse function inventoryTransaction() for each transaction
+    //Creates new accounts receivable invoice record
+    let dbInvoice = await createArInvoice()
+
+    let transactionData = req.body.orderData.cartData.map(transaction => {
+      return inventoryTransaction(dbInvoice, transaction)
+    })
+    //Promise all using the array transactionData to create each transaction records asynchronously
+    await Promise.all(transactionData)
+    //Wait for promise function to create a new accounts receivable record
+    let dbAccountsReceivable = await recordAccountsReceiveable({
+      debit: dbInvoice.invoice_total,
+      note: null,
+      invoice_number: dbInvoice.invoice_number,
+      invoice_id: dbInvoice.id,
+      exmmployee_id: req.user.id
+    })
+
+    let dbSalesRevenueRec = await recordSalesRevenue({
+      customer_account_number: dbInvoice.customer_account_number,
+      credit: dbInvoice.invoice_total,
+      note: null,
+      ar_invoice_id: dbInvoice.id,
+      ar_invoice_number: dbInvoice.invoice_number,
+      exmmployee_id: req.user.id
+    })
+
+    if(req.body.orderData.paymentInfo.paymentAmount >= 0){
+      console.log()
+      console.log("Record Payment")
+      await recordCashLedger({
+        accountTable: "accounts_receivable",
+        accountTableId: dbAccountsReceivable.id,
+        debit: +req.body.orderData.paymentInfo.paymentAmount,
+        check: req.body.orderData.paymentInfo.checkNumber? true: false,
+        cash: req.body.orderData.paymentInfo.checkNumber? false: true, 
+        checkNumber: req.body.orderData.paymentInfo.checkNumber? req.body.paymentInfo.checkNumber: null,
+        note: null,
+        referenceNumber: dbInvoice.invoice_number,
+        referenceId: dbInvoice.id,
+        exmmployee_id: req.user.id
       })
     }
+    let completedOrder = await getCompletedOrder(dbInvoice)
+
+    res.json(completedOrder)
+  }
 
     if(checkPermission(req.user, permission_req)){
-      //Creates new accounts receivable invoice record
-      db.accounts_receivable_invoices.create({
-        customer_account_number: req.body.orderData.customerData.customer_account_number,
-        order_date: req.body.orderData.orderDate,
-        //delivery_date: req.body,
-        //pickup_date: req.body,
-        invoice_total: req.body.orderData.cartTotalSale,
-        employee_id: req.user.id,
-        payment_status: req.body.orderData.paymentStatus
-      }).then( dbInvoice => {
-      //Create inventory transactions
-        
-        // transactionsData will hold array of inventoryTransaction promises passing in each transaction
-        let transactionData = req.body.orderData.cartData.map(transaction => {
-          return inventoryTransaction(dbInvoice.invoice_number, transaction)
-        })
-
-        //Promise all using the array transactionData to create each transaction records asynchronously  
-        Promise.all(transactionData).then( dbTransactions => {
-          //If function to record payment if there was a payment, otherwise run function getCompletedOrder function to get
-          //invoice data and send back to client
-          if(["Paid","Partial"].indexOf(req.body.orderData.paymentStatus) >= 0){
-            console.log("Record Payment")
-            recordPayment(dbInvoice).then( result => {
-              getCompletedOrder(dbInvoice)
-            })
-          }else{
-            getCompletedOrder(dbInvoice)
-          }
-        })
-      })
+      submitOrder()
     }else{
       console.log("User Unauthorized")
       console.log("User: "+req.user.id)

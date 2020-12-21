@@ -10,7 +10,7 @@ const inventoryContext = React.createContext({
     selectedProduct: undefined,
     //Used for creating new inventory, but new accounts payable invoice record must be created fiest
     newInvoiceDetails: {
-        invoice_number: undefined,
+        ap_invoice_number: undefined,
         purchase_order_number: undefined,
         invoice_date: undefined,
         due_date: undefined,

@@ -3,6 +3,9 @@ module.exports = function ( sequelize, DataTypes){
         // product_code: {
         //     type: DataTypes.STRING,
         // },
+        ap_invoice_number: {
+            type: DataTypes.STRING
+        },
         name_english: {
             type: DataTypes.STRING
         },
