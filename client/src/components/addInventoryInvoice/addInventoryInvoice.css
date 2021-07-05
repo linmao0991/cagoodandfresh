@@ -9,8 +9,13 @@
     font-weight: bold;
 }
 
-#supplier-name::-webkit-input-placeholder{
+#invoice-total,#supplier-name{
     color: white;
+}
+
+#invoice-total,#supplier-name{
+    background-color:#4d4b4b!important;
+    border: 1px solid #4d4b4b
 }
 
 .invoice-item-container {
@@ -37,6 +42,39 @@
 
 .invoice-item-list-mobile {
     display: none;
+}
+
+.item-card {
+    border-bottom: 1px solid grey;
+    border-top: 1px solid grey;
+    background-color: none;
+    color: 'white';
+}
+
+.item-card .card-header:hover{
+    border-color: white;
+    background-color:#5f5f5f;
+    cursor: pointer;
+    color: #ffc107
+}
+
+.item-card .card-header{
+    background-color: #404040;
+    color: white;
+}
+
+.card-header-title{
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.card-header-arrow {
+    display:inline;
+    border: 1px solid white;
+    padding: 2px 3px 2px 2px;
+    font-size: 10px;
+    border-radius: 5px;
+    margin-right: 5px;
 }
 
 @media only screen and (max-width: 768px) {

@@ -34,7 +34,7 @@ class Directory extends Component{
             checkNumber: null,
         },
         invNewInvoiceDetails: {
-            invoice_number: '',
+            ap_invoice_number: '',
             purchase_order_number: '',
             invoice_date: '',
             due_date: '',

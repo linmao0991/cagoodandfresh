@@ -9,6 +9,9 @@ module.exports = function ( sequelize, DataTypes){
         product_name_chinese: {
             type: DataTypes.STRING
         },
+        ar_invoice_number : {
+            type: DataTypes.STRING
+        },
         upc: {
             type: DataTypes.STRING
         },

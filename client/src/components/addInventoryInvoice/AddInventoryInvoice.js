@@ -1,5 +1,5 @@
 import React,{useState, useContext, Suspense, useEffect} from 'react';
-import {Container, Row, Col, Button, Spinner, Modal, InputGroup, FormControl, Badge, Accordion, Card} from 'react-bootstrap';
+import {Container, Row, Col, Button, Spinner, Modal, InputGroup, FormControl, Badge, Accordion, Card, Dropdown, SplitButton} from 'react-bootstrap';
 import InventoryContext from '../../context/InventoryContext';
 import API from '../../utils/Api'
 import './addInventoryInvoice.css'
@@ -11,6 +11,7 @@ const AddInventoryInvoice = () => {
     const [showModal, setShowModal] = useState(false)
     const [modalData, setModalData] = useState(null)
     const [addItemLoading, setAddItemLoading] = useState(false)
+    const [submittingInv, setSubmittingInv] = useState(false)
 
     const modalSwitchFunction = () => {
         switch (modalData.type){
@@ -66,9 +67,8 @@ const AddInventoryInvoice = () => {
         setShowModal(false)
     }
 
-    const checkInvDetails = () => {
-        setAddItemLoading(true)
-        let inputValues = ["invoice-number","supplier-name","receive-date"]
+    const validateInvoiceDetails = () => {
+        let inputValues = ["ap-invoice-number","supplier-name","receive-date"]
         let checkInputValues = [];
         inputValues.forEach(inputValue => {
             if(document.getElementById(inputValue).value === undefined
@@ -84,7 +84,29 @@ const AddInventoryInvoice = () => {
                 document.getElementById(inputValue).style.removeProperty('border-width')
             }
         })
-        if(checkInputValues.every(value => {return value? true: false})){
+        return (checkInputValues.every(value => {return value? true: false}))
+    }
+
+    const validateInvoiceItems = () => {
+        let validateFields =['ap_invoice_number','purchase_order_number','supplier_id','supplier_name','receive_date','due_date',]
+        let validatedItemsArray = inventoryContext.newInvoiceItems.map((item,index) => {
+            validateFields.forEach(field =>{
+                if(inventoryContext.newInvoiceDetails[field] !== undefined &&
+                    item[field] !== inventoryContext.newInvoiceDetails[field]){
+                    item[field] = inventoryContext.newInvoiceDetails[field]
+                }else if (item[field] === undefined || item[field] === ""){
+                    item[field] = null
+                }
+            })
+            return item
+        })
+        console.log(validatedItemsArray)
+        return validatedItemsArray
+    }
+
+    const checkInvDetails = () => {
+        setAddItemLoading(true)
+        if(validateInvoiceDetails()){
             setAddItemLoading(false)
             handleModelSwitch('add-new-item','xl')
         }else{
@@ -123,6 +145,14 @@ const AddInventoryInvoice = () => {
         inventoryContext.storeNewInvoiceDetails(newInvoiceDetails)
     }
 
+    const submitInvoice = () => {
+        setSubmittingInv(true)
+        if(validateInvoiceDetails()){
+            validateInvoiceItems()
+            //setSubmittingInv(false)
+            console.log('success')
+        }
+    }
     //Runs if there is a change in newInvoiceItems context
     //--Will always run when switchig to different sub directories
     useEffect(()=> {
@@ -153,11 +183,11 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Invoice Number</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            value={inventoryContext.newInvoiceDetails.invoice_number}
+                            value={inventoryContext.newInvoiceDetails.ap_invoice_number}
                             placeholder="Invoice Number"
                             aria-label="Invoice Number"
-                            aria-describedby="invoice-number"
-                            id="invoice-number" 
+                            aria-describedby="ap-invoice-number"
+                            id="ap-invoice-number" 
                             onChange={(e) => handleInputchange(e)}
                             />
                         </InputGroup>     
@@ -177,57 +207,6 @@ const AddInventoryInvoice = () => {
                             />
                         </InputGroup>   
                     </Row>
-                    <Row>
-                        <InputGroup className="mb-3">
-                            <InputGroup.Prepend>
-                                <Button 
-                                    variant='warning' 
-                                    style={{width: '140px', fontWeight: 'bold', textAlign: 'left'}}
-                                    onClick={() => handleModelSwitch('search-supplier','xl')}
-                                    >Search</Button>
-                            </InputGroup.Prepend>
-                            <FormControl
-                            style={{backgroundColor:'#4d4b4b', color: 'white'}}
-                            disabled
-                            value={inventoryContext.newInvoiceDetails.supplier_name}
-                            id="supplier-name"
-                            placeholder="Select a Supplier"
-                            aria-label="Supplier"
-                            aria-describedby="supplier-name"
-                            >
-                            </FormControl>
-                            <InputGroup.Append>
-                                <InputGroup.Text 
-                                    style={{
-                                        backgroundColor:inventoryContext.newInvoiceDetails.supplier_name?'yellowgreen':"Red", 
-                                        fontWeight: 'bold',
-                                        color: 'white'}}
-                                >
-                                   {inventoryContext.newInvoiceDetails.supplier_name?'✓':'X'}
-                                </InputGroup.Text>
-                            </InputGroup.Append>
-                        </InputGroup>   
-                    </Row>
-                    <Row>
-                        <InputGroup className="mb-3">
-                            <InputGroup.Prepend>
-                                <InputGroup.Text>Invoice Total</InputGroup.Text>
-                            </InputGroup.Prepend>
-                            <FormControl
-                            style={{backgroundColor:'lightgrey'}}
-                            disabled
-                            value={`$${inventoryContext.newInvoiceDetails.invoice_total.toFixed(2)}`}
-                            id="invoice-total"
-                            placeholder="$0.00"
-                            type='text'
-                            aria-label="Invoice Total"
-                            aria-describedby="invoice-total"
-                            onChange={(e) => handleInputchange(e)}
-                            />
-                        </InputGroup>   
-                    </Row>
-                </Col>
-                <Col className='invoice-detail-column' md={6} lg={4}>
                     <Row>
                         <InputGroup className="mb-3">
                             <InputGroup.Prepend>
@@ -260,6 +239,38 @@ const AddInventoryInvoice = () => {
                             />
                         </InputGroup>
                     </Row>
+                </Col>
+                <Col className='invoice-detail-column' md={6} lg={4}>
+                    <Row>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Prepend>
+                                <Button 
+                                    variant='warning' 
+                                    style={{width: '140px', fontWeight: 'bold', textAlign: 'left'}}
+                                    onClick={() => handleModelSwitch('search-supplier','xl')}
+                                    >Search</Button>
+                            </InputGroup.Prepend>
+                            <FormControl
+                            disabled
+                            value={inventoryContext.newInvoiceDetails.supplier_name}
+                            id="supplier-name"
+                            placeholder="Select a Supplier"
+                            aria-label="Supplier"
+                            aria-describedby="supplier-name"
+                            >
+                            </FormControl>
+                            <InputGroup.Append>
+                                <InputGroup.Text 
+                                    style={{
+                                        backgroundColor:inventoryContext.newInvoiceDetails.supplier_name?'yellowgreen':"Red", 
+                                        fontWeight: 'bold',
+                                        color: 'white'}}
+                                >
+                                   {inventoryContext.newInvoiceDetails.supplier_name?'✓':'X'}
+                                </InputGroup.Text>
+                            </InputGroup.Append>
+                        </InputGroup>   
+                    </Row>
                     <Row>
                         <InputGroup className="mb-3">
                             <InputGroup.Prepend>
@@ -277,9 +288,36 @@ const AddInventoryInvoice = () => {
                         </InputGroup> 
                     </Row>
                     <Row>
-                        <Button variant='warning' style={{width: '100%'}} onClick={()=>checkInvDetails('add-new-item','xl')}>
+                        <InputGroup className="mb-3">
+                            <InputGroup.Prepend>
+                                <InputGroup.Text>Invoice Total</InputGroup.Text>
+                            </InputGroup.Prepend>
+                            <FormControl
+                            disabled
+                            value={`$${inventoryContext.newInvoiceDetails.invoice_total.toFixed(2)}`}
+                            id="invoice-total"
+                            placeholder="$0.00"
+                            type='text'
+                            aria-label="Invoice Total"
+                            aria-describedby="invoice-total"
+                            onChange={(e) => handleInputchange(e)}
+                            />
+                        </InputGroup>   
+                    </Row>
+                    <Row className="mb-3">
+                        {/* <Button id="add-invoice-item" variant='warning' style={{width: '100%', fontWeight: 'bold'}} onClick={()=>checkInvDetails('add-new-item','xl')}>
                             {addItemLoading? loadingSpinner: 'Add Invoice Item'}
-                        </Button>
+                        </Button> */}
+                        <SplitButton
+                            id="add-invoice-item"
+                            style={{width: '100%', fontWeight: 'bold'}}
+                            variant="warning"
+                            title={addItemLoading? loadingSpinner: 'Add Invoice Item'}
+                            onClick={()=>checkInvDetails('add-new-item','xl')}
+                        >
+                            <Dropdown.Item eventKey="1" onClick={submitInvoice}>Submit Invoice</Dropdown.Item>
+                            <Dropdown.Item eventKey="2">Clear Invoice</Dropdown.Item>
+                        </SplitButton>
                     </Row>
                 </Col>
             </Row>
@@ -326,13 +364,14 @@ const AddInventoryInvoice = () => {
                         <Accordion style={{width: '100%'}}>
                             {inventoryContext.newInvoiceItems.map((item, index) => {
                                 return(
-                                    <Card key={`m-${index}`}
-                                    style={{backgroundColor: '#333333', borderColor: 'black', color: 'white'}}>
+                                    <Card key={`m-${index}`} className="item-card">
                                         <Accordion.Toggle 
                                         as={Card.Header} 
                                         eventKey={`${index}`} 
-                                        style={{backgroundColor: '#d39e00', color: 'black', overflow: 'hidden', whiteSpace: 'nowrap'}}>
-                                            {item.invoice_quantity} - {item.name_english}
+                                        >
+                                            <div className="card-header-title" >
+                                                <div className="card-header-arrow">▼</div><div style={{display:'inline'}}>{item.invoice_quantity} - {item.name_english}</div>
+                                            </div>
                                         </Accordion.Toggle>
                                         <Accordion.Collapse eventKey={`${index}`}>
                                             <Card.Body>

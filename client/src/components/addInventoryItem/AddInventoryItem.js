@@ -287,7 +287,7 @@ const AddInventoryRecord = (props) => {
             //Same as product.id
             purchase_order_number: inventoryContext.newInvoiceDetails.purchase_order_number,
             //ap_invoice_number is the same as newInvoiceDetails.invoice_number
-            ap_invoice_number: inventoryContext.newInvoiceDetails.invoice_number,
+            ap_invoice_number: inventoryContext.newInvoiceDetails.ap_invoice_number,
             receive_date: inventoryContext.newInvoiceDetails.receive_date,
             supplier_id: inventoryContext.newInvoiceDetails.supplier_id,
             supplier_name: inventoryContext.newInvoiceDetails.supplier_name,
@@ -302,7 +302,7 @@ const AddInventoryRecord = (props) => {
         setItemDetail({...defaultDetails})
     }, [
         //ap_invoice_number is the same as newInvoiceDetails.invoice_number
-        inventoryContext.newInvoiceDetails.invoice_number,
+        inventoryContext.newInvoiceDetails.ap_invoice_number,
         inventoryContext.newInvoiceDetails.receive_date,
         inventoryContext.newInvoiceDetails.supplier_id,
         inventoryContext.newInvoiceDetails.supplier_name,

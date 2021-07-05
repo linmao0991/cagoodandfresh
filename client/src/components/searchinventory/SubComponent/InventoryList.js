@@ -96,6 +96,7 @@ function InventoryList (props){
             //allInventory means get all inventory including 0 quantity left.
             allInventory: true,
         }).then( results => {
+            console.log(results)
             inventoryContext.storeInventory(results.data)
             Api.getProductSuppliers({
                 supplier_ids: [product.supplier_primary_id,product.supplier_secondary_id,product.supplier_tertiary_id]
