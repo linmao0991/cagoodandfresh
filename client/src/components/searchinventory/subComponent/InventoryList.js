@@ -153,7 +153,7 @@ function InventoryList (props){
                     </>
                 )
             default:
-                return(null)
+                return null
         }
     }
 
