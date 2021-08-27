@@ -56,7 +56,7 @@ recordCashLedger = data => {
   })
 }
 
-recordAccountsReceiveable = (data) => {
+recordAccountsReceivable = (data) => {
   return new Promise((resolve, reject) => {
     console.log("[Record AR]")
     let {
@@ -971,7 +971,7 @@ router.post('/submit_order', (req,res)=>{
     //Creates new accounts receivable invoice record
     let dbInvoice = await createArInvoice()
 
-    let dbAccountsReceivable = await recordAccountsReceiveable({
+    let dbAccountsReceivable = await recordAccountsReceivable({
       debit: dbInvoice.invoice_total,
       note: null,
       invoice_number: dbInvoice.invoice_number,
