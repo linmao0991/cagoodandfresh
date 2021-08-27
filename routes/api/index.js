@@ -6,7 +6,6 @@ let router = require("express").Router();
 const { Op } = require("sequelize");
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const yelp = require('yelp-fusion');
-const { resolve } = require('path');
 const client = yelp.client(process.env.YELP_KEY);
 
 //Global Functions
@@ -902,23 +901,23 @@ router.post('/submit_order', (req,res)=>{
     const permission_req = 1
 
     //Promise to create transaction record in inventory_transaction table
-    const inventoryTransaction = (invoice, data) => {
+    const inventoryTransaction = (invoice, transaction) => {
       return new Promise((reslove, reject) => {
         db.inventory_transaction.create({
           ar_invoice_id: invoice.id,
           ar_invoice_number: invoice.invoice_number,
-          inventory_id: data.inventory_id,
-          product_code: data.product_code,
-          product_name_english: data.name_english,
-          product_name_chinese: data.name_chinese,
-          upc: data.upc,
-          quantity: data.quantity,
-          measurement_system: data.measurement_system,
-          weight: data.weight,
-          sale_price: data.sale_price,
-          cost: data.cost,
-          transaction_type: data.transaction_type,
-          location: data.location
+          inventory_id: transaction.inventory_id,
+          product_code: transaction.product_code,
+          product_name_english: transaction.name_english,
+          product_name_chinese: transaction.name_chinese,
+          upc: transaction.upc,
+          quantity: transaction.quantity,
+          measurement_system: transaction.measurement_system,
+          weight: transaction.weight,
+          sale_price: transaction.sale_price,
+          cost: transaction.cost,
+          transaction_type: transaction.transaction_type,
+          location: transaction.location
         }).then( result => {
           reslove(result)
         }).catch( err => {
@@ -937,21 +936,9 @@ router.post('/submit_order', (req,res)=>{
           },
           include:[
             {model: db.inventory_transaction},
-            {model: db.cash}
           ]
         }).then( dbInvoice => {
-          db.cash.findAll({
-            where: {
-              [Op.and]: [
-                {reference_id: dbInvoice.invoice.id},
-                {reference: 'accounts_receivable_invoices'}
-              ]
-            }
-          }).then(dbCash => {
-            console.log("[Order Completed]")
-            resolve(dbCash)
-            //res.json(result)
-          })
+          resolve( dbInvoice)
         }).catch( err => {
           reject(err)
           //res.status(404).json({ error: err});
@@ -984,12 +971,6 @@ router.post('/submit_order', (req,res)=>{
     //Creates new accounts receivable invoice record
     let dbInvoice = await createArInvoice()
 
-    let transactionData = req.body.orderData.cartData.map(transaction => {
-      return inventoryTransaction(dbInvoice, transaction)
-    })
-    //Promise all using the array transactionData to create each transaction records asynchronously
-    await Promise.all(transactionData)
-    //Wait for promise function to create a new accounts receivable record
     let dbAccountsReceivable = await recordAccountsReceiveable({
       debit: dbInvoice.invoice_total,
       note: null,
@@ -997,6 +978,13 @@ router.post('/submit_order', (req,res)=>{
       invoice_id: dbInvoice.id,
       exmmployee_id: req.user.id
     })
+
+    let transactionData = req.body.orderData.cartData.map(transaction => {
+      return inventoryTransaction(dbInvoice, transaction)
+    })
+    //Promise all using the array transactionData to create each transaction records asynchronously
+    await Promise.all(transactionData)
+    //Wait for promise function to create a new accounts receivable record
 
     let dbSalesRevenueRec = await recordSalesRevenue({
       customer_account_number: dbInvoice.customer_account_number,
@@ -1035,6 +1023,6 @@ router.post('/submit_order', (req,res)=>{
       console.log("User: "+req.user.id)
       res.status(401).json({ error: "User Unauthorized"});
     }
-  })
+})
 
 module.exports = router;
