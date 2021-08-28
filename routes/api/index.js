@@ -460,7 +460,6 @@ router.post("/add_ap_invoice", (req,res) => {
 
   if(checkPermission(req.user, permission_level)){
     const { invoiceDetails, inventoryRecords } = req.body
-
     db.accounts_payable_invoices.create(invoiceDetails).then(response => {
         let recordInvArray = []
         inventoryRecords.forEach(record => {
@@ -473,7 +472,6 @@ router.post("/add_ap_invoice", (req,res) => {
                 cost: parseFloat(record.cost)
               }))
         })
-        console.log(recordInvArray)
        Promise.all(recordInvArray).then(result => {
          if ( result.error) {
            console.log({error: result.error})
