@@ -5,24 +5,24 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: false,
             unique: true
         },
-        // supplier_id: {
-        //     type: DataTypes.STRING,
-        //     allowNull: true
-        // },
+        supplier_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true
+        },
         purchase_order_number: {
             type: DataTypes.STRING,
             allowNull: true
         },
         invoice_date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.STRING,
             allowNull: true
         },
         due_date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.STRING,
             allowNull: true
         },
         receive_date: {
-            type: DataTypes.DATEONLY,
+            type: DataTypes.STRING,
             allowNull: false
         },
         account_number: {
