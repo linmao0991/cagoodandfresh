@@ -441,11 +441,11 @@ router.get("/get_product_categories", (req, res) =>{
 
 //Add ap invoice and inventory records
 router.post("/add_ap_invoice", (req,res) => {
+  let permission_level = 3
+
   const recordInventory = (inventory) => {
     return new Promise((resolve, reject) => {
-      db.inventory.create({
-        inventory
-      }).then(response => {
+      db.inventory.create(inventory).then(response => {
         resolve(response)
       }).catch( err => {
         resolve({
@@ -458,17 +458,30 @@ router.post("/add_ap_invoice", (req,res) => {
     })
   }
 
-  let permission_level = 3
   if(checkPermission(req.user, permission_level)){
-    db.accounts_payable_invoices.create(
-      req.invoiceDetails).then( response => {
-        let recordInvArray = req.inventoryDetials.map(invenotry => {
-          return recordInventory({...inventory, ap_invoice_id: response.data.id})
+    const { invoiceDetails, inventoryRecords } = req.body
+
+    db.accounts_payable_invoices.create(invoiceDetails).then(response => {
+        let recordInvArray = []
+        inventoryRecords.forEach(record => {
+          recordInvArray.push(
+              recordInventory({
+                ...record,
+                ap_invoice_id: response.dataValues.id,
+                invoice_quantity: parseFloat(record.invoice_quantity),
+                sale_price: parseFloat(record.sale_price),
+                cost: parseFloat(record.cost)
+              }))
         })
-       Promise.all(recordInvArray).then( result => {
+        console.log(recordInvArray)
+       Promise.all(recordInvArray).then(result => {
+         if ( result.error) {
+           console.log({error: result.error})
+           res.json({error: result.error})
+         }
          res.json({
            accounts_payable_invoice: response,
-           inventory_items: result
+           inventory_items: result,
          })
        })
     }).catch( err => {
