@@ -1,8 +1,10 @@
 import React,{useState, useContext, Suspense, useEffect} from 'react';
 import {Container, Row, Col, Button, Spinner, Modal, InputGroup, FormControl, Badge, Accordion, Card, Dropdown, SplitButton} from 'react-bootstrap';
 import InventoryContext from '../../context/InventoryContext';
-import API from '../../utils/Api'
+import Api from '../../utils/Api'
 import './addInventoryInvoice.css'
+import { resetInventoryDetails } from "../../context/utils";
+
 const AddInventoryItem = React.lazy(() => import('../addInventoryItem/AddInventoryItem'));
 const SupplierList = React.lazy(() => import('../supplierlist/SupplierList'))
 
@@ -12,6 +14,12 @@ const AddInventoryInvoice = () => {
     const [modalData, setModalData] = useState(null)
     const [addItemLoading, setAddItemLoading] = useState(false)
     const [submittingInv, setSubmittingInv] = useState(false)
+    const [newInvoiceDetails, setNewInventoryDetails] = useState(inventoryContext.newInvoiceDetails)
+    const { ap_invoice_number, purchase_order_number, receive_date, due_date, paid_amount, invoice_total, supplier_name } = newInvoiceDetails
+
+    useEffect(() => {
+        setNewInventoryDetails(inventoryContext.newInvoiceDetails)
+    }, [inventoryContext])
 
     const modalSwitchFunction = () => {
         switch (modalData.type){
@@ -46,9 +54,7 @@ const AddInventoryInvoice = () => {
                     </>
                 )
             default:
-                return(
-                    null
-                )
+                return null
         }
     }
 
@@ -84,12 +90,12 @@ const AddInventoryInvoice = () => {
                 document.getElementById(inputValue).style.removeProperty('border-width')
             }
         })
-        return (checkInputValues.every(value => {return value? true: false}))
+        return (checkInputValues.every(value => { return !!value}))
     }
 
     const validateInvoiceItems = () => {
-        let validateFields =['ap_invoice_number','purchase_order_number','supplier_id','supplier_name','receive_date','due_date',]
-        let validatedItemsArray = inventoryContext.newInvoiceItems.map((item,index) => {
+        let validateFields =['ap_invoice_number','purchase_order_number','supplier_id']
+        let validatedItemsArray = inventoryContext.newInvoiceItems.map(item => {
             validateFields.forEach(field =>{
                 if(inventoryContext.newInvoiceDetails[field] !== undefined &&
                     item[field] !== inventoryContext.newInvoiceDetails[field]){
@@ -133,7 +139,7 @@ const AddInventoryInvoice = () => {
         inventoryContext.storeNewInvoiceItems(newInvoiceItems)
     }
 
-    const handleInputchange = e => {
+    const handleInputChange = e => {
         let newInvoiceDetails = {...inventoryContext.newInvoiceDetails}
         let fieldName = e.target.id.replace(/-/g,'_')
         newInvoiceDetails[fieldName] = e.target.value
@@ -148,13 +154,34 @@ const AddInventoryInvoice = () => {
     const submitInvoice = () => {
         setSubmittingInv(true)
         if(validateInvoiceDetails()){
-            validateInvoiceItems()
-            //setSubmittingInv(false)
+            const {ap_invoice_number, invoice_date, due_date, receive_date, account_number, invoice_total, paid_amount, purchase_order_number, supplier_id } = inventoryContext.newInvoiceDetails
+            let invoiceData = {
+                invoiceDetails: {
+                    invoice_number: ap_invoice_number,
+                    purchase_order_number,
+                    invoice_date,
+                    due_date,
+                    receive_date,
+                    invoice_total,
+                    payment_status: (paid_amount >= invoice_total),
+                    supplier_id,
+                    account_number,
+                },
+                inventoryRecords: validateInvoiceItems()
+            }
+            Api.addInventoryInvoice(invoiceData).then(res => {
+                console.log(res)
+                resetInventoryDetails(inventoryContext)
+                inventoryContext.storeNewInvoiceItems([])
+                document.getElementsByTagName('input').value = ''
+                setSubmittingInv(false)
+            })
             console.log('success')
         }
     }
+
     //Runs if there is a change in newInvoiceItems context
-    //--Will always run when switchig to different sub directories
+    //--Will always run when switching to different sub directories
     useEffect(()=> {
         //If newInvoiceItems array has items, calculates new invoice total using array.
         if(Array.isArray(inventoryContext.newInvoiceItems) && 
@@ -183,12 +210,13 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Invoice Number</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            value={inventoryContext.newInvoiceDetails.ap_invoice_number}
-                            placeholder="Invoice Number"
-                            aria-label="Invoice Number"
-                            aria-describedby="ap-invoice-number"
-                            id="ap-invoice-number" 
-                            onChange={(e) => handleInputchange(e)}
+                                disabled={submittingInv}
+                                value={ap_invoice_number}
+                                placeholder="Invoice Number"
+                                aria-label="Invoice Number"
+                                aria-describedby="ap-invoice-number"
+                                id="ap-invoice-number"
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup>     
                     </Row>
@@ -198,12 +226,13 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>PO Number</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            value={inventoryContext.newInvoiceDetails.purchase_order_number}
-                            id="purchase-order-number"
-                            placeholder="PO Number"
-                            aria-label="PO Number"
-                            aria-describedby="po-number"
-                            onChange={(e) => handleInputchange(e)}
+                                disabled={submittingInv}
+                                value={purchase_order_number}
+                                id="purchase-order-number"
+                                placeholder="PO Number"
+                                aria-label="PO Number"
+                                aria-describedby="po-number"
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup>   
                     </Row>
@@ -213,13 +242,14 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Receive Date</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            id="receive-date"
-                            value={inventoryContext.newInvoiceDetails.receive_date}
-                            placeholder="MM/DD/YYYY"
-                            aria-label="Receive Date"
-                            aria-describedby="receive-date"
-                            type='date'
-                            onChange={(e) => handleInputchange(e)}
+                                disabled={submittingInv}
+                                id="receive-date"
+                                value={receive_date}
+                                placeholder="MM/DD/YYYY"
+                                aria-label="Receive Date"
+                                aria-describedby="receive-date"
+                                type='date'
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup> 
                     </Row>
@@ -229,13 +259,14 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Due Date</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            id="due-date"
-                            value={inventoryContext.newInvoiceDetails.due_date}
-                            placeholder="MM/DD/YYYY"
-                            aria-label="Due Date"
-                            aria-describedby="due-date"
-                            type='date'
-                            onChange={(e) => handleInputchange(e)}
+                                disabled={submittingInv}
+                                id="due-date"
+                                value={due_date}
+                                placeholder="MM/DD/YYYY"
+                                aria-label="Due Date"
+                                aria-describedby="due-date"
+                                type='date'
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup>
                     </Row>
@@ -244,29 +275,31 @@ const AddInventoryInvoice = () => {
                     <Row>
                         <InputGroup className="mb-3">
                             <InputGroup.Prepend>
-                                <Button 
+                                <Button
+                                    disabled={submittingInv}
                                     variant='warning' 
                                     style={{width: '140px', fontWeight: 'bold', textAlign: 'left'}}
                                     onClick={() => handleModelSwitch('search-supplier','xl')}
                                     >Search</Button>
                             </InputGroup.Prepend>
                             <FormControl
-                            disabled
-                            value={inventoryContext.newInvoiceDetails.supplier_name}
-                            id="supplier-name"
-                            placeholder="Select a Supplier"
-                            aria-label="Supplier"
-                            aria-describedby="supplier-name"
+                                disabled
+                                value={supplier_name}
+                                id="supplier-name"
+                                placeholder="Select a Supplier"
+                                aria-label="Supplier"
+                                aria-describedby="supplier-name"
                             >
                             </FormControl>
                             <InputGroup.Append>
                                 <InputGroup.Text 
                                     style={{
-                                        backgroundColor:inventoryContext.newInvoiceDetails.supplier_name?'yellowgreen':"Red", 
+                                        backgroundColor: supplier_name ? 'yellowgreen' : "Red",
                                         fontWeight: 'bold',
-                                        color: 'white'}}
+                                        color: 'white'
+                                    }}
                                 >
-                                   {inventoryContext.newInvoiceDetails.supplier_name?'✓':'X'}
+                                   {supplier_name?'✓':'X'}
                                 </InputGroup.Text>
                             </InputGroup.Append>
                         </InputGroup>   
@@ -277,13 +310,14 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Paid Amount</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            value={inventoryContext.newInvoiceDetails.paid_amount}
-                            placeholder="$0.00"
-                            aria-label="Paid Amount"
-                            aria-describedby="paid-amount"
-                            type='number'
-                            id="paid-amount"
-                            onChange={(e) => handleInputchange(e)}
+                                disabled={submittingInv}
+                                value={paid_amount}
+                                placeholder="$0.00"
+                                aria-label="Paid Amount"
+                                aria-describedby="paid-amount"
+                                type='number'
+                                id="paid-amount"
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup> 
                     </Row>
@@ -293,14 +327,14 @@ const AddInventoryInvoice = () => {
                                 <InputGroup.Text>Invoice Total</InputGroup.Text>
                             </InputGroup.Prepend>
                             <FormControl
-                            disabled
-                            value={`$${inventoryContext.newInvoiceDetails.invoice_total.toFixed(2)}`}
-                            id="invoice-total"
-                            placeholder="$0.00"
-                            type='text'
-                            aria-label="Invoice Total"
-                            aria-describedby="invoice-total"
-                            onChange={(e) => handleInputchange(e)}
+                                disabled
+                                value={`$${invoice_total.toFixed(2)}`}
+                                id="invoice-total"
+                                placeholder="$0.00"
+                                type='text'
+                                aria-label="Invoice Total"
+                                aria-describedby="invoice-total"
+                                onChange={(e) => handleInputChange(e)}
                             />
                         </InputGroup>   
                     </Row>
@@ -310,13 +344,14 @@ const AddInventoryInvoice = () => {
                         </Button> */}
                         <SplitButton
                             id="add-invoice-item"
+                            disabled={submittingInv}
                             style={{width: '100%', fontWeight: 'bold'}}
                             variant="warning"
                             title={addItemLoading? loadingSpinner: 'Add Invoice Item'}
                             onClick={()=>checkInvDetails('add-new-item','xl')}
                         >
-                            <Dropdown.Item eventKey="1" onClick={submitInvoice}>Submit Invoice</Dropdown.Item>
-                            <Dropdown.Item eventKey="2">Clear Invoice</Dropdown.Item>
+                            <Dropdown.Item disabled={submittingInv} eventKey="1" onClick={submitInvoice}>Submit Invoice</Dropdown.Item>
+                            <Dropdown.Item disabled={submittingInv} eventKey="2">Clear Invoice</Dropdown.Item>
                         </SplitButton>
                     </Row>
                 </Col>
@@ -341,7 +376,7 @@ const AddInventoryInvoice = () => {
                             return(
                                 <Row key={index}>
                                     <Col>
-                                        <div className="invoice-item-container"style={{display: 'flex'}}>
+                                        <div className="invoice-item-container" style={{display: 'flex'}}>
                                             <div style={{display:"inline-block", width: '30%', padding: '2px 2px 2px 5px'}}>{item.name_english}</div>
                                             <div style={{display:"inline-block", width: '30%', padding: '2px 2px 2px 5px'}}>{item.name_chinese}</div>
                                             <div style={{display:"inline-block", width: '10%', padding: '2px 2px 2px 5px', textAlign: "center"}}>{item.invoice_quantity}</div>
