@@ -153,7 +153,7 @@ function InventoryList (props){
                     </>
                 )
             default:
-                return(null)
+                return null
         }
     }
 
@@ -167,7 +167,7 @@ function InventoryList (props){
             >
                 <thead style={listingStyle.thead}>
                     <tr style={listingStyle.tr}>
-                        <td style={{...listingStyle.col_1_width,...listingStyle.tdth}}></td>
+                        <td style={{...listingStyle.col_1_width, ...listingStyle.tdth}}/>
                         <td style={{...listingStyle.col_2_width,...listingStyle.tdth}}>Inventory</td>
                         <td style={{...listingStyle.col_3_width,...listingStyle.tdth}}>Product Name English</td>
                         <td style={{...listingStyle.col_4_width,...listingStyle.tdth}}>Product Name Chinese</td>
