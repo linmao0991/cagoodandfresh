@@ -234,9 +234,7 @@ class OrderForm extends Component{
                     </>
                 )
             default:
-                return(
-                null
-                )
+                return null
         }
 
     }
