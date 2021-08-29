@@ -1,7 +1,7 @@
 module.exports = function ( sequelize, DataTypes){
-    var cash = sequelize.define("cash", {
-        //Account is referenced to corresponding ledgar entry. IE accounts_receivable, accounts_payable, expenses
-        account: {
+    return sequelize.define("cash", {
+        //Account is referenced to corresponding ledger entry. IE accounts_receivable, accounts_payable, expenses
+        account_number: {
             type: DataTypes.STRING,
             allowNull: false
         },
@@ -35,14 +35,14 @@ module.exports = function ( sequelize, DataTypes){
             type: DataTypes.STRING(500),
             allowNull: true
         },
-        //References are invice numbers of accounts_receivable_invoices, accounts_payable_invoies, utility account numbers
+        //References are invoice numbers of accounts_receivable_invoices, accounts_payable_invoices, utility account numbers
         //--Reference will be used to find the invoices cash is paid or received from
-        reference: {
+        ar_invoice_number: {
             type: DataTypes.STRING,
             allowNull: false
         },
         // Foreign Key to associate with 
-        reference_id: {
+        ar_invoice_id: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -53,5 +53,4 @@ module.exports = function ( sequelize, DataTypes){
     },{
         freezeTableName: true
     });
-    return cash;
 };
