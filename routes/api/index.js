@@ -20,7 +20,7 @@ checkPermission = (user, permission_req) =>{
 
 recordCashLedger = data => {
   return new Promise((resolve, reject) => {
-    console.log("[Record Cash Tranaction]")
+    console.log("[Record Cash Transaction]")
     let { 
       accountTable,
       accountTableId,
@@ -32,10 +32,10 @@ recordCashLedger = data => {
       note = null,
       referenceNumber,
       referenceId,
-      exmmployee_id
+      employee_id
     } = data
     db.cash.create({
-      account: accountTable,
+      account_number: accountTable,
       account_id: accountTableId,
       credit: credit,
       debit: debit,
@@ -43,11 +43,11 @@ recordCashLedger = data => {
       cash: cash,
       check_number: checkNumber,
       note: note,
-      employee_id: exmmployee_id,
-      reference: referenceNumber,
-      reference_id: referenceId 
+      employee_id: employee_id,
+      ar_invoice_number: referenceNumber,
+      ar_invoice_id: referenceId
     }).then( dbCash => {
-      console.log("[Cash Tranaction Recorded]")
+      console.log("[Cash Transaction Recorded]")
       console.log(dbCash)
       resolve(dbCash)
     }).catch(err => {
@@ -56,7 +56,7 @@ recordCashLedger = data => {
   })
 }
 
-recordAccountsReceiveable = (data) => {
+recordAccountsReceivable = (data) => {
   return new Promise((resolve, reject) => {
     console.log("[Record AR]")
     let {
@@ -65,7 +65,8 @@ recordAccountsReceiveable = (data) => {
       note = null,
       invoice_number,
       invoice_id,
-      exmmployee_id
+      employee_id,
+      date
     } = data
 
     db.accounts_receivable.create({
@@ -73,9 +74,10 @@ recordAccountsReceiveable = (data) => {
       debit: debit,
       note: note,
       //Reference to accounts_receivable_invoice
-      reference: invoice_number,
-      reference_id: invoice_id,
-      employee_id: exmmployee_id,
+      ar_invoice_number: invoice_number,
+      ar_invoice_id: invoice_id,
+      employee_id: employee_id,
+      date,
     }).then( result => {
       console.log("[AR Recorded]")
       resolve(result)
@@ -901,7 +903,7 @@ router.post('/submit_order', (req,res)=>{
     const permission_req = 1
 
     //Promise to create transaction record in inventory_transaction table
-    const inventoryTransaction = (invoice, transaction) => {
+    const inventoryTransaction = async (invoice, transaction) => {
       return new Promise((reslove, reject) => {
         db.inventory_transaction.create({
           ar_invoice_id: invoice.id,
@@ -935,10 +937,10 @@ router.post('/submit_order', (req,res)=>{
             invoice_number: invoice.invoice_number
           },
           include:[
-            {model: db.inventory_transaction},
+            { model: db.inventory_transaction },
           ]
-        }).then( dbInvoice => {
-          resolve( dbInvoice)
+        }).then( arInvoice  => {
+          resolve( arInvoice)
         }).catch( err => {
           reject(err)
           //res.status(404).json({ error: err});
@@ -946,7 +948,7 @@ router.post('/submit_order', (req,res)=>{
       })
     }
 
-    const createArInvoice = () => {
+    const createArInvoice = async () => {
       return new Promise((resolve,reject) => {
         console.log("[Create AR Invoice]")
         db.accounts_receivable_invoices.create({
@@ -957,9 +959,9 @@ router.post('/submit_order', (req,res)=>{
           invoice_total: req.body.orderData.cartTotalSale,
           employee_id: req.user.id,
           payment_status: req.body.orderData.paymentStatus
-        }).then( dbInvoice => {
+        }).then( arInvoice => {
           console.log("[AR Invoice Created]")
-          resolve(dbInvoice)
+          resolve(arInvoice)
         }).catch( err => {
           reject(err)
         })
@@ -969,49 +971,54 @@ router.post('/submit_order', (req,res)=>{
   const submitOrder = async () => {
     //Create array of promse function inventoryTransaction() for each transaction
     //Creates new accounts receivable invoice record
-    let dbInvoice = await createArInvoice()
+    let arInvoice = await createArInvoice()
 
-    let dbAccountsReceivable = await recordAccountsReceiveable({
-      debit: dbInvoice.invoice_total,
+    let dbAccountsReceivable = await recordAccountsReceivable({
+      debit: arInvoice.invoice_total,
       note: null,
-      invoice_number: dbInvoice.invoice_number,
-      invoice_id: dbInvoice.id,
-      exmmployee_id: req.user.id
+      invoice_number: arInvoice.invoice_number,
+      invoice_id: arInvoice.id,
+      employee_id: req.user.id,
+      date: req.body.orderData.orderDate,
     })
 
     let transactionData = req.body.orderData.cartData.map(transaction => {
-      return inventoryTransaction(dbInvoice, transaction)
+      return inventoryTransaction(arInvoice, transaction)
     })
     //Promise all using the array transactionData to create each transaction records asynchronously
     await Promise.all(transactionData)
     //Wait for promise function to create a new accounts receivable record
 
-    let dbSalesRevenueRec = await recordSalesRevenue({
-      customer_account_number: dbInvoice.customer_account_number,
-      credit: dbInvoice.invoice_total,
-      note: null,
-      ar_invoice_id: dbInvoice.id,
-      ar_invoice_number: dbInvoice.invoice_number,
-      exmmployee_id: req.user.id
-    })
+    //Record revenue
 
-    if(req.body.orderData.paymentInfo.paymentAmount >= 0){
-      console.log()
-      console.log("Record Payment")
-      await recordCashLedger({
-        accountTable: "accounts_receivable",
-        accountTableId: dbAccountsReceivable.id,
-        debit: +req.body.orderData.paymentInfo.paymentAmount,
-        check: req.body.orderData.paymentInfo.checkNumber? true: false,
-        cash: req.body.orderData.paymentInfo.checkNumber? false: true, 
-        checkNumber: req.body.orderData.paymentInfo.checkNumber? req.body.paymentInfo.checkNumber: null,
-        note: null,
-        referenceNumber: dbInvoice.invoice_number,
-        referenceId: dbInvoice.id,
-        exmmployee_id: req.user.id
-      })
-    }
-    let completedOrder = await getCompletedOrder(dbInvoice)
+    // let dbSalesRevenueRec = await recordSalesRevenue({
+    //   customer_account_number: arInvoice.customer_account_number,
+    //   credit: arInvoice.invoice_total,
+    //   note: null,
+    //   ar_invoice_id: arInvoice.id,
+    //   ar_invoice_number: arInvoice.invoice_number,
+    //   employee_id: req.user.id
+    // })
+
+
+    //Record cash payment ifi its cash.
+
+    // if(req.body.orderData.paymentInfo.paymentAmount >= 0){
+    //   console.log("Record Payment")
+    //   await recordCashLedger({
+    //     accountTable: "accounts_receivable",
+    //     accountTableId: arInvoice.id,
+    //     debit: +req.body.orderData.paymentInfo.paymentAmount,
+    //     check: !!req.body.orderData.paymentInfo.checkNumber,
+    //     cash: !req.body.orderData.paymentInfo.checkNumber,
+    //     checkNumber: req.body.orderData.paymentInfo.checkNumber? req.body.paymentInfo.checkNumber: null,
+    //     note: null,
+    //     referenceNumber: arInvoice.invoice_number,
+    //     referenceId: arInvoice.id,
+    //     employee_id: req.user.id
+    //   })
+    // }
+    let completedOrder = await getCompletedOrder(arInvoice)
 
     res.json(completedOrder)
   }
