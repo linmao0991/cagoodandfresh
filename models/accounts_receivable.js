@@ -1,5 +1,5 @@
 module.exports = function ( sequelize, DataTypes){
-    var accounts_receivable = sequelize.define("accounts_receivable", {
+    return sequelize.define("accounts_receivable", {
         date: {
             type: DataTypes.STRING,
             allowNull: true
@@ -17,11 +17,11 @@ module.exports = function ( sequelize, DataTypes){
             allowNull: true
         },
         //Reference to accounts_receivable_invoice
-        reference: {
+        ar_invoice_number: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        reference_id: {
+        ar_invoice_id: {
             type: DataTypes.INTEGER,
             allowNull: false
         },
@@ -32,5 +32,4 @@ module.exports = function ( sequelize, DataTypes){
     },{
         freezeTableName: true
     });
-    return accounts_receivable;
 };
