@@ -2,7 +2,7 @@ import React, {useContext, useState}from 'react';
 import {Button, Container, Row, Col, DropdownButton, Dropdown, Spinner} from "react-bootstrap";
 import InventoryContext from '../../context/InventoryContext';
 import Api from '../../utils/Api'
-import InventoryList from './subcomponent/InventoryList';
+import InventoryList from './subComponent/InventoryList';
 import InventorySearch from '../inventorySearch/InventorySearch';
 
 function SearchInventory (props){
@@ -54,9 +54,7 @@ function SearchInventory (props){
                     </Spinner>
                 )
             default:
-                return(
-                    null
-                )
+                return null
         }
     }
 
