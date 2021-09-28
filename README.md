@@ -1,3 +1,3 @@
 # cagoodandfresh
 
-Deployment https://cagoodandfresh.herokuapp.com/
+Deploy at https://cagoodandfresh.herokuapp.com/
