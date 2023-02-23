@@ -19,7 +19,7 @@
     "nodemon": "^2.0.4",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "sequelize": "^5.21.12",
+    "sequelize": "^6.28.2",
     "sequelize-cli": "^6.2.0",
     "yelp-fusion": "^3.0.0"
   },
